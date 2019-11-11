@@ -5,8 +5,8 @@ import (
 )
 
 type Cluster struct {
-	SlaveNodes []NodeInfo `json:"slaveNodes"`
-	MasterIp   *string    `json:"masterIp"`
+	SlaveNodes []NodeInfo
+	MasterIp   *string
 }
 
 func (cluster *Cluster) AddSlaveNode(node NodeInfo) {
