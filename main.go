@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"math/rand"
 	"net"
+	"strconv"
 	"time"
 
 	"github.com/labstack/echo"
@@ -51,7 +52,9 @@ func main() {
 		Echo:    echo.New()}
 
 	/* Try to connect to the cluster, and send request to cluster if able to connect */
-	ableToConnect := app.TestConnectToMaster()
+	ableToConnect, newID := app.TestConnectToMaster()
+
+	fmt.Println("NEW ID: " + strconv.Itoa(newID))
 
 	/*
 	 * Listen for other incoming requests form other nodes to join cluster
@@ -60,8 +63,9 @@ func main() {
 	if ableToConnect || (!ableToConnect && *makeMasterOnError) {
 		if *makeMasterOnError {
 			fmt.Println("Will start this node as master.")
+			app.ConfigureMasterRoutes()
 		}
-		app.ConfigureRoutes()
+
 	} else {
 		fmt.Println("Quitting system. Set makeMasterOnError flag to make the node master.", myid)
 	}
