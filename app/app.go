@@ -18,7 +18,7 @@ type Application struct {
 	Echo    *echo.Echo
 }
 
-func (a *Application) ConfigureMasterRoutes() {
+func (a *Application) ConfigureRoutes() {
 	fmt.Println("Configure routes listening on " + a.Me.Port)
 
 	// Middleware
@@ -69,6 +69,7 @@ func (a *Application) TestConnectToMaster(testIP *string) (bool, int) {
 
 		fmt.Println(t.Dest)
 		a.Me = t.Dest
+
 		return true, t.Dest.NodeId
 	}
 	return false, a.Me.NodeId

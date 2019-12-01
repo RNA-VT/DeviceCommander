@@ -66,8 +66,8 @@ func main() {
 		if *makeMasterOnError {
 			app.Cluster.MasterNode = me
 			fmt.Println("Will start this node as master.")
-			app.ConfigureMasterRoutes()
 		}
+		app.ConfigureRoutes()
 
 	} else {
 		fmt.Println("Quitting system. Set makeMasterOnError flag to make the node master.", myid)
