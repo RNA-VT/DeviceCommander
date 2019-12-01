@@ -35,48 +35,41 @@ func (a *Application) ConfigureMasterRoutes() {
 }
 
 func (a *Application) isMaster() bool {
-	if *a.Cluster.MasterIp == a.Me.ToFullAdress() {
+	if a.Cluster.MasterNode == a.Me {
 		return true
 	}
+
 	return false
 }
 
 // TestConnectToMaster check if master exists and get assigned id
-func (a *Application) TestConnectToMaster() (bool, int) {
-	if a.isMaster() {
-		return true, a.Me.NodeId
-	} else {
-		var masterURL string = "http://" + *a.Cluster.MasterIp + "/join_network"
-		parsedURL, err := url.Parse(masterURL)
-		fmt.Println("[test] Test Url: " + parsedURL.String())
-		resp, err := http.Get(parsedURL.String())
+func (a *Application) TestConnectToMaster(testIP *string) (bool, int) {
+	var masterURL string = "http://" + *testIP + "/join_network"
+	parsedURL, err := url.Parse(masterURL)
+	fmt.Println("[test] Test Url: " + parsedURL.String())
+	resp, err := http.Get(parsedURL.String())
 
-		if err != nil {
-			if _, ok := err.(net.Error); ok {
-				fmt.Println("[test] Couldn't connect to cluster.", a.Me.NodeId)
-				fmt.Println(err)
-				return false, a.Me.NodeId
-			}
-		} else {
-			fmt.Println("[test] Connected to cluster. Sending message to node.")
-
-			defer resp.Body.Close()
-			// body, err := ioutil.ReadAll(resp.Body)
-
-			// if err != nil {
-			// 	fmt.Println(err)
-			// }
-			decoder := json.NewDecoder(resp.Body)
-			var t nodecluster.Cluster
-			err = decoder.Decode(&t)
-			if err != nil {
-				panic(err)
-			}
-			fmt.Println(t)
-			// var m Message
-			// json.Unmarshal()
-			return true, 20
+	if err != nil {
+		if _, ok := err.(net.Error); ok {
+			fmt.Println("[test] Couldn't connect to cluster.", a.Me.NodeId)
+			fmt.Println(err)
+			return false, a.Me.NodeId
 		}
+	} else {
+		fmt.Println("[test] Connected to cluster. Sending message to node.")
+
+		defer resp.Body.Close()
+
+		decoder := json.NewDecoder(resp.Body)
+		var t nodecluster.AddToClusterMessage
+		err = decoder.Decode(&t)
+		if err != nil {
+			panic(err)
+		}
+
+		fmt.Println(t.Dest)
+		a.Me = t.Dest
+		return true, t.Dest.NodeId
 	}
 	return false, a.Me.NodeId
 }
@@ -94,15 +87,23 @@ func (a *Application) defaultGet(c echo.Context) error {
 func (a *Application) joinNetwork(c echo.Context) error {
 	fmt.Println("[master] Node asked to join cluster")
 
+	newNodeID := a.Cluster.GenerateUniqueID()
+	newNodeIP := c.RealIP()
+	newNodePort := a.Cluster.GenerateUniquePort(newNodeIP)
+
 	newNode := nodecluster.NodeInfo{
-		NodeId:     a.Cluster.GenerateUniqueID(),
-		NodeIpAddr: "99.99.99.99",
-		Port:       "8002",
+		NodeId:     newNodeID,
+		NodeIpAddr: newNodeIP,
+		Port:       newNodePort,
 	}
 
 	a.Cluster.AddSlaveNode(newNode)
 
-	fmt.Println(newNode)
+	message := nodecluster.AddToClusterMessage{
+		Source:  a.Me,
+		Dest:    newNode,
+		Cluster: a.Cluster,
+	}
 
-	return c.JSON(http.StatusOK, a.Cluster)
+	return c.JSON(http.StatusOK, message)
 }

@@ -33,9 +33,11 @@ func main() {
 
 	/* Generate id for myself */
 	rand.Seed(time.Now().UTC().UnixNano())
-	myid := rand.Intn(99999999)
+	myid := rand.Intn(100)
 
 	myIp, _ := net.InterfaceAddrs()
+	// myIpString := strings.Split(myIp[0].String(), "/")[0]
+
 	me := nodecluster.NodeInfo{
 		NodeId:     myid,
 		NodeIpAddr: myIp[0].String(),
@@ -52,7 +54,7 @@ func main() {
 		Echo:    echo.New()}
 
 	/* Try to connect to the cluster, and send request to cluster if able to connect */
-	ableToConnect, newID := app.TestConnectToMaster()
+	ableToConnect, newID := app.TestConnectToMaster(clusterip)
 
 	fmt.Println("NEW ID: " + strconv.Itoa(newID))
 
@@ -62,6 +64,7 @@ func main() {
 	 */
 	if ableToConnect || (!ableToConnect && *makeMasterOnError) {
 		if *makeMasterOnError {
+			app.Cluster.MasterNode = me
 			fmt.Println("Will start this node as master.")
 			app.ConfigureMasterRoutes()
 		}

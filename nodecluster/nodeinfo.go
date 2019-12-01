@@ -4,7 +4,7 @@ import (
 	"strconv"
 )
 
-/* Information/Metadata about node */
+// NodeInfo Information/Metadata about node
 type NodeInfo struct {
 	NodeId     int
 	NodeIpAddr string
