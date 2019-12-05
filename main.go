@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"math/rand"
 	"net"
-	"strconv"
 	"time"
 
 	"github.com/labstack/echo"
@@ -46,7 +45,6 @@ func main() {
 	var cluster nodecluster.Cluster
 
 	cluster.AddSlaveNode(me)
-	cluster.MasterIp = clusterip
 
 	app := app.Application{
 		Cluster: cluster,
@@ -54,11 +52,14 @@ func main() {
 		Echo:    echo.New()}
 
 	/* Try to connect to the cluster, and send request to cluster if able to connect */
-	ableToConnect, newID := app.TestConnectToMaster(clusterip)
+	ableToConnect := app.TestConnectToMaster(clusterip)
 
-	fmt.Println("NEW ID: " + strconv.Itoa(newID))
+	ableToConnect, assignedInfo := app.JoinNetwork(clusterip)
+	app.Me = assignedInfo
 
-	/*
+	// fmt.Println("NEW ID: " + strconv.Itoa(newID))
+
+	/*f
 	 * Listen for other incoming requests form other nodes to join cluster
 	 * Note: We are not doing anything fancy right now to make this node as master. Not yet!
 	 */

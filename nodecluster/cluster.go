@@ -8,7 +8,6 @@ import (
 
 type Cluster struct {
 	SlaveNodes []NodeInfo
-	MasterIp   *string
 	MasterNode NodeInfo
 }
 
@@ -28,7 +27,7 @@ func (c *Cluster) GenerateUniqueID() int {
 
 // GenerateUniquePort returns a unique id for asigning to a new node
 func (c *Cluster) GenerateUniquePort(targetIP string) string {
-	randPort := 8001
+	randPort := 8002
 	nodesInQuestion := c.GetAllSlavesByIP(targetIP)
 
 	for i := 0; i < len(nodesInQuestion); i++ {
@@ -66,6 +65,17 @@ func (c *Cluster) GetAllSlavesByIP(targetIP string) []NodeInfo {
 	return nodes
 }
 
+// PrintClusterInfo will cleanly print out info about the cluster
 func (c *Cluster) PrintClusterInfo() {
-	fmt.Println(c)
+	fmt.Println()
+	fmt.Println("====Master====")
+	fmt.Println(c.MasterNode)
+
+	fmt.Println()
+
+	for i := 0; i < len(c.SlaveNodes); i++ {
+		fmt.Println("----Node---")
+		fmt.Println(c.SlaveNodes[i])
+	}
+	fmt.Println()
 }
