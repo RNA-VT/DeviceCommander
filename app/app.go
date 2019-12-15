@@ -67,6 +67,8 @@ func (a *Application) JoinNetwork(testIP *string) (bool, nodecluster.NodeInfo) {
 
 		a.Cluster.PrintClusterInfo()
 
+		_ = a.Cluster.SendMessageToAllNodes("/", t)
+
 		return true, t.Dest
 	}
 	return false, a.Me

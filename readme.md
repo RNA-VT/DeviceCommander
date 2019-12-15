@@ -1,5 +1,10 @@
 go run main.go
 
+## Dependencies
+
+  - sshpass
+    -  `brew install http://git.io/sshpass.rb` (MAC)
+
 ## Run Args
   -clusterip string
     	ip address of any node to connnect (default "127.0.0.1:8001")

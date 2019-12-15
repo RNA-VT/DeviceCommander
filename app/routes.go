@@ -31,6 +31,10 @@ func (a *Application) getClusterInfo(c echo.Context) error {
 }
 
 func (a *Application) defaultGet(c echo.Context) error {
+	fmt.Println()
+	fmt.Println("DefaultGet:")
+	fmt.Println(c)
+	fmt.Println()
 	return c.String(http.StatusOK, "This is a FireController Node")
 }
 

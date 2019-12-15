@@ -1,8 +1,12 @@
 package nodecluster
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"log"
 	"math/rand"
+	"net/http"
 	"strconv"
 )
 
@@ -78,4 +82,32 @@ func (c *Cluster) PrintClusterInfo() {
 		fmt.Println(c.SlaveNodes[i])
 	}
 	fmt.Println()
+}
+
+// SendMessageToAllNodes will take a byte slice and POST it to each node
+func (c *Cluster) SendMessageToAllNodes(urlPath string, message AddToClusterMessage) bool {
+	for i := 0; i < len(c.SlaveNodes); i++ {
+		c.SlaveNodes[i].ToFullAddress()
+
+		bytesRepresentation, err := json.Marshal(c)
+		if err != nil {
+			log.Fatalln(err)
+		}
+
+		currURL := c.SlaveNodes[i].ToFullAddress() + urlPath
+
+		resp, err := http.Post(currURL, "application/json", bytes.NewBuffer(bytesRepresentation))
+		if err != nil {
+			log.Fatalln(err)
+		}
+
+		var result map[string]interface{}
+
+		json.NewDecoder(resp.Body).Decode(&result)
+
+		log.Println(result)
+		log.Println(result["data"])
+
+	}
+	return true
 }

@@ -1,0 +1,10 @@
+version: "3"
+services:
+  gofire:
+    build: .
+    command: ["go", "run", "main.go"]
+    volumes:
+      - .:/go/src/GoFire
+    ports:
+      - "8080:80"
+    restart: unless-stopped

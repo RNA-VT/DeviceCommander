@@ -12,11 +12,12 @@ type NodeInfo struct {
 }
 
 /* Just for pretty printing the node info */
-func (node NodeInfo) String() string {
+func (node *NodeInfo) String() string {
 	return "NodeInfo:{ nodeId:" + strconv.Itoa(node.NodeId) + ", nodeIpAddr:" + node.NodeIpAddr + ", port:" + node.Port + " }"
 }
 
-/* Just for pretty printing the node info */
-func (node NodeInfo) ToFullAdress() string {
+// ToFullAddress returns a network address including the ip address and port that this node is listening on
+func (node *NodeInfo) ToFullAddress() string {
+	/* Just for pretty printing the node info */
 	return node.NodeIpAddr + ":" + node.Port
 }
