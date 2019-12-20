@@ -19,8 +19,8 @@ type Application struct {
 }
 
 // TestConnectToMaster check if master exists and get assigned id
-func (a *Application) TestConnectToMaster(testIP *string) bool {
-	var masterURL string = "http://" + *testIP
+func (a *Application) TestConnectToMaster(testIP string) bool {
+	masterURL := "http://" + testIP
 	parsedURL, err := url.Parse(masterURL)
 	fmt.Println("[test] Test Url: " + parsedURL.String())
 	resp, err := http.Get(parsedURL.String())
@@ -29,7 +29,6 @@ func (a *Application) TestConnectToMaster(testIP *string) bool {
 		if _, ok := err.(net.Error); ok {
 			fmt.Println("[test] Couldn't connect to cluster.", a.Me.NodeId)
 			fmt.Println(err)
-			return false
 		}
 	} else {
 		fmt.Println(resp)
@@ -39,8 +38,8 @@ func (a *Application) TestConnectToMaster(testIP *string) bool {
 }
 
 // JoinNetwork check if master exists and get assigned id and port
-func (a *Application) JoinNetwork(testIP *string) (bool, nodecluster.NodeInfo) {
-	var masterURL string = "http://" + *testIP + "/join_network"
+func (a *Application) JoinNetwork(testIP string) (bool, nodecluster.NodeInfo) {
+	masterURL := "http://" + testIP + "/join_network"
 	parsedURL, err := url.Parse(masterURL)
 	fmt.Println("[test] Test Url: " + parsedURL.String())
 	resp, err := http.Get(parsedURL.String())
@@ -49,7 +48,6 @@ func (a *Application) JoinNetwork(testIP *string) (bool, nodecluster.NodeInfo) {
 		if _, ok := err.(net.Error); ok {
 			fmt.Println("[test] Couldn't connect to cluster.", a.Me.NodeId)
 			fmt.Println(err)
-			return false, a.Me
 		}
 	} else {
 		fmt.Println("[test] Connected to cluster. Sending message to node.")
