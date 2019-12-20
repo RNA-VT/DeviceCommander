@@ -4,40 +4,25 @@ package main
 import (
 	"firecontroller/app"
 	"firecontroller/nodecluster"
-	"flag"
 	"fmt"
 	"math/rand"
 	"net"
-	"os"
 	"time"
 
 	"github.com/labstack/echo"
+	"github.com/spf13/viper"
 )
 
 /* The entry point for our System */
 func main() {
-	/* Parse the provided parameters on command line */
-	// makeMasterOnError := flag.Bool(
-	// 	"makeMasterOnError",
-	// 	false,
-	// 	"make this node master if unable to connect to the cluster ip provided.")
-	clusterip := flag.String(
-		"clusterip",
-		"127.0.0.1:8001",
-		"ip address of any node to connnect")
-	myport := flag.String(
-		"myport",
-		"8001",
-		"ip address to run this node on. default is 8001.")
-	flag.Parse()
+	/* Load Config from Env Vars */
+	configureEnvironment()
+	defaultMaster := viper.GetString("DEFAULT_MASTER")
+	port := viper.GetString("PORT")
+	fullHostname := viper.GetString("HOST") + ":" + port
+	fmt.Println(fullHostname)
 
-	makeMasterOnError, exists := os.LookupEnv("DEFAULT_MASTER")
-
-	if !exists {
-		makeMasterOnError = "FALSE"
-	}
-
-	/* Generate id for myself */
+	// /* Generate id for myself */
 	rand.Seed(time.Now().UTC().UnixNano())
 	myid := rand.Intn(100)
 
@@ -47,7 +32,7 @@ func main() {
 	me := nodecluster.NodeInfo{
 		NodeId:     myid,
 		NodeIpAddr: myIP[0].String(),
-		Port:       *myport}
+		Port:       port}
 
 	var cluster nodecluster.Cluster
 
@@ -59,9 +44,9 @@ func main() {
 		Echo:    echo.New()}
 
 	/* Try to connect to the cluster, and send request to cluster if able to connect */
-	ableToConnect := app.TestConnectToMaster(clusterip)
+	ableToConnect := app.TestConnectToMaster(fullHostname)
 
-	ableToConnect, assignedInfo := app.JoinNetwork(clusterip)
+	ableToConnect, assignedInfo := app.JoinNetwork(fullHostname)
 	app.Me = assignedInfo
 
 	// fmt.Println("NEW ID: " + strconv.Itoa(newID))
@@ -70,8 +55,8 @@ func main() {
 	 * Listen for other incoming requests form other nodes to join cluster
 	 * Note: We are not doing anything fancy right now to make this node as master. Not yet!
 	 */
-	if ableToConnect || (!ableToConnect && makeMasterOnError == "TRUE") {
-		if makeMasterOnError == "TRUE" {
+	if ableToConnect || (!ableToConnect && defaultMaster == "TRUE") {
+		if defaultMaster == "TRUE" {
 			app.Cluster.MasterNode = me
 			fmt.Println("Will start this node as master.")
 		}
@@ -80,4 +65,22 @@ func main() {
 	} else {
 		fmt.Println("Quitting system. Set makeMasterOnError flag to make the node master.", myid)
 	}
+}
+
+func configureEnvironment() {
+	viper.SetConfigName("config")
+	viper.SetConfigType("yaml")
+	viper.AddConfigPath(".")
+
+	err := viper.ReadInConfig()
+	if err != nil {
+		panic(fmt.Errorf("fatal error config file: %s ", err))
+	}
+
+	viper.AutomaticEnv()
+
+	viper.SetDefault("ENV", "local")
+	viper.SetDefault("DEFAULT_MASTER", false)
+	viper.SetDefault("HOST", "127.0.0.1")
+	viper.SetDefault("PORT", 8001)
 }
