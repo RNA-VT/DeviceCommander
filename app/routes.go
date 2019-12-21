@@ -46,8 +46,8 @@ func (a *Application) joinNetwork(c echo.Context) error {
 	newNodePort := a.Cluster.GenerateUniquePort(newNodeIP)
 
 	newNode := nodecluster.NodeInfo{
-		NodeId:     newNodeID,
-		NodeIpAddr: newNodeIP,
+		NodeID:     newNodeID,
+		NodeIPAddr: newNodeIP,
 		Port:       newNodePort,
 	}
 

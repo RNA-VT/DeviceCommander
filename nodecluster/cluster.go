@@ -50,7 +50,7 @@ func (c *Cluster) GetSlaveByID(targetID int) []NodeInfo {
 	var nodes []NodeInfo
 
 	for i := 0; i < len(c.SlaveNodes); i++ {
-		if c.SlaveNodes[i].NodeId == targetID {
+		if c.SlaveNodes[i].NodeID == targetID {
 			return append(nodes, c.SlaveNodes[i])
 		}
 	}
@@ -63,7 +63,7 @@ func (c *Cluster) GetAllSlavesByIP(targetIP string) []NodeInfo {
 	var nodes []NodeInfo
 
 	for i := 0; i < len(c.SlaveNodes); i++ {
-		if c.SlaveNodes[i].NodeIpAddr == targetIP {
+		if c.SlaveNodes[i].NodeIPAddr == targetIP {
 			nodes = append(nodes, c.SlaveNodes[i])
 		}
 	}
