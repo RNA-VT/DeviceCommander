@@ -43,7 +43,6 @@ func (a *Application) joinNetwork(c echo.Context) error {
 
 	newNodeID := a.Cluster.GenerateUniqueID()
 	newNodeIP := c.RealIP()
-	fmt.Println("assignedIP:", newNodeIP)
 	newNodePort := a.Cluster.GenerateUniquePort(newNodeIP)
 
 	newNode := nodecluster.NodeInfo{
