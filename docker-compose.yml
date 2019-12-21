@@ -9,4 +9,4 @@ services:
       - "8080:80"
     restart: unless-stopped
     environment:
-      - DEFAULT_MASTER=TRUE
+      - GOFIRE_MASTER=TRUE
