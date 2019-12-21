@@ -10,16 +10,18 @@ import (
 	"strconv"
 )
 
+//Cluster object definition
 type Cluster struct {
 	SlaveNodes []NodeInfo
 	MasterNode NodeInfo
 }
 
+//AddSlaveNode appends a device controller to the node list
 func (c *Cluster) AddSlaveNode(node NodeInfo) {
 	c.SlaveNodes = append(c.SlaveNodes, node)
 }
 
-// GenerateUniqueID returns a unique id for asigning to a new node
+//GenerateUniqueID returns a unique id for asigning to a new node
 func (c *Cluster) GenerateUniqueID() int {
 	randID := rand.Intn(100)
 	for len(c.GetSlaveByID(randID)) > 0 {

@@ -30,9 +30,10 @@ func main() {
 	// myIpString := strings.Split(myIp[0].String(), "/")[0]
 
 	me := nodecluster.NodeInfo{
-		NodeId:     myid,
-		NodeIpAddr: myIP[0].String(),
-		Port:       port}
+		NodeID:     myid,
+		NodeIPAddr: myIP[0].String(),
+		Port:       port,
+	}
 
 	var cluster nodecluster.Cluster
 
@@ -41,7 +42,8 @@ func main() {
 	app := app.Application{
 		Cluster: cluster,
 		Me:      me,
-		Echo:    echo.New()}
+		Echo:    echo.New(),
+	}
 
 	/* Try to connect to the cluster, and send request to cluster if able to connect */
 	ableToConnect := app.TestConnectToMaster(fullHostname)

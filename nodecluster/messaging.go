@@ -5,7 +5,7 @@ package nodecluster
 // "time"
 // "encoding/json"
 
-/* A standard format for a Request/Response for adding node to cluster */
+/*AddToClusterMessage A standard format for a Request/Response for adding node to cluster */
 type AddToClusterMessage struct {
 	Source  NodeInfo
 	Dest    NodeInfo

@@ -7,14 +7,14 @@ import (
 	"strconv"
 )
 
-/* Information/Metadata about node */
+/*BaseComponent object definition */
 type BaseComponent struct {
 	UID     int
 	Name    string
 	OnState bool
 }
 
-/* Just for pretty printing the node info */
+/*CurrentStateSting just for pretty printing the node info */
 func (c BaseComponent) CurrentStateSting() string {
 	state := "OFF"
 
