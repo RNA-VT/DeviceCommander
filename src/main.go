@@ -17,9 +17,9 @@ import (
 func main() {
 	/* Load Config from Env Vars */
 	configureEnvironment()
-	defaultMaster := viper.GetString("GOFIRE_MASTER")
-	port := viper.GetString("GOFIRE_PORT")
-	fullHostname := viper.GetString("GOFIRE_HOST") + ":" + port
+	gofireMaster := viper.GetBool("GOFIRE_MASTER")
+	goFirePort := viper.GetString("GOFIRE_PORT")
+	fullHostname := viper.GetString("GOFIRE_HOST") + ":" + goFirePort
 	fmt.Println(fullHostname)
 
 	// /* Generate id for myself */
@@ -31,11 +31,12 @@ func main() {
 	me := nodecluster.NodeInfo{
 		NodeID:     myid,
 		NodeIPAddr: myIP[0].String(),
-		Port:       port,
+		Port:       goFirePort,
 	}
 
 	var cluster nodecluster.Cluster
 
+	//Add this device to the slave list
 	cluster.AddSlaveNode(me)
 
 	app := app.Application{
@@ -44,28 +45,36 @@ func main() {
 		Echo:    echo.New(),
 	}
 
-	/* Try to connect to the cluster, and send request to cluster if able to connect */
-	ableToConnect := app.TestConnectToMaster(fullHostname)
-
-	ableToConnect, assignedInfo := app.JoinNetwork(fullHostname)
-	app.Me = assignedInfo
-
-	// fmt.Println("NEW ID: " + strconv.Itoa(newID))
-
-	/*f
-	 * Listen for other incoming requests form other nodes to join cluster
-	 * Note: We are not doing anything fancy right now to make this node as master. Not yet!
-	 */
-	if ableToConnect || (!ableToConnect && defaultMaster == "TRUE") {
-		if defaultMaster == "TRUE" {
-			app.Cluster.MasterNode = me
-			fmt.Println("Will start this node as master.")
-		}
-		app.ConfigureRoutes()
+	//check to see if this instance is also the master
+	if gofireMaster {
+		fmt.Println("Master Mode Enabled!")
+		app.Cluster.MasterNode = me
+		/*
+		 * Listen for other incoming requests form other nodes to join cluster
+		 * Note: We are not doing anything fancy right now to make this node as master. Not yet!
+		 */
 
 	} else {
-		fmt.Println("Quitting system. Set makeMasterOnError flag to make the node master.", myid)
+		fmt.Println("Slave Mode Enabled.")
+		//Try and Connect to the Master
+		_, err := app.TestConnectToMaster(fullHostname)
+		if err != nil {
+			fmt.Println("Failed to Reach Master Node: PANIC")
+			//TODO: Add Retry or failover maybe? panic for now
+			panic(err)
+		}
+		app.Me, err = app.JoinNetwork(fullHostname)
+		if err != nil {
+			fmt.Println("Failed to Join Network: PANIC")
+			panic(err)
+		}
 	}
+
+	fmt.Println("***************************************")
+	fmt.Println("~Rejoice~ GoFire Lives Again! ~Rejoice~")
+	fmt.Println("***************************************")
+
+	app.ConfigureRoutes()
 }
 
 func configureEnvironment() {

@@ -87,20 +87,18 @@ func (c *Cluster) PrintClusterInfo() {
 }
 
 // SendMessageToAllNodes will take a byte slice and POST it to each node
-func (c *Cluster) SendMessageToAllNodes(urlPath string, message AddToClusterMessage) bool {
+func (c *Cluster) SendMessageToAllNodes(urlPath string, message AddToClusterMessage) error {
 	for i := 0; i < len(c.SlaveNodes); i++ {
-		c.SlaveNodes[i].ToFullAddress()
-
 		bytesRepresentation, err := json.Marshal(c)
 		if err != nil {
-			log.Fatalln(err)
+			fmt.Println("Failed to convert cluster to json: ", c)
+			return err
 		}
-
 		currURL := c.SlaveNodes[i].ToFullAddress() + urlPath
 
 		resp, err := http.Post(currURL, "application/json", bytes.NewBuffer(bytesRepresentation))
 		if err != nil {
-			log.Fatalln(err)
+			fmt.Println("WARNING: Failed to POST to Peer: ", c.SlaveNodes[i].String())
 		}
 
 		var result map[string]interface{}
@@ -111,5 +109,5 @@ func (c *Cluster) SendMessageToAllNodes(urlPath string, message AddToClusterMess
 		log.Println(result["data"])
 
 	}
-	return true
+	return nil
 }
