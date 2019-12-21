@@ -1,23 +1,28 @@
-run:
-	docker-compose up
 
-run-old:
-	go run main.go
-
-run-master:
-	go run main.go --makeMasterOnError
-
-help:
-	go run main.go -h
-
+build:
+	cd src && go build
+	
 distribute:
-	./build-scripts/distribute-executables.sh
+	./environment/build-scripts/distribute-executables.sh
 
 fix-permissions:
-	chmod u+x ./build-scripts/install-dependencies.sh
-	chmod u+x ./build-scripts/distribute-executables.sh
+	chmod u+x ./environment/build-scripts/install-dependencies.sh
+	chmod u+x ./environment/build-scripts/distribute-executables.sh
+
+help:
+	cd src && go run main.go -h
 
 install:
-	./build-scripts/install-dependencies.sh
+	./environment/build-scripts/install-dependencies.sh
+
+run-docker:
+	cd environment && docker-compose up
+
+run-master:
+	cd src && GOFIRE_MASTER=true go run main.go
+
+run-slave:
+	cd src && go run main.go
+
 
 
