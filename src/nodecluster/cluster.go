@@ -87,27 +87,36 @@ func (c *Cluster) PrintClusterInfo() {
 }
 
 // SendMessageToAllNodes will take a byte slice and POST it to each node
-func (c *Cluster) SendMessageToAllNodes(urlPath string, message AddToClusterMessage) error {
+func (c *Cluster) SendMessageToAllNodes(urlPath string, message AddToClusterMessage, excludeNodes []NodeInfo) error {
 	for i := 0; i < len(c.SlaveNodes); i++ {
-		bytesRepresentation, err := json.Marshal(c)
-		if err != nil {
-			fmt.Println("Failed to convert cluster to json: ", c)
-			return err
+		if !isExcluded(c.SlaveNodes[i], excludeNodes) {
+			bytesRepresentation, err := json.Marshal(c)
+			if err != nil {
+				fmt.Println("Failed to convert cluster to json: ", c)
+				return err
+			}
+			currURL := c.SlaveNodes[i].ToFullAddress() + urlPath
+
+			resp, err := http.Post(currURL, "application/json", bytes.NewBuffer(bytesRepresentation))
+			if err != nil {
+				fmt.Println("WARNING: Failed to POST to Peer: ", c.SlaveNodes[i].String(), currURL)
+			} else {
+				var result map[string]interface{}
+				decoder := json.NewDecoder(resp.Body)
+				decoder.Decode(&result)
+				log.Println(result)
+				log.Println(result["data"])
+			}
 		}
-		currURL := c.SlaveNodes[i].ToFullAddress() + urlPath
-
-		resp, err := http.Post(currURL, "application/json", bytes.NewBuffer(bytesRepresentation))
-		if err != nil {
-			fmt.Println("WARNING: Failed to POST to Peer: ", c.SlaveNodes[i].String())
-		}
-
-		var result map[string]interface{}
-
-		json.NewDecoder(resp.Body).Decode(&result)
-
-		log.Println(result)
-		log.Println(result["data"])
-
 	}
 	return nil
+}
+
+func isExcluded(node NodeInfo, exclusions []NodeInfo) bool {
+	for i := 0; i < len(exclusions); i++ {
+		if node.String() == exclusions[i].String() {
+			return true
+		}
+	}
+	return false
 }

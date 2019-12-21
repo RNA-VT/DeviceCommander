@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"math/rand"
 	"net"
+	"strings"
 	"time"
 
 	"github.com/labstack/echo"
@@ -30,7 +31,7 @@ func main() {
 
 	me := nodecluster.NodeInfo{
 		NodeID:     myid,
-		NodeIPAddr: myIP[0].String(),
+		NodeIPAddr: strings.Split(myIP[0].String(), "/")[0],
 		Port:       goFirePort,
 	}
 
