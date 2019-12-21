@@ -1,4 +1,4 @@
-go run main.go
+## GoFire 
 
 ## Dependencies
 
@@ -12,3 +12,21 @@ go run main.go
 
 ## Example Start
   `GOFIRE_HOST=127.0.0.1 GOFIRE_PORT=8001 GOFIRE_MASTER=false ENV=local go run main.go`
+
+## Make Commands
+
+  build: build Go source
+  
+  distribute: manually build and deploy GoFire to the ips in config.sh
+
+  fix-permissions: permission install scrips
+
+  help: show GoFire help
+
+  install: install GoFire deps
+
+  run-docker: run GoFire locally in a docker container
+
+  run-master: run GoFire in Master mode
+
+  run-slave: run GoFire in Slave mode
