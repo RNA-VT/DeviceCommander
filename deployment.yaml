@@ -27,7 +27,7 @@ spec:
           args: ["run", "main.go"]
           restartPolicy: OnFailure
           env:
-            - name: DEFAULT_MASTER
+            - name: GOFIRE_MASTER
               value: "TRUE"
           ports:
             - containerPort: 8001

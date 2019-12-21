@@ -27,7 +27,7 @@ func (a *Application) TestConnectToMaster(testIP string) bool {
 
 	if err != nil {
 		if _, ok := err.(net.Error); ok {
-			fmt.Println("[test] Couldn't connect to cluster.", a.Me.NodeId)
+			fmt.Println("[test] Couldn't connect to cluster.", a.Me.NodeID)
 			fmt.Println(err)
 		}
 	} else {
@@ -46,7 +46,7 @@ func (a *Application) JoinNetwork(testIP string) (bool, nodecluster.NodeInfo) {
 
 	if err != nil {
 		if _, ok := err.(net.Error); ok {
-			fmt.Println("[test] Couldn't connect to cluster.", a.Me.NodeId)
+			fmt.Println("[test] Couldn't connect to cluster.", a.Me.NodeID)
 			fmt.Println(err)
 		}
 	} else {

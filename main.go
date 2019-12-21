@@ -17,9 +17,9 @@ import (
 func main() {
 	/* Load Config from Env Vars */
 	configureEnvironment()
-	defaultMaster := viper.GetString("DEFAULT_MASTER")
-	port := viper.GetString("PORT")
-	fullHostname := viper.GetString("HOST") + ":" + port
+	defaultMaster := viper.GetString("GOFIRE_MASTER")
+	port := viper.GetString("GOFIRE_PORT")
+	fullHostname := viper.GetString("GOFIRE_HOST") + ":" + port
 	fmt.Println(fullHostname)
 
 	// /* Generate id for myself */
@@ -27,12 +27,12 @@ func main() {
 	myid := rand.Intn(100)
 
 	myIP, _ := net.InterfaceAddrs()
-	// myIpString := strings.Split(myIp[0].String(), "/")[0]
 
 	me := nodecluster.NodeInfo{
-		NodeId:     myid,
-		NodeIpAddr: myIP[0].String(),
-		Port:       port}
+		NodeID:     myid,
+		NodeIPAddr: myIP[0].String(),
+		Port:       port,
+	}
 
 	var cluster nodecluster.Cluster
 
@@ -41,7 +41,8 @@ func main() {
 	app := app.Application{
 		Cluster: cluster,
 		Me:      me,
-		Echo:    echo.New()}
+		Echo:    echo.New(),
+	}
 
 	/* Try to connect to the cluster, and send request to cluster if able to connect */
 	ableToConnect := app.TestConnectToMaster(fullHostname)
@@ -80,7 +81,7 @@ func configureEnvironment() {
 	viper.AutomaticEnv()
 
 	viper.SetDefault("ENV", "local")
-	viper.SetDefault("DEFAULT_MASTER", false)
-	viper.SetDefault("HOST", "127.0.0.1")
-	viper.SetDefault("PORT", 8001)
+	viper.SetDefault("GOFIRE_MASTER", false)
+	viper.SetDefault("GOFIRE_HOST", "127.0.0.1")
+	viper.SetDefault("GOFIRE_PORT", 8001)
 }

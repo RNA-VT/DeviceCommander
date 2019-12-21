@@ -6,9 +6,9 @@ go run main.go
     -  `brew install http://git.io/sshpass.rb` (MAC)
 
 ## Environment Variables
-  HOST Master node hostname or ip (Default: 127.0.0.1)
-  PORT Master node service port (Default: 8001)
-  DEFAULT_MASTER Set to true to let this node take on the master role if a master cannot be reached (Default: false)
+  GOFIRE_HOST Master node hostname or ip (Default: 127.0.0.1)
+  GOFIRE_PORT Master node service port (Default: 8001)
+  GOFIRE_MASTER Set to true to let this node take on the master role if a master cannot be reached (Default: false)
 
 ## Example Start
-  `HOST=127.0.0.1 PORT=8001 DEFAULT_MASTER=false ENV=local go run main.php`
+  `GOFIRE_HOST=127.0.0.1 GOFIRE_PORT=8001 GOFIRE_MASTER=false ENV=local go run main.go`
