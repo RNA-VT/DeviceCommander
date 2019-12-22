@@ -7,7 +7,6 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
-	"strconv"
 )
 
 //Cluster object definition
@@ -29,20 +28,6 @@ func (c *Cluster) GenerateUniqueID() int {
 		fmt.Println(len(c.GetSlaveByID(randID)))
 	}
 	return randID
-}
-
-// GenerateUniquePort returns a unique id for asigning to a new node
-func (c *Cluster) GenerateUniquePort(targetIP string) string {
-	randPort := 8002
-	nodesInQuestion := c.GetAllSlavesByIP(targetIP)
-
-	for i := 0; i < len(nodesInQuestion); i++ {
-		if nodesInQuestion[i].Port == strconv.Itoa(randPort) {
-			randPort++
-		}
-	}
-
-	return strconv.Itoa(randPort)
 }
 
 // GetSlaveByID find a slave node by its ID
@@ -95,11 +80,12 @@ func (c *Cluster) SendMessageToAllNodes(urlPath string, message AddToClusterMess
 				fmt.Println("Failed to convert cluster to json: ", c)
 				return err
 			}
-			currURL := c.SlaveNodes[i].ToFullAddress() + urlPath
+			currURL := "http://" + c.SlaveNodes[i].ToFullAddress() + urlPath
 
 			resp, err := http.Post(currURL, "application/json", bytes.NewBuffer(bytesRepresentation))
 			if err != nil {
 				fmt.Println("WARNING: Failed to POST to Peer: ", c.SlaveNodes[i].String(), currURL)
+				fmt.Println(err)
 			} else {
 				var result map[string]interface{}
 				decoder := json.NewDecoder(resp.Body)

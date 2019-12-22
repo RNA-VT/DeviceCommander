@@ -1,6 +1,7 @@
 package app
 
 import (
+	"bytes"
 	"encoding/json"
 	"firecontroller/nodecluster"
 	"fmt"
@@ -18,25 +19,34 @@ type Application struct {
 }
 
 // TestConnectToMaster check if master exists and get assigned id
-func (a *Application) TestConnectToMaster(URL string) (resp *http.Response, err error) {
+func (a *Application) TestConnectToMaster(URL string) error {
 	parsedURL, err := url.Parse("http://" + URL)
 	if err != nil {
 		fmt.Println("Failed to Parse URL")
-		return nil, err
+		return err
 	}
-	return http.Get(parsedURL.String())
+	_, err = http.Get(parsedURL.String())
+	return err
 }
 
 // JoinNetwork check if master exists and get assigned id and port
-func (a *Application) JoinNetwork(URL string) (nodecluster.NodeInfo, error) {
+func (a *Application) JoinNetwork(URL string, node nodecluster.NodeInfo) error {
 	parsedURL, err := url.Parse("http://" + URL + "/join_network")
 	fmt.Println("[test] Test Url: " + parsedURL.String())
-	resp, err := http.Get(parsedURL.String())
+	msg := nodecluster.JoinNetworkMessage{
+		Node: a.Me,
+	}
+	body, err := json.Marshal(msg)
+	if err != nil {
+		fmt.Println("Failed to create json message body")
+		return err
+	}
+	resp, err := http.Post(parsedURL.String(), "application/json", bytes.NewBuffer(body))
 
 	if err != nil {
 		fmt.Println("[test] Couldn't connect to master.", a.Me.NodeID)
 		fmt.Println(err)
-		return nodecluster.NodeInfo{}, err
+		return err
 	}
 	fmt.Println("Connected to master. Sending message to node.")
 
@@ -48,18 +58,21 @@ func (a *Application) JoinNetwork(URL string) (nodecluster.NodeInfo, error) {
 	if err != nil {
 		fmt.Println("Failed to decode response from Master Node")
 		fmt.Println(err)
-		return nodecluster.NodeInfo{}, err
+		return err
 	}
 	//Update self with data from the master
-	a.Me = t.Dest
+	a.Me.NodeID = t.Dest.NodeID
+
 	a.Cluster = t.Cluster
 	a.Cluster.PrintClusterInfo()
+
 	var exclusions []nodecluster.NodeInfo
 	exclusions = append(exclusions, t.Dest)
 	err = a.Cluster.SendMessageToAllNodes("/", t, exclusions)
 	if err != nil {
 		fmt.Println("Unexpected Error during attempt to contact all peers: ", err)
-		return nodecluster.NodeInfo{}, err
+		return err
 	}
-	return t.Dest, nil
+
+	return nil
 }

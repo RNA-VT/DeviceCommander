@@ -18,11 +18,22 @@ import (
 func main() {
 	/* Load Config from Env Vars */
 	configureEnvironment()
-	gofireMaster := viper.GetBool("GOFIRE_MASTER")
-	goFirePort := viper.GetString("GOFIRE_PORT")
-	fullHostname := viper.GetString("GOFIRE_HOST") + ":" + goFirePort
-	fmt.Println(fullHostname)
 
+	gofireMaster := viper.GetBool("GOFIRE_MASTER")
+
+	//Pick Listening Port
+	port := "8001"
+	host := "node1.mindshark.io"
+	if viper.GetBool("GOFIRE_MASTER") {
+		host = viper.GetString("GOFIRE_MASTER_HOST")
+		port = viper.GetString("GOFIRE_MASTER_PORT")
+	} else {
+		host = viper.GetString("GOFIRE_HOST")
+		port = viper.GetString("GOFIRE_PORT")
+	}
+
+	fullHostname := host + ":" + port
+	masterHostname := viper.GetString("GOFIRE_MASTER_HOST") + ":" + viper.GetString("GOFIRE_MASTER_PORT")
 	// /* Generate id for myself */
 	rand.Seed(time.Now().UTC().UnixNano())
 	myid := rand.Intn(100)
@@ -32,7 +43,7 @@ func main() {
 	me := nodecluster.NodeInfo{
 		NodeID:     myid,
 		NodeIPAddr: strings.Split(myIP[0].String(), "/")[0],
-		Port:       goFirePort,
+		Port:       port,
 	}
 
 	var cluster nodecluster.Cluster
@@ -50,6 +61,7 @@ func main() {
 	if gofireMaster {
 		fmt.Println("Master Mode Enabled!")
 		app.Cluster.MasterNode = me
+		app.Cluster.MasterNode.Port = port
 		/*
 		 * Listen for other incoming requests form other nodes to join cluster
 		 * Note: We are not doing anything fancy right now to make this node as master. Not yet!
@@ -58,24 +70,20 @@ func main() {
 	} else {
 		fmt.Println("Slave Mode Enabled.")
 		//Try and Connect to the Master
-		_, err := app.TestConnectToMaster(fullHostname)
+		err := app.TestConnectToMaster(masterHostname)
 		if err != nil {
 			fmt.Println("Failed to Reach Master Node: PANIC")
 			//TODO: Add Retry or failover maybe? panic for now
 			panic(err)
 		}
-		app.Me, err = app.JoinNetwork(fullHostname)
+		err = app.JoinNetwork(masterHostname, me)
 		if err != nil {
 			fmt.Println("Failed to Join Network: PANIC")
 			panic(err)
 		}
 	}
 
-	fmt.Println("***************************************")
-	fmt.Println("~Rejoice~ GoFire Lives Again! ~Rejoice~")
-	fmt.Println("***************************************")
-
-	app.ConfigureRoutes()
+	app.ConfigureRoutes(fullHostname)
 }
 
 func configureEnvironment() {
@@ -94,4 +102,6 @@ func configureEnvironment() {
 	viper.SetDefault("GOFIRE_MASTER", false)
 	viper.SetDefault("GOFIRE_HOST", "127.0.0.1")
 	viper.SetDefault("GOFIRE_PORT", 8001)
+	viper.SetDefault("GOFIRE_MASTER_PORT", 8000)
+	viper.SetDefault("GOFIRE_MASTER_HOST", "127.0.0.1")
 }
