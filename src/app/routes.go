@@ -1,8 +1,9 @@
 package app
 
 import (
+	"encoding/json"
 	"firecontroller/nodecluster"
-	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/labstack/echo"
@@ -10,8 +11,7 @@ import (
 )
 
 // ConfigureRoutes will use Echo to start listening on the appropriate paths
-func (a *Application) ConfigureRoutes() {
-	fmt.Println("Configure routes listening on " + a.Me.Port)
+func (a *Application) ConfigureRoutes(listenURL string) {
 
 	// Middleware
 	a.Echo.Use(middleware.Logger())
@@ -19,11 +19,19 @@ func (a *Application) ConfigureRoutes() {
 
 	// Routes
 	a.Echo.GET("/", a.defaultGet)
+	a.Echo.POST("/", a.peerUpdate)
 	a.Echo.GET("/cluster_info", a.getClusterInfo)
-	a.Echo.GET("/join_network", a.joinNetwork)
+	a.Echo.POST("/join_network", a.joinNetwork)
+
+	log.Println("Configure routes listening on " + listenURL)
+
+	log.Println("***************************************")
+	log.Println("~Rejoice~ GoFire Lives Again! ~Rejoice~")
+	log.Println("***************************************")
 
 	// Start server
-	a.Echo.Logger.Fatal(a.Echo.Start(":" + a.Me.Port))
+	a.Echo.Logger.Fatal(a.Echo.Start(listenURL))
+
 }
 
 func (a *Application) getClusterInfo(c echo.Context) error {
@@ -31,34 +39,54 @@ func (a *Application) getClusterInfo(c echo.Context) error {
 }
 
 func (a *Application) defaultGet(c echo.Context) error {
-	fmt.Println()
-	fmt.Println("DefaultGet:")
-	fmt.Println(c)
-	fmt.Println()
+	log.Println("Someone is touching me")
+
 	return c.String(http.StatusOK, "This is a FireController Node")
 }
 
 func (a *Application) joinNetwork(c echo.Context) error {
-	fmt.Println("[master] Node asked to join cluster")
+	log.Println("[master] Node asked to join cluster")
 
-	newNodeID := a.Cluster.GenerateUniqueID()
-	newNodeIP := c.RealIP()
-	newNodePort := a.Cluster.GenerateUniquePort(newNodeIP)
-
-	newNode := nodecluster.NodeInfo{
-		NodeID:     newNodeID,
-		NodeIPAddr: newNodeIP,
-		Port:       newNodePort,
+	body := c.Request().Body
+	decoder := json.NewDecoder(body)
+	var msg nodecluster.JoinNetworkMessage
+	err := decoder.Decode(&msg)
+	if err != nil {
+		log.Println("Error decoding Request Body", err)
 	}
+	requestingNode := msg.Node
+	requestingNode.NodeID = a.Cluster.GenerateUniqueID()
 
-	a.Cluster.AddSlaveNode(newNode)
+	a.Cluster.AddSlaveNode(requestingNode)
+
 	a.Cluster.PrintClusterInfo()
 
 	message := nodecluster.AddToClusterMessage{
 		Source:  a.Me,
-		Dest:    newNode,
+		Dest:    requestingNode,
 		Cluster: a.Cluster,
 	}
 
 	return c.JSON(http.StatusOK, message)
+}
+
+//PeerUpdate receives new cluster info from the most recently registered peer
+func (a *Application) peerUpdate(c echo.Context) error {
+	log.Println("Receiving Update from New Peer")
+	body := c.Request().Body
+
+	var clustah nodecluster.Cluster
+	err := json.NewDecoder(body).Decode(&clustah)
+	if err != nil {
+		log.Println("Failed to decode Cluster info from new peer")
+		//TODO: Add Cluster Info Request to repair Cluster info
+		return err
+	}
+	//TODO: Verify my presence in SlaveList
+	//TODO: Verify my Master state
+	//TODO: Inform Master of Bad Config
+
+	//Update my cluster
+	a.Cluster = clustah
+	return c.JSON(http.StatusOK, "Peer Update Successfully Received!")
 }

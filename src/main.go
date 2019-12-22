@@ -5,8 +5,10 @@ import (
 	"firecontroller/app"
 	"firecontroller/nodecluster"
 	"fmt"
+	"log"
 	"math/rand"
 	"net"
+	"strings"
 	"time"
 
 	"github.com/labstack/echo"
@@ -17,11 +19,22 @@ import (
 func main() {
 	/* Load Config from Env Vars */
 	configureEnvironment()
-	defaultMaster := viper.GetString("GOFIRE_MASTER")
-	port := viper.GetString("GOFIRE_PORT")
-	fullHostname := viper.GetString("GOFIRE_HOST") + ":" + port
-	fmt.Println(fullHostname)
 
+	gofireMaster := viper.GetBool("GOFIRE_MASTER")
+
+	//Pick Listening Port
+	port := "8001"
+	host := "node1.mindshark.io"
+	if viper.GetBool("GOFIRE_MASTER") {
+		host = viper.GetString("GOFIRE_MASTER_HOST")
+		port = viper.GetString("GOFIRE_MASTER_PORT")
+	} else {
+		host = viper.GetString("GOFIRE_HOST")
+		port = viper.GetString("GOFIRE_PORT")
+	}
+
+	fullHostname := host + ":" + port
+	masterHostname := viper.GetString("GOFIRE_MASTER_HOST") + ":" + viper.GetString("GOFIRE_MASTER_PORT")
 	// /* Generate id for myself */
 	rand.Seed(time.Now().UTC().UnixNano())
 	myid := rand.Intn(100)
@@ -30,12 +43,13 @@ func main() {
 
 	me := nodecluster.NodeInfo{
 		NodeID:     myid,
-		NodeIPAddr: myIP[0].String(),
+		NodeIPAddr: strings.Split(myIP[0].String(), "/")[0],
 		Port:       port,
 	}
 
 	var cluster nodecluster.Cluster
 
+	//Add this device to the slave list
 	cluster.AddSlaveNode(me)
 
 	app := app.Application{
@@ -44,28 +58,33 @@ func main() {
 		Echo:    echo.New(),
 	}
 
-	/* Try to connect to the cluster, and send request to cluster if able to connect */
-	ableToConnect := app.TestConnectToMaster(fullHostname)
-
-	ableToConnect, assignedInfo := app.JoinNetwork(fullHostname)
-	app.Me = assignedInfo
-
-	// fmt.Println("NEW ID: " + strconv.Itoa(newID))
-
-	/*f
-	 * Listen for other incoming requests form other nodes to join cluster
-	 * Note: We are not doing anything fancy right now to make this node as master. Not yet!
-	 */
-	if ableToConnect || (!ableToConnect && defaultMaster == "TRUE") {
-		if defaultMaster == "TRUE" {
-			app.Cluster.MasterNode = me
-			fmt.Println("Will start this node as master.")
-		}
-		app.ConfigureRoutes()
+	//check to see if this instance is also the master
+	if gofireMaster {
+		log.Println("Master Mode Enabled!")
+		app.Cluster.MasterNode = me
+		app.Cluster.MasterNode.Port = port
+		/*
+		 * Listen for other incoming requests form other nodes to join cluster
+		 * Note: We are not doing anything fancy right now to make this node as master. Not yet!
+		 */
 
 	} else {
-		fmt.Println("Quitting system. Set makeMasterOnError flag to make the node master.", myid)
+		log.Println("Slave Mode Enabled.")
+		//Try and Connect to the Master
+		err := app.TestConnectToMaster(masterHostname)
+		if err != nil {
+			log.Println("Failed to Reach Master Node: PANIC")
+			//TODO: Add Retry or failover maybe? panic for now
+			panic(err)
+		}
+		err = app.JoinNetwork(masterHostname, me)
+		if err != nil {
+			log.Println("Failed to Join Network: PANIC")
+			panic(err)
+		}
 	}
+
+	app.ConfigureRoutes(fullHostname)
 }
 
 func configureEnvironment() {
@@ -84,4 +103,6 @@ func configureEnvironment() {
 	viper.SetDefault("GOFIRE_MASTER", false)
 	viper.SetDefault("GOFIRE_HOST", "127.0.0.1")
 	viper.SetDefault("GOFIRE_PORT", 8001)
+	viper.SetDefault("GOFIRE_MASTER_PORT", 8000)
+	viper.SetDefault("GOFIRE_MASTER_HOST", "127.0.0.1")
 }

@@ -11,3 +11,8 @@ type AddToClusterMessage struct {
 	Dest    NodeInfo
 	Cluster Cluster
 }
+
+//JoinNetworkMessage is the registration request
+type JoinNetworkMessage struct {
+	Node NodeInfo
+}
