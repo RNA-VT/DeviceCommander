@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"firecontroller/nodecluster"
-	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 
@@ -22,7 +22,7 @@ type Application struct {
 func (a *Application) TestConnectToMaster(URL string) error {
 	parsedURL, err := url.Parse("http://" + URL)
 	if err != nil {
-		fmt.Println("Failed to Parse URL")
+		log.Println("Failed to Parse URL")
 		return err
 	}
 	_, err = http.Get(parsedURL.String())
@@ -32,23 +32,23 @@ func (a *Application) TestConnectToMaster(URL string) error {
 // JoinNetwork check if master exists and get assigned id and port
 func (a *Application) JoinNetwork(URL string, node nodecluster.NodeInfo) error {
 	parsedURL, err := url.Parse("http://" + URL + "/join_network")
-	fmt.Println("[test] Test Url: " + parsedURL.String())
+	log.Println("[test] Test Url: " + parsedURL.String())
 	msg := nodecluster.JoinNetworkMessage{
 		Node: a.Me,
 	}
 	body, err := json.Marshal(msg)
 	if err != nil {
-		fmt.Println("Failed to create json message body")
+		log.Println("Failed to create json message body")
 		return err
 	}
 	resp, err := http.Post(parsedURL.String(), "application/json", bytes.NewBuffer(body))
 
 	if err != nil {
-		fmt.Println("[test] Couldn't connect to master.", a.Me.NodeID)
-		fmt.Println(err)
+		log.Println("[test] Couldn't connect to master.", a.Me.NodeID)
+		log.Println(err)
 		return err
 	}
-	fmt.Println("Connected to master. Sending message to node.")
+	log.Println("Connected to master. Sending message to node.")
 
 	defer resp.Body.Close()
 
@@ -56,8 +56,8 @@ func (a *Application) JoinNetwork(URL string, node nodecluster.NodeInfo) error {
 	var t nodecluster.AddToClusterMessage
 	err = decoder.Decode(&t)
 	if err != nil {
-		fmt.Println("Failed to decode response from Master Node")
-		fmt.Println(err)
+		log.Println("Failed to decode response from Master Node")
+		log.Println(err)
 		return err
 	}
 	//Update self with data from the master
@@ -70,7 +70,7 @@ func (a *Application) JoinNetwork(URL string, node nodecluster.NodeInfo) error {
 	exclusions = append(exclusions, t.Dest)
 	err = a.Cluster.SendMessageToAllNodes("/", t, exclusions)
 	if err != nil {
-		fmt.Println("Unexpected Error during attempt to contact all peers: ", err)
+		log.Println("Unexpected Error during attempt to contact all peers: ", err)
 		return err
 	}
 

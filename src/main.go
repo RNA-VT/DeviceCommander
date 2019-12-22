@@ -5,6 +5,7 @@ import (
 	"firecontroller/app"
 	"firecontroller/nodecluster"
 	"fmt"
+	"log"
 	"math/rand"
 	"net"
 	"strings"
@@ -59,7 +60,7 @@ func main() {
 
 	//check to see if this instance is also the master
 	if gofireMaster {
-		fmt.Println("Master Mode Enabled!")
+		log.Println("Master Mode Enabled!")
 		app.Cluster.MasterNode = me
 		app.Cluster.MasterNode.Port = port
 		/*
@@ -68,17 +69,17 @@ func main() {
 		 */
 
 	} else {
-		fmt.Println("Slave Mode Enabled.")
+		log.Println("Slave Mode Enabled.")
 		//Try and Connect to the Master
 		err := app.TestConnectToMaster(masterHostname)
 		if err != nil {
-			fmt.Println("Failed to Reach Master Node: PANIC")
+			log.Println("Failed to Reach Master Node: PANIC")
 			//TODO: Add Retry or failover maybe? panic for now
 			panic(err)
 		}
 		err = app.JoinNetwork(masterHostname, me)
 		if err != nil {
-			fmt.Println("Failed to Join Network: PANIC")
+			log.Println("Failed to Join Network: PANIC")
 			panic(err)
 		}
 	}

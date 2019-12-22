@@ -3,7 +3,6 @@ package nodecluster
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"log"
 	"math/rand"
 	"net/http"
@@ -25,7 +24,7 @@ func (c *Cluster) GenerateUniqueID() int {
 	randID := rand.Intn(100)
 	for len(c.GetSlaveByID(randID)) > 0 {
 		randID = rand.Intn(100)
-		fmt.Println(len(c.GetSlaveByID(randID)))
+		log.Println(len(c.GetSlaveByID(randID)))
 	}
 	return randID
 }
@@ -58,17 +57,17 @@ func (c *Cluster) GetAllSlavesByIP(targetIP string) []NodeInfo {
 
 // PrintClusterInfo will cleanly print out info about the cluster
 func (c *Cluster) PrintClusterInfo() {
-	fmt.Println()
-	fmt.Println("====Master====")
-	fmt.Println(c.MasterNode)
+	log.Println()
+	log.Println("====Master====")
+	log.Println(c.MasterNode)
 
-	fmt.Println()
+	log.Println()
 
 	for i := 0; i < len(c.SlaveNodes); i++ {
-		fmt.Println("----Node---")
-		fmt.Println(c.SlaveNodes[i])
+		log.Println("----Node---")
+		log.Println(c.SlaveNodes[i])
 	}
-	fmt.Println()
+	log.Println()
 }
 
 // SendMessageToAllNodes will take a byte slice and POST it to each node
@@ -77,21 +76,20 @@ func (c *Cluster) SendMessageToAllNodes(urlPath string, message AddToClusterMess
 		if !isExcluded(c.SlaveNodes[i], excludeNodes) {
 			bytesRepresentation, err := json.Marshal(c)
 			if err != nil {
-				fmt.Println("Failed to convert cluster to json: ", c)
+				log.Println("Failed to convert cluster to json: ", c)
 				return err
 			}
 			currURL := "http://" + c.SlaveNodes[i].ToFullAddress() + urlPath
 
 			resp, err := http.Post(currURL, "application/json", bytes.NewBuffer(bytesRepresentation))
 			if err != nil {
-				fmt.Println("WARNING: Failed to POST to Peer: ", c.SlaveNodes[i].String(), currURL)
-				fmt.Println(err)
+				log.Println("WARNING: Failed to POST to Peer: ", c.SlaveNodes[i].String(), currURL)
+				log.Println(err)
 			} else {
 				var result map[string]interface{}
 				decoder := json.NewDecoder(resp.Body)
 				decoder.Decode(&result)
 				log.Println(result)
-				log.Println(result["data"])
 			}
 		}
 	}
