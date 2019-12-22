@@ -49,12 +49,12 @@ func (a *Application) joinNetwork(c echo.Context) error {
 
 	body := c.Request().Body
 	decoder := json.NewDecoder(body)
-	var msg nodecluster.AddToClusterMessage
+	var msg nodecluster.JoinNetworkMessage
 	err := decoder.Decode(&msg)
 	if err != nil {
 		log.Println("Error decoding Request Body", err)
 	}
-	requestingNode := msg.Source
+	requestingNode := msg.Node
 	requestingNode.NodeID = a.Cluster.GenerateUniqueID()
 
 	a.Cluster.AddSlaveNode(requestingNode)
