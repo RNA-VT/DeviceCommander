@@ -66,8 +66,7 @@ func (a *Application) JoinNetwork(URL string, node nodecluster.NodeInfo) error {
 	a.Cluster = t.Cluster
 	a.Cluster.PrintClusterInfo()
 
-	var exclusions []nodecluster.NodeInfo
-	exclusions = append(exclusions, t.Dest)
+	exclusions := []nodecluster.NodeInfo{t.Dest}
 	err = a.Cluster.SendMessageToAllNodes("/", t, exclusions)
 	if err != nil {
 		log.Println("Unexpected Error during attempt to contact all peers: ", err)
