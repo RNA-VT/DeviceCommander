@@ -1,14 +1,14 @@
 package app
 
 import (
-	"firecontroller/nodecluster"
+	"firecontroller/cluster"
 
 	"github.com/labstack/echo"
 )
 
 // The Application encapsulates the required state for the running software
 type Application struct {
-	Cluster nodecluster.Cluster
+	Cluster cluster.Cluster
 	Echo    *echo.Echo
 }
 

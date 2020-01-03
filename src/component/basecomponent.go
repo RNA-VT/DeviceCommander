@@ -1,4 +1,4 @@
-package firecomponent
+package component
 
 import (
 	// "fmt"
@@ -14,8 +14,8 @@ type BaseComponent struct {
 	OnState bool
 }
 
-/*CurrentStateSting just for pretty printing the node info */
-func (c BaseComponent) CurrentStateSting() string {
+/*CurrentStateSting just for pretty printing the device info */
+func (c *BaseComponent) CurrentStateSting() string {
 	state := "OFF"
 
 	if c.OnState {

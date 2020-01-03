@@ -3,7 +3,7 @@ package main
 /* Al useful imports */
 import (
 	"firecontroller/app"
-	"firecontroller/nodecluster"
+	"firecontroller/cluster"
 	"fmt"
 
 	"github.com/labstack/echo"
@@ -17,7 +17,7 @@ func main() {
 
 	//Pick Listening Port
 	port := "8001"
-	host := "node1.mindshark.io"
+	host := "device1.mindshark.io"
 
 	if viper.GetBool("GOFIRE_MASTER") {
 		host = viper.GetString("GOFIRE_MASTER_HOST")
@@ -30,12 +30,12 @@ func main() {
 	fullHostname := host + ":" + port
 
 	app := app.Application{
-		Cluster: nodecluster.Cluster{
+		Cluster: cluster.Cluster{
 			Name: viper.GetString("CLUSTER_NAME"),
 		},
 		Echo: echo.New(),
 	}
-	
+
 	app.Cluster.Start()
 	app.ConfigureRoutes(fullHostname)
 }

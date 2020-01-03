@@ -2,7 +2,7 @@ package app
 
 import (
 	"encoding/json"
-	"firecontroller/nodecluster"
+	"firecontroller/cluster"
 	"log"
 	"net/http"
 
@@ -45,17 +45,17 @@ func (a *Application) defaultGet(c echo.Context) error {
 }
 
 func (a *Application) joinNetwork(c echo.Context) error {
-	log.Println("[master] Node asked to join cluster")
+	log.Println("[master] Device asked to join cluster")
 
 	body := c.Request().Body
 	decoder := json.NewDecoder(body)
-	var msg nodecluster.JoinNetworkMessage
+	var msg cluster.JoinNetworkMessage
 	err := decoder.Decode(&msg)
 	if err != nil {
 		log.Println("Error decoding Request Body", err)
 	}
 
-	response, err := a.Cluster.AddNode(msg.Node)
+	response, err := a.Cluster.AddDevice(msg.Device)
 	if err != nil {
 		log.Println("Error Joining Cluster")
 	}
@@ -68,7 +68,7 @@ func (a *Application) peerUpdate(c echo.Context) error {
 	log.Println("Receiving Update from New Peer")
 	body := c.Request().Body
 
-	var clustahUpdate nodecluster.ClusterUpdateMessage
+	var clustahUpdate cluster.PeerUpdateMessage
 	err := json.NewDecoder(body).Decode(&clustahUpdate)
 	if err != nil {
 		log.Println("Failed to decode Cluster info from new peer")
