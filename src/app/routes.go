@@ -82,6 +82,6 @@ func (a *Application) peerUpdate(c echo.Context) error {
 	//Update my cluster
 	a.Cluster.LoadCluster(clustahUpdate.Cluster)
 
-	log.Println("Peer Update")
-	return c.JSON(http.StatusOK, "Peer Update Successfully Received!")
+	log.Println("Peer Update Completed")
+	return c.JSON(http.StatusOK, "Peer Update Successfully Received by : "+a.Cluster.Me.String())
 }

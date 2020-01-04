@@ -50,10 +50,10 @@ func (c *Cluster) UpdatePeers(urlPath string, message PeerUpdateMessage, exclude
 				log.Println(err)
 			} else {
 				defer resp.Body.Close()
-				var result map[string]interface{}
+				var result string
 				decoder := json.NewDecoder(resp.Body)
 				decoder.Decode(&result)
-				log.Println(result)
+				log.Println("Result:", result)
 			}
 		}
 	}

@@ -4,7 +4,7 @@ import (
 	"strconv"
 )
 
-//Device Information/Metadata about device
+//Device Information/Metadata about a device
 type Device struct {
 	ID   int
 	Host string

@@ -15,7 +15,7 @@ func (s *Solenoid) close(delay int) {
 
 }
 
-// SolenoidType is an enum
+// SolenoidType -
 type SolenoidType int
 
 const (
