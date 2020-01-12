@@ -156,8 +156,6 @@ func (c *Cluster) JoinNetwork(URL string) error {
 	//Update self with data from the master
 	c.LoadCluster(t.Cluster)
 
-	c.PrintClusterInfo()
-
 	return nil
 }
 
@@ -218,6 +216,7 @@ func (c *Cluster) LoadCluster(cluster Cluster) {
 	c.Name = cluster.Name
 	c.MasterDevice = cluster.MasterDevice
 	c.SlaveDevices = cluster.SlaveDevices
+	c.PrintClusterInfo()
 }
 
 func isExcluded(device device.Device, exclusions []device.Device) bool {
