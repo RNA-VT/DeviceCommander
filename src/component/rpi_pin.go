@@ -27,6 +27,7 @@ package component
   +-----+---------+----++----+---------+-----+
 */
 
+//RpiPin -
 type RpiPin struct {
 	BcmPin    uint8
 	Name      string
@@ -35,10 +36,11 @@ type RpiPin struct {
 
 //GetPins - Returns Pins for Raspi 4
 func GetPins() []RpiPin {
-	return [...]RpiPin{
+	var noPin uint8 = 255
+	return []RpiPin{
 		RpiPin{
 			HeaderPin: 1,
-			BcmPin:    -1,
+			BcmPin:    noPin,
 			Name:      "3.3v",
 		},
 		RpiPin{
@@ -58,7 +60,7 @@ func GetPins() []RpiPin {
 		},
 		RpiPin{
 			HeaderPin: 9,
-			BcmPin:    -1,
+			BcmPin:    noPin,
 			Name:      "0v",
 		},
 		RpiPin{
@@ -78,7 +80,7 @@ func GetPins() []RpiPin {
 		},
 		RpiPin{
 			HeaderPin: 17,
-			BcmPin:    -1,
+			BcmPin:    noPin,
 			Name:      "3.3v",
 		},
 		RpiPin{
@@ -98,7 +100,7 @@ func GetPins() []RpiPin {
 		},
 		RpiPin{
 			HeaderPin: 25,
-			BcmPin:    -1,
+			BcmPin:    noPin,
 			Name:      "0v",
 		},
 		RpiPin{
@@ -133,22 +135,22 @@ func GetPins() []RpiPin {
 		},
 		RpiPin{
 			HeaderPin: 39,
-			BcmPin:    -1,
+			BcmPin:    noPin,
 			Name:      "0v",
 		},
 		RpiPin{
 			HeaderPin: 2,
-			BcmPin:    -1,
+			BcmPin:    noPin,
 			Name:      "5v",
 		},
 		RpiPin{
 			HeaderPin: 4,
-			BcmPin:    -1,
+			BcmPin:    noPin,
 			Name:      "5v",
 		},
 		RpiPin{
 			HeaderPin: 6,
-			BcmPin:    -1,
+			BcmPin:    noPin,
 			Name:      "0v",
 		},
 		RpiPin{
@@ -168,7 +170,7 @@ func GetPins() []RpiPin {
 		},
 		RpiPin{
 			HeaderPin: 14,
-			BcmPin:    -1,
+			BcmPin:    noPin,
 			Name:      "0v",
 		},
 		RpiPin{
@@ -183,7 +185,7 @@ func GetPins() []RpiPin {
 		},
 		RpiPin{
 			HeaderPin: 20,
-			BcmPin:    -1,
+			BcmPin:    noPin,
 			Name:      "0v",
 		},
 		RpiPin{
@@ -208,7 +210,7 @@ func GetPins() []RpiPin {
 		},
 		RpiPin{
 			HeaderPin: 30,
-			BcmPin:    -1,
+			BcmPin:    noPin,
 			Name:      "0v",
 		},
 		RpiPin{
@@ -218,7 +220,7 @@ func GetPins() []RpiPin {
 		},
 		RpiPin{
 			HeaderPin: 34,
-			BcmPin:    -1,
+			BcmPin:    noPin,
 			Name:      "0v",
 		},
 		RpiPin{
