@@ -35,8 +35,8 @@ func main() {
 		},
 		Echo: echo.New(),
 	}
-
 	app.Cluster.Start()
+
 	app.ConfigureRoutes(fullHostname)
 }
 
@@ -59,4 +59,8 @@ func configureEnvironment() {
 	viper.SetDefault("GOFIRE_MASTER_PORT", 8000)
 	viper.SetDefault("GOFIRE_MASTER_HOST", "127.0.0.1")
 	viper.SetDefault("CLUSTER_NAME", "MasterOfHot")
+}
+
+func getDeviceConfiguration() error {
+	return nil
 }

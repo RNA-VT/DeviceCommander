@@ -11,10 +11,11 @@ import (
 
 /*BaseComponent object definition */
 type BaseComponent struct {
-	UID     int
-	Name    string
-	Enabled bool
-	GPIO    Gpio
+	UID       int
+	Name      string `yaml:"name"`
+	HeaderPin int    `yaml:"header_pin"`
+	Enabled   bool
+	GPIO      Gpio
 }
 
 //Enable - make this component available to command
