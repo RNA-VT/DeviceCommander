@@ -1,7 +1,9 @@
 package component
 
 import (
+	"encoding/json"
 	"errors"
+	"log"
 	"strconv"
 	"strings"
 
@@ -11,8 +13,19 @@ import (
 //Gpio - a raspberrypi digital gpio pin
 type Gpio struct {
 	Pin     rpio.Pin
-	PinInfo RpiPin
+	PinInfo RpiPinMap
 	Failed  bool
+}
+
+func (g *Gpio) String() string {
+	var pinString string
+	json, err := json.Marshal(g.Pin)
+	if err != nil {
+		pinString = err.Error()
+	} else {
+		pinString = string(json)
+	}
+	return "GPIO: \n\tPin Info: " + g.PinInfo.String() + "\n\t" + "FAILED: " + strconv.FormatBool(g.Failed) + "\n\tPin: " + pinString
 }
 
 //InitializePin - create gpio pin object and set modes
@@ -28,7 +41,7 @@ func (g *Gpio) InitializePin(headerPin int, initHigh bool) error {
 	} else {
 		g.Pin.Low()
 	}
-
+	log.Println("[GPIO INIT]: Init Completed!\n" + g.String())
 	return nil
 }
 

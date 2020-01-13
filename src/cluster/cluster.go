@@ -21,7 +21,7 @@ type Cluster struct {
 	Me           device.Device
 }
 
-//Start registers this device, retrieves cluster config and verifies peers
+//Start registers this device, retrieves cluster config, loads local components and verifies peers
 func (c *Cluster) Start() {
 	gofireMaster := viper.GetBool("GOFIRE_MASTER")
 	if gofireMaster {
@@ -60,18 +60,33 @@ func (c *Cluster) UpdatePeers(urlPath string, message PeerUpdateMessage, exclude
 	return nil
 }
 
+//NewDevice -
+func (c *Cluster) NewDevice(host string, port string) (device.Device, error) {
+	dvc := device.Device{
+		ID:   c.generateUniqueID(),
+		Host: host,
+		Port: port,
+	}
+	err := dvc.LoadSolenoids()
+	if err != nil {
+		return dvc, nil
+	}
+
+	return device.Device{}, err
+}
+
 //******************************************************************************************************
 //*******Master Only Methods****************************************************************************
 //******************************************************************************************************
 
 //KingMe makes this device the master
 func (c *Cluster) KingMe() {
-	c.Me = device.Device{
-		ID:   c.generateUniqueID(),
-		Host: viper.GetString("GOFIRE_MASTER_HOST"),
-		Port: viper.GetString("GOFIRE_MASTER_PORT"),
+	me, err := c.NewDevice(viper.GetString("GOFIRE_MASTER_HOST"), viper.GetString("GOFIRE_MASTER_PORT"))
+	if err != nil {
+		log.Println("Failed to Create New Device:", err.Error())
 	}
-	c.MasterDevice = c.Me
+	c.Me = me
+	c.MasterDevice = me
 	//The Master waits ...
 }
 
@@ -102,14 +117,14 @@ func (c *Cluster) AddDevice(newDevice device.Device) (response PeerUpdateMessage
 
 //ALifeOfServitude is all that awaits this device
 func (c *Cluster) ALifeOfServitude() {
-	c.Me = device.Device{
-		ID:   c.generateUniqueID(),
-		Host: viper.GetString("GOFIRE_HOST"),
-		Port: viper.GetString("GOFIRE_PORT"),
+	me, err := c.NewDevice(viper.GetString("GOFIRE_HOST"), viper.GetString("GOFIRE_PORT"))
+	if err != nil {
+		log.Println("Failed to Create New Device:", err.Error())
 	}
+	c.Me = me
 	masterHostname := viper.GetString("GOFIRE_MASTER_HOST") + ":" + viper.GetString("GOFIRE_MASTER_PORT")
 	//Try and Connect to the Master
-	err := test(masterHostname)
+	err = test(masterHostname)
 	if err != nil {
 		log.Println("Failed to Reach Master Device: PANIC")
 		//TODO: Add Retry or failover maybe? panic for now

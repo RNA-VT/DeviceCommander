@@ -1,5 +1,7 @@
 package component
 
+import "strconv"
+
 /*
   +-----+---------+----------+---------+-----+
   | BCM |   Name  | Physical | Name    | BCM |
@@ -27,213 +29,217 @@ package component
   +-----+---------+----++----+---------+-----+
 */
 
-//RpiPin -
-type RpiPin struct {
+//RpiPinMap -
+type RpiPinMap struct {
 	BcmPin    uint8
 	Name      string
 	HeaderPin int
 }
 
+func (r *RpiPinMap) String() string {
+	return "Raspberry Pi Pin: " + r.Name + "\n\tHeader Pin: " + strconv.Itoa(r.HeaderPin) + "\n\tBCM Pin: " + strconv.Itoa(int(r.BcmPin))
+}
+
 //GetPins - Returns Pins for Raspi 4
-func GetPins() []RpiPin {
+func GetPins() []RpiPinMap {
 	var noPin uint8 = 255
-	return []RpiPin{
-		RpiPin{
+	return []RpiPinMap{
+		RpiPinMap{
 			HeaderPin: 1,
 			BcmPin:    noPin,
 			Name:      "3.3v",
 		},
-		RpiPin{
+		RpiPinMap{
 			HeaderPin: 3,
 			BcmPin:    2,
 			Name:      "SDA 1",
 		},
-		RpiPin{
+		RpiPinMap{
 			HeaderPin: 5,
 			BcmPin:    3,
 			Name:      "SCL 1",
 		},
-		RpiPin{
+		RpiPinMap{
 			HeaderPin: 7,
 			BcmPin:    4,
 			Name:      "GPIO  7",
 		},
-		RpiPin{
+		RpiPinMap{
 			HeaderPin: 9,
 			BcmPin:    noPin,
 			Name:      "0v",
 		},
-		RpiPin{
+		RpiPinMap{
 			HeaderPin: 11,
 			BcmPin:    17,
 			Name:      "GPIO 0",
 		},
-		RpiPin{
+		RpiPinMap{
 			HeaderPin: 13,
 			BcmPin:    27,
 			Name:      "GPIO 2",
 		},
-		RpiPin{
+		RpiPinMap{
 			HeaderPin: 15,
 			BcmPin:    22,
 			Name:      "GPIO 3",
 		},
-		RpiPin{
+		RpiPinMap{
 			HeaderPin: 17,
 			BcmPin:    noPin,
 			Name:      "3.3v",
 		},
-		RpiPin{
+		RpiPinMap{
 			HeaderPin: 19,
 			BcmPin:    10,
 			Name:      "MOSI",
 		},
-		RpiPin{
+		RpiPinMap{
 			HeaderPin: 21,
 			BcmPin:    9,
 			Name:      "MISO",
 		},
-		RpiPin{
+		RpiPinMap{
 			HeaderPin: 23,
 			BcmPin:    11,
 			Name:      "SCLK",
 		},
-		RpiPin{
+		RpiPinMap{
 			HeaderPin: 25,
 			BcmPin:    noPin,
 			Name:      "0v",
 		},
-		RpiPin{
+		RpiPinMap{
 			HeaderPin: 27,
 			BcmPin:    0,
 			Name:      "SDA 0",
 		},
-		RpiPin{
+		RpiPinMap{
 			HeaderPin: 29,
 			BcmPin:    5,
 			Name:      "GPIO 21",
 		},
-		RpiPin{
+		RpiPinMap{
 			HeaderPin: 31,
 			BcmPin:    6,
 			Name:      "GPIO 22",
 		},
-		RpiPin{
+		RpiPinMap{
 			HeaderPin: 33,
 			BcmPin:    13,
 			Name:      "GPIO 23",
 		},
-		RpiPin{
+		RpiPinMap{
 			HeaderPin: 35,
 			BcmPin:    19,
 			Name:      "GPIO 24",
 		},
-		RpiPin{
+		RpiPinMap{
 			HeaderPin: 37,
 			BcmPin:    26,
 			Name:      "GPIO 25",
 		},
-		RpiPin{
+		RpiPinMap{
 			HeaderPin: 39,
 			BcmPin:    noPin,
 			Name:      "0v",
 		},
-		RpiPin{
+		RpiPinMap{
 			HeaderPin: 2,
 			BcmPin:    noPin,
 			Name:      "5v",
 		},
-		RpiPin{
+		RpiPinMap{
 			HeaderPin: 4,
 			BcmPin:    noPin,
 			Name:      "5v",
 		},
-		RpiPin{
+		RpiPinMap{
 			HeaderPin: 6,
 			BcmPin:    noPin,
 			Name:      "0v",
 		},
-		RpiPin{
+		RpiPinMap{
 			HeaderPin: 8,
 			BcmPin:    14,
 			Name:      "TxD",
 		},
-		RpiPin{
+		RpiPinMap{
 			HeaderPin: 10,
 			BcmPin:    15,
 			Name:      "RxD",
 		},
-		RpiPin{
+		RpiPinMap{
 			HeaderPin: 12,
 			BcmPin:    18,
 			Name:      "GPIO 1",
 		},
-		RpiPin{
+		RpiPinMap{
 			HeaderPin: 14,
 			BcmPin:    noPin,
 			Name:      "0v",
 		},
-		RpiPin{
+		RpiPinMap{
 			HeaderPin: 16,
 			BcmPin:    23,
 			Name:      "GPIO 4",
 		},
-		RpiPin{
+		RpiPinMap{
 			HeaderPin: 18,
 			BcmPin:    24,
 			Name:      "GPIO 5",
 		},
-		RpiPin{
+		RpiPinMap{
 			HeaderPin: 20,
 			BcmPin:    noPin,
 			Name:      "0v",
 		},
-		RpiPin{
+		RpiPinMap{
 			HeaderPin: 22,
 			BcmPin:    25,
 			Name:      "GPIO 6",
 		},
-		RpiPin{
+		RpiPinMap{
 			HeaderPin: 24,
 			BcmPin:    8,
 			Name:      "CE0",
 		},
-		RpiPin{
+		RpiPinMap{
 			HeaderPin: 26,
 			BcmPin:    7,
 			Name:      "CE1",
 		},
-		RpiPin{
+		RpiPinMap{
 			HeaderPin: 28,
 			BcmPin:    1,
 			Name:      "SCL 0",
 		},
-		RpiPin{
+		RpiPinMap{
 			HeaderPin: 30,
 			BcmPin:    noPin,
 			Name:      "0v",
 		},
-		RpiPin{
+		RpiPinMap{
 			HeaderPin: 32,
 			BcmPin:    12,
 			Name:      "GPIO 26",
 		},
-		RpiPin{
+		RpiPinMap{
 			HeaderPin: 34,
 			BcmPin:    noPin,
 			Name:      "0v",
 		},
-		RpiPin{
+		RpiPinMap{
 			HeaderPin: 36,
 			BcmPin:    16,
 			Name:      "GPIO 27",
 		},
-		RpiPin{
+		RpiPinMap{
 			HeaderPin: 38,
 			BcmPin:    20,
 			Name:      "GPIO 28",
 		},
-		RpiPin{
+		RpiPinMap{
 			HeaderPin: 40,
 			BcmPin:    21,
 			Name:      "GPIO 29",
