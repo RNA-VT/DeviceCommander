@@ -14,7 +14,7 @@ type Device struct {
 	ID        int
 	Host      string
 	Port      string
-	Solenoids []component.Solenoid
+	Solenoids []component.Solenoid `yaml:"solenoids"`
 }
 
 /*String Just for pretty printing the device info */
@@ -36,7 +36,8 @@ func (device *Device) LoadSolenoids() error {
 		log.Printf("yamlFile.Get err   #%v ", err)
 		return err
 	}
-	err = yaml.Unmarshal(yamlFile, &device.Solenoids)
+	err = yaml.Unmarshal(yamlFile, &device)
+	log.Println(device.Solenoids)
 	if err != nil {
 		log.Fatalf("Unmarshal: %v", err)
 		return err

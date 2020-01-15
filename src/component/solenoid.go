@@ -39,7 +39,7 @@ func (s *Solenoid) healthy() bool {
 }
 
 // SolenoidTypes -
-type SolenoidTypes int
+type SolenoidTypes string
 
 const (
 	// NormallyClosed represents a solenoid that does not allow flow without power
@@ -52,8 +52,8 @@ const (
 type SolenoidModes string
 
 const (
-	//Source - tank supply, pilot supply and transport solenoids
-	Source = "source"
+	//Supply - tank supply, pilot supply and transport solenoids
+	Supply = "supply"
 	//Igniter - glowfly or other HSI
 	Igniter = "igniter"
 	//Outlet - propane exhaust solenoid
