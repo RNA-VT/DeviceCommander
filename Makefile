@@ -24,5 +24,5 @@ run-master:
 run-slave:
 	cd src && go run main.go
 
-
-
+run-slave2:
+	cd src && GOFIRE_PORT=8002 go run main.go

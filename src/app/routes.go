@@ -17,6 +17,13 @@ func (a *Application) ConfigureRoutes(listenURL string) {
 	a.Echo.Use(middleware.Logger())
 	a.Echo.Use(middleware.Recover())
 
+	// CORS restricted
+	// Allows requests from any `https://labstack.com` or `https://labstack.net` origin
+	// wth GET, PUT, POST or DELETE method.
+	a.Echo.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"*"},
+	}))
+
 	// Routes
 	a.Echo.GET("/", a.defaultGet)
 	a.Echo.POST("/", a.peerUpdate)
@@ -31,7 +38,6 @@ func (a *Application) ConfigureRoutes(listenURL string) {
 
 	// Start server
 	a.Echo.Logger.Fatal(a.Echo.Start(listenURL))
-
 }
 
 func (a *Application) getClusterInfo(c echo.Context) error {
