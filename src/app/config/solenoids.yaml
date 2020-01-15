@@ -1,35 +1,37 @@
-- name: main_supply
-  type: supply
-  header_pin: 7
-  voltage: 120
-  mode: NC
-- name: sign_trench_inlet
-  type: supply
-  header_pin: 11
-  voltage: 120
-  mode: NC
-- name: sign_trench_outlet
-  type: supply
-  header_pin: 13
-  voltage: 120
-  mode: NC
-- name: sign_0
-  type: outlet
-  header_pin: 15
-  voltage: 120
-  mode: NC
-- name: sign_2
-  type: outlet
-  header_pin: 29
-  voltage: 120
-  mode: NC
-- name: sign_3
-  type: outlet
-  header_pin: 31
-  voltage: 120
-  mode: NC
-- name: sign_4
-  type: outlet
-  header_pin: 33
-  voltage: 120
-  mode: NC
+solenoids:
+  - name: main_supply
+    type: supply
+    voltage: 120
+    mode: NC
+    base_component:
+      header_pin: 7
+  - name: sign_trench_inlet
+    type: supply
+    header_pin: 11
+    voltage: 120
+    mode: NC
+  - name: sign_trench_outlet
+    type: supply
+    header_pin: 13
+    voltage: 120
+    mode: NC
+  - name: sign_0
+    type: outlet
+    header_pin: 15
+    voltage: 120
+    mode: NC
+  - name: sign_2
+    type: outlet
+    header_pin: 29
+    voltage: 120
+    mode: NC
+  - name: sign_3
+    type: outlet
+    header_pin: 31
+    voltage: 120
+    mode: NC
+  - name: sign_4
+    type: outlet
+    header_pin: 33
+    voltage: 120
+    mode: NC
