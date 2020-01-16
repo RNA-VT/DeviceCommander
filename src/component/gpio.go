@@ -37,11 +37,11 @@ func (g *Gpio) InitializePin(headerPin int, initHigh bool) error {
 	}
 	//This Pin Checks Out...
 	g.Pin = rpio.Pin(g.PinInfo.BcmPin)
-	g.Pin.Output()
+	//g.Pin.Output()
 	if initHigh {
-		g.Pin.High()
+		//g.Pin.High()
 	} else {
-		g.Pin.Low()
+		//g.Pin.Low()
 	}
 	log.Println("[GPIO INIT]: Init Completed!\n" + g.String())
 	return nil
