@@ -3,8 +3,8 @@ solenoids:
     type: supply
     voltage: 120
     mode: NC
-    base_component:
-      header_pin: 7
+    gpio: 
+      pin: 7
   - name: sign_trench_inlet
     type: supply
     header_pin: 11
