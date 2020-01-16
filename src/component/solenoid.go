@@ -39,7 +39,7 @@ func (s *Solenoid) Init() error {
 
 func (s *Solenoid) open(duration int) {
 	if s.healthy() {
-		s.GPIO.Pin.High()
+		//s.GPIO.Pin.High()
 		s.close(duration)
 	} else {
 		//Log attempt to open unhealthy solenoid

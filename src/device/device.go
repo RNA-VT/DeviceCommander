@@ -24,9 +24,13 @@ func (device *Device) String() string {
 }
 
 //Init - Initialize all the components on this device
-func (device *Device) Init() {
+func (device *Device) Init() error {
 	for i := 0; i < len(device.Solenoids); i++ {
-		device.Solenoids[i].Init()
+		err := device.Solenoids[i].Init()
+		if err != nil {
+			return err
+		}
+		return nil
 	}
 }
 
@@ -48,14 +52,17 @@ func (device *Device) LoadSolenoids() error {
 		log.Fatalf("Unmarshal: %v", err)
 		return err
 	}
-	log.Println("Loaded the Following Solenoids: ", device.SolenoidsString())
+	log.Println("Loaded the Following Solenoids: ", device.solenoidsString())
 	log.Print("Performing Initializations: ")
-	device.Init()
+	err = device.Init()
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
 //SolenoidsString assembles a string of all the Solenoids on this device.
-func (device *Device) SolenoidsString() string {
+func (device *Device) solenoidsString() string {
 	out := ""
 	for i := 0; i < len(device.Solenoids); i++ {
 		out += device.Solenoids[i].String()
