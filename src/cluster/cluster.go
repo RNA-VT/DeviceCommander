@@ -69,10 +69,10 @@ func (c *Cluster) NewDevice(host string, port string) (device.Device, error) {
 	}
 	err := dvc.LoadSolenoids()
 	if err != nil {
-		return dvc, nil
+		return device.Device{}, err
 	}
+	return dvc, nil
 
-	return device.Device{}, err
 }
 
 //******************************************************************************************************

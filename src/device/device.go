@@ -28,10 +28,10 @@ func (device *Device) Init() error {
 	for i := 0; i < len(device.Solenoids); i++ {
 		err := device.Solenoids[i].Init()
 		if err != nil {
-			return err
+			log.Println("Failed to load: ", device.Solenoids[i].String())
 		}
-		return nil
 	}
+	return nil
 }
 
 //ToFullAddress returns a network address including the ip address and port that this device is listening on
