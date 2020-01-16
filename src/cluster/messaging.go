@@ -4,13 +4,6 @@ import (
 	"firecontroller/device"
 )
 
-/*AddToClusterMessage A standard format for a Request/Response for adding device to cluster */
-type AddToClusterMessage struct {
-	Source  device.Device
-	Dest    device.Device
-	Cluster Cluster
-}
-
 //JoinNetworkMessage is the registration request
 type JoinNetworkMessage struct {
 	Device device.Device
