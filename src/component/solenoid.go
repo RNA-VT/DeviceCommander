@@ -1,6 +1,7 @@
 package component
 
 import (
+	"log"
 	"strconv"
 	"time"
 )
@@ -25,8 +26,17 @@ func (s *Solenoid) String() string {
 		labelStringLine("Gpio", s.GPIO.String())
 }
 func labelStringLine(key string, value string) string {
-	return "\n\t" + key + ": " + value
+	return "\n\t" + key + ":\t " + value
 }
+
+//Init - Enable, set initial value, log solenoid initial state
+func (s *Solenoid) Init() error {
+	s.Enable(true)
+	log.Println("Enabled and Initialized Solenoid:", s.String())
+	//TODO: Look into what feedback we can get on gpio init
+	return nil
+}
+
 func (s *Solenoid) open(duration int) {
 	if s.healthy() {
 		s.GPIO.Pin.High()

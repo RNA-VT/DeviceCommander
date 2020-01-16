@@ -23,6 +23,13 @@ func (device *Device) String() string {
 	return "Device:{ deviceId:" + strconv.Itoa(device.ID) + ", Host:" + device.Host + ", port:" + device.Port + " }"
 }
 
+//Init - Initialize all the components on this device
+func (device *Device) Init() {
+	for i := 0; i < len(device.Solenoids); i++ {
+		device.Solenoids[i].Init()
+	}
+}
+
 //ToFullAddress returns a network address including the ip address and port that this device is listening on
 func (device *Device) ToFullAddress() string {
 	/* Just for pretty printing the device info */
@@ -41,8 +48,17 @@ func (device *Device) LoadSolenoids() error {
 		log.Fatalf("Unmarshal: %v", err)
 		return err
 	}
-	for i := 0; i < len(device.Solenoids); i++ {
-		log.Println(device.Solenoids[i].String())
-	}
+	log.Println("Loaded the Following Solenoids: ", device.SolenoidsString())
+	log.Print("Performing Initializations: ")
+	device.Init()
 	return nil
+}
+
+//SolenoidsString assembles a string of all the Solenoids on this device.
+func (device *Device) SolenoidsString() string {
+	out := ""
+	for i := 0; i < len(device.Solenoids); i++ {
+		out += device.Solenoids[i].String()
+	}
+	return out
 }
