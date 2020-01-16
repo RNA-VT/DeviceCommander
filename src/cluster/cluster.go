@@ -161,7 +161,7 @@ func (c *Cluster) JoinNetwork(URL string) error {
 	defer resp.Body.Close()
 
 	decoder := json.NewDecoder(resp.Body)
-	var t AddToClusterMessage
+	var t PeerUpdateMessage
 	err = decoder.Decode(&t)
 	if err != nil {
 		log.Println("Failed to decode response from Master Device")

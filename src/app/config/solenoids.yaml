@@ -1,10 +1,12 @@
-solenoids:
+device:
+  name: "SignFire Controller"
+  description: "Located in the control case on the MindShark Sign"
+solenoids: 
   - name: main_supply
     type: supply
     voltage: 120
     mode: NC
-    gpio: 
-      pin: 7
+    header_pin: 7
   - name: sign_trench_inlet
     type: supply
     header_pin: 11
