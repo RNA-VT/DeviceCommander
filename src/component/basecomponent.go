@@ -12,10 +12,10 @@ import (
 /*BaseComponent object definition */
 type BaseComponent struct {
 	UID       int
+	Enabled   bool
 	Name      string `yaml:"name"`
 	HeaderPin int    `yaml:"header_pin"`
-	Enabled   bool
-	GPIO      Gpio
+	GPIO      Gpio   `yaml:"gpio"`
 }
 
 //Enable - make this component available to command
@@ -30,8 +30,8 @@ func (c *BaseComponent) Disable() {
 	c.GPIO.Pin.Low()
 }
 
-/*CurrentStateSting just for pretty printing the device info */
-func (c *BaseComponent) CurrentStateSting() string {
+/*CurrentStateString just for pretty printing the device info */
+func (c *BaseComponent) CurrentStateString() string {
 	state := "OFF"
 
 	if c.GPIO.Pin.Read() == rpio.High {
@@ -41,3 +41,19 @@ func (c *BaseComponent) CurrentStateSting() string {
 	message := "[" + strconv.Itoa(c.UID) + "] is " + state
 	return message
 }
+
+/*
+	{
+		0
+		0
+		false
+		{
+			0
+			{
+				0
+				0
+			}
+			false
+		}
+	}
+*/

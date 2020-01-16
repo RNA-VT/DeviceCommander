@@ -37,10 +37,12 @@ func (device *Device) LoadSolenoids() error {
 		return err
 	}
 	err = yaml.Unmarshal(yamlFile, &device)
-	log.Println(device.Solenoids)
 	if err != nil {
 		log.Fatalf("Unmarshal: %v", err)
 		return err
+	}
+	for i := 0; i < len(device.Solenoids); i++ {
+		log.Println(device.Solenoids[i].String())
 	}
 	return nil
 }

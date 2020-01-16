@@ -7,12 +7,26 @@ import (
 
 // Solenoid - base component + solenoid specific metadata
 type Solenoid struct {
-	BaseComponent
-	Voltage int           `yaml:"voltage"`
-	Type    SolenoidTypes `yaml:"type"`
-	Mode    SolenoidModes `yaml:"mode"`
+	BaseComponent `yaml:",inline"`
+	Voltage       int           `yaml:"voltage"`
+	Type          SolenoidTypes `yaml:"type"`
+	Mode          SolenoidModes `yaml:"mode"`
 }
 
+func (s *Solenoid) String() string {
+	return "\nSolenoid Device:" +
+		labelStringLine("UID", strconv.Itoa(s.UID)) +
+		labelStringLine("Name", s.Name) +
+		labelStringLine("Header Pin", strconv.Itoa(s.HeaderPin)) +
+		labelStringLine("Enabled", strconv.FormatBool(s.Enabled)) +
+		labelStringLine("Type", string(s.Type)) +
+		labelStringLine("Mode", string(s.Mode)) +
+		labelStringLine("Voltage", strconv.Itoa(s.Voltage)) +
+		labelStringLine("Gpio", s.GPIO.String())
+}
+func labelStringLine(key string, value string) string {
+	return "\n\t" + key + ": " + value
+}
 func (s *Solenoid) open(duration int) {
 	if s.healthy() {
 		s.GPIO.Pin.High()

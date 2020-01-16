@@ -25,7 +25,9 @@ func (g *Gpio) String() string {
 	} else {
 		pinString = string(json)
 	}
-	return "GPIO: \n\tPin Info: " + g.PinInfo.String() + "\n\t" + "FAILED: " + strconv.FormatBool(g.Failed) + "\n\tPin: " + pinString
+	return labelStringLine("\tFAILED", strconv.FormatBool(g.Failed)) +
+		labelStringLine("\tPin", pinString) +
+		labelStringLine("\tPin Info", g.PinInfo.String())
 }
 
 //InitializePin - create gpio pin object and set modes
