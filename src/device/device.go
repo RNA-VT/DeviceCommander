@@ -42,7 +42,7 @@ func (device *Device) ToFullAddress() string {
 
 //LoadSolenoids - Load Solenoid Array from Config
 func (device *Device) LoadSolenoids() error {
-	yamlFile, err := ioutil.ReadFile("/Users/tushar/fun/GoFire/src/app/config/solenoids.yaml")
+	yamlFile, err := ioutil.ReadFile("./app/config/solenoids.yaml")
 	if err != nil {
 		log.Printf("yamlFile.Get err   #%v ", err)
 		return err
