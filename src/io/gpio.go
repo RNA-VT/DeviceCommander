@@ -1,20 +1,33 @@
-package component
+package io
 
 import (
 	"encoding/json"
 	"errors"
+	"firecontroller/io/mock"
+	"firecontroller/utilities"
 	"log"
 	"strconv"
 	"strings"
 
+	"github.com/spf13/viper"
 	"github.com/stianeikeland/go-rpio/v4"
 )
 
 //Gpio - a raspberrypi digital gpio pin
 type Gpio struct {
-	Pin     rpio.Pin
+	Pin     GpioPin
 	PinInfo RpiPinMap
 	Failed  bool
+}
+
+//GpioPin - an interface to support mocking rpio.Pin
+type GpioPin interface {
+	Output()
+	High()
+	Low()
+	Toggle()
+	Write(rpio.State)
+	Read() rpio.State
 }
 
 func (g *Gpio) String() string {
@@ -25,34 +38,44 @@ func (g *Gpio) String() string {
 	} else {
 		pinString = string(json)
 	}
-	return labelStringLine("\tFAILED", strconv.FormatBool(g.Failed)) +
-		labelStringLine("\tPin", pinString) +
-		labelStringLine("\tPin Info", g.PinInfo.String())
+	return utilities.LabelString("\tFAILED", strconv.FormatBool(g.Failed)) +
+		utilities.LabelString("\tPin", pinString) +
+		utilities.LabelString("\tPin Info", g.PinInfo.String())
 }
 
 //Init - create gpio pin object and set modes
 func (g *Gpio) Init(headerPin int, initHigh bool) error {
+
 	if err := g.loadPinInfoByHeader(headerPin); err != nil {
 		return err
 	}
 	log.Println("BCM Pin:", g.PinInfo.BcmPin)
-	//This Pin Checks Out...
-	g.Pin = rpio.Pin(g.PinInfo.BcmPin)
-	//g.Pin.Output()
-	if initHigh {
-		//g.Pin.High()
+	//This pin theoretically checks out, but is it real?
+	if viper.GetBool("GOFIRE_MOCK_GPIO") {
+		//Nothing is real and the is pin is laughable. Mock it.
+		g.Pin = mock.Pin{
+			Pin: g.PinInfo.BcmPin,
+		}
 	} else {
-		//g.Pin.Low()
+		g.Pin = rpio.Pin(g.PinInfo.BcmPin)
+	}
+	g.Pin.Output()
+	if initHigh {
+		g.Pin.High()
+	} else {
+		g.Pin.Low()
 	}
 	log.Println("[GPIO INIT]: Init Completed!\n" + g.String())
 	return nil
 }
 
+//HandleEnable -
 func (g *Gpio) HandleEnable() bool {
-
+	g.Pin.Low()
 	return true
 }
 
+//HandleDisable -
 func (g *Gpio) HandleDisable() bool {
 	g.Pin.Low()
 	return true

@@ -1,6 +1,9 @@
-package component
+package io
 
-import "strconv"
+import (
+	"firecontroller/utilities"
+	"strconv"
+)
 
 /*
   +-----+---------+----------+---------+-----+
@@ -37,9 +40,9 @@ type RpiPinMap struct {
 }
 
 func (r *RpiPinMap) String() string {
-	return labelStringLine("\t\tName", r.Name) +
-		labelStringLine("\t\tHeader Pin", strconv.Itoa(r.HeaderPin)) +
-		labelStringLine("\t\tBCM Pin", strconv.Itoa(int(r.BcmPin)))
+	return utilities.LabelString("\t\tName", r.Name) +
+		utilities.LabelString("\t\tHeader Pin", strconv.Itoa(r.HeaderPin)) +
+		utilities.LabelString("\t\tBCM Pin", strconv.Itoa(int(r.BcmPin)))
 }
 
 //GetPins - Returns Pins for Raspi 4
