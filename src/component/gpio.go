@@ -30,11 +30,12 @@ func (g *Gpio) String() string {
 		labelStringLine("\tPin Info", g.PinInfo.String())
 }
 
-//InitializePin - create gpio pin object and set modes
-func (g *Gpio) InitializePin(headerPin int, initHigh bool) error {
+//Init - create gpio pin object and set modes
+func (g *Gpio) Init(headerPin int, initHigh bool) error {
 	if err := g.loadPinInfoByHeader(headerPin); err != nil {
 		return err
 	}
+	log.Println("BCM Pin:", g.PinInfo.BcmPin)
 	//This Pin Checks Out...
 	g.Pin = rpio.Pin(g.PinInfo.BcmPin)
 	//g.Pin.Output()
@@ -45,6 +46,26 @@ func (g *Gpio) InitializePin(headerPin int, initHigh bool) error {
 	}
 	log.Println("[GPIO INIT]: Init Completed!\n" + g.String())
 	return nil
+}
+
+func (g *Gpio) HandleEnable() bool {
+
+	return true
+}
+
+func (g *Gpio) HandleDisable() bool {
+	g.Pin.Low()
+	return true
+}
+
+/*CurrentStateString just for pretty printing the device info */
+func (g *Gpio) CurrentStateString() string {
+	state := "OFF"
+
+	if g.Pin.Read() == rpio.High {
+		state = "ON"
+	}
+	return g.PinInfo.String() + "\n\t" + "State: " + state
 }
 
 func (g *Gpio) loadPinInfoByHeader(headerPin int) error {

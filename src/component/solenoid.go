@@ -12,6 +12,27 @@ type Solenoid struct {
 	Voltage       int           `yaml:"voltage"`
 	Type          SolenoidTypes `yaml:"type"`
 	Mode          SolenoidModes `yaml:"mode"`
+	GPIO          Gpio
+}
+
+//Init - Enable, set initial value, log solenoid initial state
+func (s *Solenoid) Init() error {
+	log.Println("Enabled and Initialized Solenoid:", s.String())
+	//TODO: Look into what feedback we can get on gpio init
+	return nil
+}
+
+//Enable and optionally initialize this Solenoid
+func (s *Solenoid) Enable(init bool) {
+	s.GetBase().Enabled = true
+	if init {
+		s.GPIO.Init(s.GetBase().HeaderPin, false)
+	}
+}
+
+//Disable this solenoid
+func (s *Solenoid) Disable() {
+	s.GetBase().Enabled = false
 }
 
 func (s *Solenoid) String() string {
@@ -25,21 +46,19 @@ func (s *Solenoid) String() string {
 		labelStringLine("Voltage", strconv.Itoa(s.Voltage)) +
 		labelStringLine("Gpio", s.GPIO.String())
 }
+
 func labelStringLine(key string, value string) string {
-	return "\n\t" + key + ":\t " + value
+	return "\n\t[" + key + "]:     " + value
 }
 
-//Init - Enable, set initial value, log solenoid initial state
-func (s *Solenoid) Init() error {
-	s.Enable(true)
-	log.Println("Enabled and Initialized Solenoid:", s.String())
-	//TODO: Look into what feedback we can get on gpio init
-	return nil
+//State returns a string of the current state of this solenoid
+func (s *Solenoid) State() string {
+	return "[GPIO PIN " + strconv.Itoa(s.HeaderPin)
 }
 
 func (s *Solenoid) open(duration int) {
 	if s.healthy() {
-		//s.GPIO.Pin.High()
+		s.GPIO.Pin.High()
 		s.close(duration)
 	} else {
 		//Log attempt to open unhealthy solenoid
