@@ -30,3 +30,6 @@
   run-master: run GoFire in Master mode
 
   run-slave: run GoFire in Slave mode
+
+## Tips
+  Make sure you have your go modules enabled: `export GO111MODULE=on`
