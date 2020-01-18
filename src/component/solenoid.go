@@ -27,15 +27,15 @@ func (s *Solenoid) Init() error {
 
 //Enable and optionally initialize this Solenoid
 func (s *Solenoid) Enable(init bool) {
-	s.GetBase().Enabled = true
+	s.Enabled = true
 	if init {
-		s.GPIO.Init(s.GetBase().HeaderPin, false)
+		s.GPIO.Init(s.HeaderPin, false)
 	}
 }
 
 //Disable this solenoid
 func (s *Solenoid) Disable() {
-	s.GetBase().Enabled = false
+	s.Enabled = false
 }
 
 func (s *Solenoid) String() string {
