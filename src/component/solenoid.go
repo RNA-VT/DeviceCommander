@@ -1,6 +1,8 @@
 package component
 
 import (
+	"firecontroller/io"
+	"firecontroller/utilities"
 	"log"
 	"strconv"
 	"time"
@@ -12,11 +14,12 @@ type Solenoid struct {
 	Voltage       int           `yaml:"voltage"`
 	Type          SolenoidTypes `yaml:"type"`
 	Mode          SolenoidModes `yaml:"mode"`
-	GPIO          Gpio
+	GPIO          io.Gpio
 }
 
 //Init - Enable, set initial value, log solenoid initial state
 func (s *Solenoid) Init() error {
+	s.Enable(true)
 	log.Println("Enabled and Initialized Solenoid:", s.String())
 	//TODO: Look into what feedback we can get on gpio init
 	return nil
@@ -37,18 +40,14 @@ func (s *Solenoid) Disable() {
 
 func (s *Solenoid) String() string {
 	return "\nSolenoid Device:" +
-		labelStringLine("UID", strconv.Itoa(s.UID)) +
-		labelStringLine("Name", s.Name) +
-		labelStringLine("Header Pin", strconv.Itoa(s.HeaderPin)) +
-		labelStringLine("Enabled", strconv.FormatBool(s.Enabled)) +
-		labelStringLine("Type", string(s.Type)) +
-		labelStringLine("Mode", string(s.Mode)) +
-		labelStringLine("Voltage", strconv.Itoa(s.Voltage)) +
-		labelStringLine("Gpio", s.GPIO.String())
-}
-
-func labelStringLine(key string, value string) string {
-	return "\n\t[" + key + "]:     " + value
+		utilities.LabelString("UID", strconv.Itoa(s.UID)) +
+		utilities.LabelString("Name", s.Name) +
+		utilities.LabelString("Header Pin", strconv.Itoa(s.HeaderPin)) +
+		utilities.LabelString("Enabled", strconv.FormatBool(s.Enabled)) +
+		utilities.LabelString("Type", string(s.Type)) +
+		utilities.LabelString("Mode", string(s.Mode)) +
+		utilities.LabelString("Voltage", strconv.Itoa(s.Voltage)) +
+		utilities.LabelString("Gpio", s.GPIO.String())
 }
 
 //State returns a string of the current state of this solenoid

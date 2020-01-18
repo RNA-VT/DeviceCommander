@@ -1,8 +1,79 @@
-package component
+package mock
 
 import "github.com/stianeikeland/go-rpio/v4"
 
+//Pin mocks an rpio.Pin object
+type Pin struct {
+	Pin       uint8
+	RpioMode  rpio.Mode
+	RpioState rpio.State
+}
+
+// Output - Set pin as Output
+func (pin Pin) Output() {
+	pin.RpioMode = rpio.Output
+}
+
+// High - Set pin High
+func (pin Pin) High() {
+	pin.RpioState = rpio.High
+}
+
+// Low - Set pin Low
+func (pin Pin) Low() {
+	pin.RpioState = rpio.Low
+}
+
+// Toggle pin state
+func (pin Pin) Toggle() {
+	TogglePin(pin)
+}
+
+// Mode - Set pin Mode
+func (pin Pin) Mode(mode rpio.Mode) {
+	PinMode(pin, mode)
+}
+
+// Set pin state (high/low)
+func (pin Pin) Write(state rpio.State) {
+	WritePin(pin, state)
+}
+
+// Read pin state (high/low)
+func (pin Pin) Read() rpio.State {
+	return ReadPin(pin)
+}
+
+// PinMode sets the mode of a given pin (Input, Output, Clock, Pwm or Spi)
+// Only Output is properly mocked right now
+func PinMode(pin Pin, mode rpio.Mode) {
+	pin.RpioMode = mode
+}
+
+// WritePin sets a given pin High or Low
+// by setting the clear or set registers respectively
+func WritePin(pin Pin, state rpio.State) {
+	pin.RpioState = state
+}
+
+// ReadPin - Read the state of a pin
+func ReadPin(pin Pin) rpio.State {
+	return pin.RpioState
+}
+
+// TogglePin - Toggle a pin state (high -> low -> high)
+func TogglePin(pin Pin) {
+	if pin.RpioState == rpio.High {
+		pin.Low()
+	} else {
+		pin.High()
+	}
+}
+
 /*
+
+From the RPIO Package:
+
 Package rpio provides GPIO access on the Raspberry PI without any need
 for external c libraries (eg. WiringPi or BCM2835).
 
@@ -68,67 +139,3 @@ https://www.raspberrypi.org/documentation/hardware/raspberrypi/bcm2835/BCM2835-A
 and https://elinux.org/BCM2835_datasheet_errata - for errors in that spec
 
 */
-
-//MockPin mocks an rpio.Pin object
-type MockPin uint8
-
-// Output - Set pin as Output
-func (pin MockPin) Output() {
-	PinMode(pin, rpio.Output)
-}
-
-// High - Set pin High
-func (pin MockPin) High() {
-	WritePin(pin, rpio.High)
-}
-
-// Low - Set pin Low
-func (pin MockPin) Low() {
-	WritePin(pin, rpio.Low)
-}
-
-// Toggle pin state
-func (pin MockPin) Toggle() {
-	TogglePin(pin)
-}
-
-// Mode - Set pin Mode
-func (pin MockPin) Mode(mode rpio.Mode) {
-	PinMode(pin, mode)
-}
-
-// Set pin state (high/low)
-func (pin MockPin) Write(state rpio.State) {
-	WritePin(pin, state)
-}
-
-// Read pin state (high/low)
-func (pin MockPin) Read() rpio.State {
-	return ReadPin(pin)
-}
-
-// PinMode sets the mode of a given pin (Input, Output, Clock, Pwm or Spi)
-//
-// Clock is possible only for pins 4, 5, 6, 20, 21.
-// Pwm is possible only for pins 12, 13, 18, 19.
-//
-// Spi mode should not be set by this directly, use SpiBegin instead.
-func PinMode(pin MockPin, mode rpio.Mode) {
-
-}
-
-// WritePin sets a given pin High or Low
-// by setting the clear or set registers respectively
-func WritePin(pin MockPin, state rpio.State) {
-
-}
-
-// ReadPin - Read the state of a pin
-func ReadPin(pin MockPin) rpio.State {
-	return rpio.Low
-}
-
-// TogglePin - Toggle a pin state (high -> low -> high)
-func TogglePin(pin MockPin) {
-
-}
