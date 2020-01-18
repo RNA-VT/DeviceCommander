@@ -1,12 +1,13 @@
 version: "3"
 services:
   gofire:
-    build: .
-    command: ["go", "run", "main.go"]
+    build: ../src
+    command: ["./firecontroller"]
     volumes:
       - .:/go/src/GoFire
     ports:
-      - "8080:80"
+      - "8000:8000"
     restart: unless-stopped
     environment:
       - GOFIRE_MASTER=TRUE
+      - GOFIRE_MASTER_HOST=host.docker.internal
