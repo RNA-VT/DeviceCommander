@@ -34,8 +34,11 @@ import (
 
 //RpiPinMap -
 type RpiPinMap struct {
-	BcmPin    uint8
-	Name      string
+	//BcmPin - The pin id on the processor, used by rpio for commands
+	BcmPin uint8
+	//Human readable name for the Raspi Pin
+	Name string
+	//Connection position on the header according to the block above^^
 	HeaderPin int
 }
 
