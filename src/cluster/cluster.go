@@ -12,7 +12,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-//Cluster - This object defines an array of control devices
+//Cluster - This object defines an array of microcontrollers
 type Cluster struct {
 	Name         string
 	SlaveDevices []mc.Microcontroller
@@ -20,7 +20,7 @@ type Cluster struct {
 	Me           mc.Microcontroller
 }
 
-//Start registers this device, retrieves cluster config, loads local components and verifies peers
+//Start registers this microcontroller, retrieves cluster config, loads local components and verifies peers
 func (c *Cluster) Start() {
 	gofireMaster := viper.GetBool("GOFIRE_MASTER")
 	if gofireMaster {
@@ -32,7 +32,7 @@ func (c *Cluster) Start() {
 	}
 }
 
-// UpdatePeers will take a byte slice and POST it to each device
+// UpdatePeers will take a byte slice and POST it to each microcontroller
 func (c *Cluster) UpdatePeers(urlPath string, message PeerUpdateMessage, excludeDevices []mc.Microcontroller) error {
 	for i := 0; i < len(c.SlaveDevices); i++ {
 		if !isExcluded(c.SlaveDevices[i], excludeDevices) {
@@ -61,16 +61,16 @@ func (c *Cluster) UpdatePeers(urlPath string, message PeerUpdateMessage, exclude
 
 //NewDevice -
 func (c *Cluster) NewDevice(host string, port string) (mc.Microcontroller, error) {
-	dvc := mc.Microcontroller{
+	micro := mc.Microcontroller{
 		ID:   c.generateUniqueID(),
 		Host: host,
 		Port: port,
 	}
-	err := dvc.LoadSolenoids()
+	err := micro.LoadSolenoids()
 	if err != nil {
 		return mc.Microcontroller{}, err
 	}
-	return dvc, nil
+	return micro, nil
 
 }
 
@@ -78,7 +78,7 @@ func (c *Cluster) NewDevice(host string, port string) (mc.Microcontroller, error
 //*******Master Only Methods****************************************************************************
 //******************************************************************************************************
 
-//KingMe makes this device the master
+//KingMe makes this microcontroller the master
 func (c *Cluster) KingMe() {
 	me, err := c.NewDevice(viper.GetString("GOFIRE_MASTER_HOST"), viper.GetString("GOFIRE_MASTER_PORT"))
 	if err != nil {
@@ -89,7 +89,7 @@ func (c *Cluster) KingMe() {
 	//The Master waits ...
 }
 
-//AddDevice attempts to add a device to the cluster and returns the response data. This should only be run by the master.
+//AddDevice attempts to add a microcontroller to the cluster and returns the response data. This should only be run by the master.
 func (c *Cluster) AddDevice(newMC mc.Microcontroller) (response PeerUpdateMessage, err error) {
 	newMC.ID = c.generateUniqueID()
 	c.SlaveDevices = append(c.SlaveDevices, newMC)
@@ -114,7 +114,7 @@ func (c *Cluster) AddDevice(newMC mc.Microcontroller) (response PeerUpdateMessag
 //*******Slave Only Methods*****************************************************************************
 //******************************************************************************************************
 
-//ALifeOfServitude is all that awaits this device
+//ALifeOfServitude is all that awaits this microcontroller
 func (c *Cluster) ALifeOfServitude() {
 	me, err := c.NewDevice(viper.GetString("GOFIRE_HOST"), viper.GetString("GOFIRE_PORT"))
 	if err != nil {
@@ -173,7 +173,7 @@ func (c *Cluster) JoinNetwork(URL string) error {
 	return nil
 }
 
-//generateUniqueID returns a unique id for asigning to a new device
+//generateUniqueID returns a unique id for asigning to a new microcontroller
 func (c *Cluster) generateUniqueID() int {
 	randID := rand.Intn(100)
 	for len(c.getSlavesByID(randID)) > 0 {
@@ -185,28 +185,28 @@ func (c *Cluster) generateUniqueID() int {
 
 // getSlaveByID find all the slave for a given ID
 func (c *Cluster) getSlavesByID(targetID int) []mc.Microcontroller {
-	var devices []mc.Microcontroller
+	var micros []mc.Microcontroller
 
 	for i := 0; i < len(c.SlaveDevices); i++ {
 		if c.SlaveDevices[i].ID == targetID {
-			return append(devices, c.SlaveDevices[i])
+			return append(micros, c.SlaveDevices[i])
 		}
 	}
 
-	return devices
+	return micros
 }
 
-// GetAllSlavesByIP find all slave device by its IP
+// GetAllSlavesByIP find all slave micro by its IP
 func (c *Cluster) GetAllSlavesByIP(host string) []mc.Microcontroller {
-	var devices []mc.Microcontroller
+	var micros []mc.Microcontroller
 
 	for i := 0; i < len(c.SlaveDevices); i++ {
 		if c.SlaveDevices[i].Host == host {
-			devices = append(devices, c.SlaveDevices[i])
+			micros = append(micros, c.SlaveDevices[i])
 		}
 	}
 
-	return devices
+	return micros
 }
 
 // PrintClusterInfo will cleanly print out info about the cluster
