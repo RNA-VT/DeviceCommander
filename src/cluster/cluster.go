@@ -178,7 +178,6 @@ func (c *Cluster) generateUniqueID() int {
 	randID := rand.Intn(100)
 	for len(c.getSlavesByID(randID)) > 0 {
 		randID = rand.Intn(100)
-		log.Println(len(c.getSlavesByID(randID)))
 	}
 	return randID
 }

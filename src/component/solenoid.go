@@ -42,7 +42,6 @@ func (s *Solenoid) Disable() {
 func (s *Solenoid) String() string {
 	metadata, err := json.Marshal(s.Metadata)
 	metaString := ""
-	log.Println(err)
 	if err != nil {
 		log.Println("failed to unmarshal metadata: ", string(metadata), err)
 	} else {
