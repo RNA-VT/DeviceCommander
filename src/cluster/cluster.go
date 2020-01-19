@@ -3,25 +3,24 @@ package cluster
 import (
 	"bytes"
 	"encoding/json"
+	mc "firecontroller/microcontroller"
 	"log"
 	"math/rand"
 	"net/http"
 	"net/url"
 
 	"github.com/spf13/viper"
-
-	"firecontroller/device"
 )
 
-//Cluster - This object defines an array of control devices
+//Cluster - This object defines an array of microcontrollers
 type Cluster struct {
 	Name         string
-	SlaveDevices []device.Device
-	MasterDevice device.Device
-	Me           device.Device
+	SlaveDevices []mc.Microcontroller
+	MasterDevice mc.Microcontroller
+	Me           mc.Microcontroller
 }
 
-//Start registers this device, retrieves cluster config and verifies peers
+//Start registers this microcontroller, retrieves cluster config, loads local components and verifies peers
 func (c *Cluster) Start() {
 	gofireMaster := viper.GetBool("GOFIRE_MASTER")
 	if gofireMaster {
@@ -33,8 +32,8 @@ func (c *Cluster) Start() {
 	}
 }
 
-// UpdatePeers will take a byte slice and POST it to each device
-func (c *Cluster) UpdatePeers(urlPath string, message PeerUpdateMessage, excludeDevices []device.Device) error {
+// UpdatePeers will take a byte slice and POST it to each microcontroller
+func (c *Cluster) UpdatePeers(urlPath string, message PeerUpdateMessage, excludeDevices []mc.Microcontroller) error {
 	for i := 0; i < len(c.SlaveDevices); i++ {
 		if !isExcluded(c.SlaveDevices[i], excludeDevices) {
 			body, err := json.Marshal(message)
@@ -60,25 +59,40 @@ func (c *Cluster) UpdatePeers(urlPath string, message PeerUpdateMessage, exclude
 	return nil
 }
 
+//NewDevice -
+func (c *Cluster) NewDevice(host string, port string) (mc.Microcontroller, error) {
+	micro := mc.Microcontroller{
+		ID:   c.generateUniqueID(),
+		Host: host,
+		Port: port,
+	}
+	err := micro.LoadSolenoids()
+	if err != nil {
+		return mc.Microcontroller{}, err
+	}
+	return micro, nil
+
+}
+
 //******************************************************************************************************
 //*******Master Only Methods****************************************************************************
 //******************************************************************************************************
 
-//KingMe makes this device the master
+//KingMe makes this microcontroller the master
 func (c *Cluster) KingMe() {
-	c.Me = device.Device{
-		ID:   c.generateUniqueID(),
-		Host: viper.GetString("GOFIRE_MASTER_HOST"),
-		Port: viper.GetString("GOFIRE_MASTER_PORT"),
+	me, err := c.NewDevice(viper.GetString("GOFIRE_MASTER_HOST"), viper.GetString("GOFIRE_MASTER_PORT"))
+	if err != nil {
+		log.Println("Failed to Create New Device:", err.Error())
 	}
-	c.MasterDevice = c.Me
+	c.Me = me
+	c.MasterDevice = me
 	//The Master waits ...
 }
 
-//AddDevice attempts to add a device to the cluster and returns the response data. This should only be run by the master.
-func (c *Cluster) AddDevice(newDevice device.Device) (response PeerUpdateMessage, err error) {
-	newDevice.ID = c.generateUniqueID()
-	c.SlaveDevices = append(c.SlaveDevices, newDevice)
+//AddDevice attempts to add a microcontroller to the cluster and returns the response data. This should only be run by the master.
+func (c *Cluster) AddDevice(newMC mc.Microcontroller) (response PeerUpdateMessage, err error) {
+	newMC.ID = c.generateUniqueID()
+	c.SlaveDevices = append(c.SlaveDevices, newMC)
 	c.PrintClusterInfo()
 
 	response = PeerUpdateMessage{
@@ -86,7 +100,7 @@ func (c *Cluster) AddDevice(newDevice device.Device) (response PeerUpdateMessage
 		Cluster: *c,
 	}
 
-	exclusions := []device.Device{newDevice, c.Me}
+	exclusions := []mc.Microcontroller{newMC, c.Me}
 	err = c.UpdatePeers("/", response, exclusions)
 	if err != nil {
 		log.Println("Unexpected Error during attempt to contact all peers: ", err)
@@ -100,16 +114,16 @@ func (c *Cluster) AddDevice(newDevice device.Device) (response PeerUpdateMessage
 //*******Slave Only Methods*****************************************************************************
 //******************************************************************************************************
 
-//ALifeOfServitude is all that awaits this device
+//ALifeOfServitude is all that awaits this microcontroller
 func (c *Cluster) ALifeOfServitude() {
-	c.Me = device.Device{
-		ID:   c.generateUniqueID(),
-		Host: viper.GetString("GOFIRE_HOST"),
-		Port: viper.GetString("GOFIRE_PORT"),
+	me, err := c.NewDevice(viper.GetString("GOFIRE_HOST"), viper.GetString("GOFIRE_PORT"))
+	if err != nil {
+		log.Println("Failed to Create New Device:", err.Error())
 	}
+	c.Me = me
 	masterHostname := viper.GetString("GOFIRE_MASTER_HOST") + ":" + viper.GetString("GOFIRE_MASTER_PORT")
 	//Try and Connect to the Master
-	err := test(masterHostname)
+	err = test(masterHostname)
 	if err != nil {
 		log.Println("Failed to Reach Master Device: PANIC")
 		//TODO: Add Retry or failover maybe? panic for now
@@ -127,7 +141,7 @@ func (c *Cluster) JoinNetwork(URL string) error {
 	parsedURL, err := url.Parse("http://" + URL + "/join_network")
 	log.Println("Trying to Join: " + parsedURL.String())
 	msg := JoinNetworkMessage{
-		Device: c.Me,
+		ImNewHere: c.Me,
 	}
 	body, err := json.Marshal(msg)
 	if err != nil {
@@ -146,7 +160,7 @@ func (c *Cluster) JoinNetwork(URL string) error {
 	defer resp.Body.Close()
 
 	decoder := json.NewDecoder(resp.Body)
-	var t AddToClusterMessage
+	var t PeerUpdateMessage
 	err = decoder.Decode(&t)
 	if err != nil {
 		log.Println("Failed to decode response from Master Device")
@@ -159,40 +173,39 @@ func (c *Cluster) JoinNetwork(URL string) error {
 	return nil
 }
 
-//generateUniqueID returns a unique id for asigning to a new device
+//generateUniqueID returns a unique id for asigning to a new microcontroller
 func (c *Cluster) generateUniqueID() int {
 	randID := rand.Intn(100)
 	for len(c.getSlavesByID(randID)) > 0 {
 		randID = rand.Intn(100)
-		log.Println(len(c.getSlavesByID(randID)))
 	}
 	return randID
 }
 
 // getSlaveByID find all the slave for a given ID
-func (c *Cluster) getSlavesByID(targetID int) []device.Device {
-	var devices []device.Device
+func (c *Cluster) getSlavesByID(targetID int) []mc.Microcontroller {
+	var micros []mc.Microcontroller
 
 	for i := 0; i < len(c.SlaveDevices); i++ {
 		if c.SlaveDevices[i].ID == targetID {
-			return append(devices, c.SlaveDevices[i])
+			return append(micros, c.SlaveDevices[i])
 		}
 	}
 
-	return devices
+	return micros
 }
 
-// GetAllSlavesByIP find all slave device by its IP
-func (c *Cluster) GetAllSlavesByIP(host string) []device.Device {
-	var devices []device.Device
+// GetAllSlavesByIP find all slave micro by its IP
+func (c *Cluster) GetAllSlavesByIP(host string) []mc.Microcontroller {
+	var micros []mc.Microcontroller
 
 	for i := 0; i < len(c.SlaveDevices); i++ {
 		if c.SlaveDevices[i].Host == host {
-			devices = append(devices, c.SlaveDevices[i])
+			micros = append(micros, c.SlaveDevices[i])
 		}
 	}
 
-	return devices
+	return micros
 }
 
 // PrintClusterInfo will cleanly print out info about the cluster
@@ -204,7 +217,7 @@ func (c *Cluster) PrintClusterInfo() {
 	log.Println()
 
 	for i := 0; i < len(c.SlaveDevices); i++ {
-		log.Println("----Device---")
+		log.Println("----Peer---")
 		log.Println(c.SlaveDevices[i])
 	}
 	log.Println()
@@ -219,9 +232,9 @@ func (c *Cluster) LoadCluster(cluster Cluster) {
 	c.PrintClusterInfo()
 }
 
-func isExcluded(device device.Device, exclusions []device.Device) bool {
+func isExcluded(m mc.Microcontroller, exclusions []mc.Microcontroller) bool {
 	for i := 0; i < len(exclusions); i++ {
-		if device.Host == exclusions[i].Host && device.Port == exclusions[i].Port {
+		if m.Host == exclusions[i].Host && m.Port == exclusions[i].Port {
 			return true
 		}
 	}
