@@ -13,7 +13,7 @@ import (
 type Solenoid struct {
 	BaseComponent `yaml:",inline"`
 	Type          SolenoidTypes `yaml:"type"`
-	Mode          SolenoidModes `yaml:"mode"`
+	Mode          SolenoidMode  `yaml:"mode"`
 	GPIO          io.Gpio
 }
 
@@ -87,22 +87,22 @@ func (s *Solenoid) healthy() bool {
 	return s.Enabled && !s.GPIO.Failed
 }
 
-// SolenoidTypes -
-type SolenoidTypes string
+// SolenoidType -
+type SolenoidType string
 
 const (
 	// NormallyClosed represents a solenoid that does not allow flow without power
-	NormallyClosed = "NC"
+	NormallyClosed SolenoidType = "NC"
 	// NormallyOpen represents a solenoid that is allows flow without power
 	NormallyOpen = "NO"
 )
 
-//SolenoidModes -
-type SolenoidModes string
+//SolenoidMode -
+type SolenoidMode string
 
 const (
 	//Supply - tank supply, pilot supply and transport solenoids
-	Supply = "supply"
+	Supply SolenoidMode = "supply"
 	//Outlet - propane exhaust solenoid
 	Outlet = "outlet"
 )
