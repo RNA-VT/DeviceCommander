@@ -56,6 +56,7 @@ func (m *Microcontroller) LoadSolenoids() error {
 	log.Print("Performing Initializations: ")
 	err = m.Init()
 	if err != nil {
+		log.Printf("Error During Initialization: #%v ", err)
 		return err
 	}
 	return nil
