@@ -65,7 +65,6 @@ func (g *Gpio) Init(headerPin int, initHigh bool) error {
 	} else {
 		g.Pin.Low()
 	}
-	log.Println("[GPIO INIT]: Init Completed!\n" + g.String())
 	return nil
 }
 
