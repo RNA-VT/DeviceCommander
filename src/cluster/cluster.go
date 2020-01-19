@@ -217,7 +217,7 @@ func (c *Cluster) PrintClusterInfo() {
 	log.Println()
 
 	for i := 0; i < len(c.SlaveDevices); i++ {
-		log.Println("----Peers---")
+		log.Println("----Peer---")
 		log.Println(c.SlaveDevices[i])
 	}
 	log.Println()
