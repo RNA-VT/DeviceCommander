@@ -31,6 +31,7 @@
   run-docker: run GoFire locally in a docker container
 
   run-master: run GoFire in Master mode
+  
   run-slave: run GoFire in Slave mode (port 8001)
 
   run-slave2: run GoFire in Slave mode (port 8002)
