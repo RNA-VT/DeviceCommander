@@ -28,6 +28,7 @@ func (m *Microcontroller) Init() error {
 		err := m.Solenoids[i].Init()
 		if err != nil {
 			log.Println("Failed to load: ", m.Solenoids[i].String())
+			return err
 		}
 	}
 	return nil
