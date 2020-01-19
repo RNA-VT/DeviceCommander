@@ -1,6 +1,7 @@
 package component
 
 import (
+	"encoding/json"
 	"firecontroller/io"
 	"firecontroller/utilities"
 	"log"
@@ -39,6 +40,14 @@ func (s *Solenoid) Disable() {
 }
 
 func (s *Solenoid) String() string {
+	metadata, err := json.Marshal(s.Metadata)
+	metaString := ""
+	log.Println(err)
+	if err != nil {
+		log.Println("failed to unmarshal metadata: ", string(metadata), err)
+	} else {
+		metaString = utilities.LabelString("Metadata", string(metadata))
+	}
 	return "\nSolenoid Device:" +
 		utilities.LabelString("UID", strconv.Itoa(s.UID)) +
 		utilities.LabelString("Name", s.Name) +
@@ -46,8 +55,8 @@ func (s *Solenoid) String() string {
 		utilities.LabelString("Enabled", strconv.FormatBool(s.Enabled)) +
 		utilities.LabelString("Type", string(s.Type)) +
 		utilities.LabelString("Mode", string(s.Mode)) +
-		utilities.LabelString("Voltage", strconv.Itoa(s.Voltage)) +
-		utilities.LabelString("Gpio", s.GPIO.String())
+		utilities.LabelString("Gpio", s.GPIO.String()) + metaString
+
 }
 
 //State returns a string of the current state of this solenoid

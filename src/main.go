@@ -35,6 +35,7 @@ func main() {
 		},
 		Echo: echo.New(),
 	}
+
 	app.Cluster.Start()
 
 	app.ConfigureRoutes(fullHostname)

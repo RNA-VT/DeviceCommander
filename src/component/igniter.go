@@ -9,14 +9,17 @@ func (i *Igniter) String() string {
 	return ""
 }
 
+//State returns a string represnting the current state
 func (i *Igniter) State() string {
 	return ""
 }
 
-func (i *Igniter) Enable(bool) {
+//Enable - enable this igniter and optionally initalize its gpio
+func (i *Igniter) Enable(init bool) {
 
 }
 
+//Disable - disable this igniter and set state to 'off'
 func (i *Igniter) Disable() {
 
 }
