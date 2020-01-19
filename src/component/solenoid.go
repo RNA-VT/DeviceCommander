@@ -12,7 +12,6 @@ import (
 // Solenoid - base component + solenoid specific metadata
 type Solenoid struct {
 	BaseComponent `yaml:",inline"`
-	Voltage       int           `yaml:"voltage"`
 	Type          SolenoidTypes `yaml:"type"`
 	Mode          SolenoidModes `yaml:"mode"`
 	GPIO          io.Gpio
