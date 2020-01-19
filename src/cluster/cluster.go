@@ -3,22 +3,21 @@ package cluster
 import (
 	"bytes"
 	"encoding/json"
+	mc "firecontroller/microcontroller"
 	"log"
 	"math/rand"
 	"net/http"
 	"net/url"
 
 	"github.com/spf13/viper"
-
-	"firecontroller/device"
 )
 
 //Cluster - This object defines an array of control devices
 type Cluster struct {
 	Name         string
-	SlaveDevices []device.Device
-	MasterDevice device.Device
-	Me           device.Device
+	SlaveDevices []mc.Microcontroller
+	MasterDevice mc.Microcontroller
+	Me           mc.Microcontroller
 }
 
 //Start registers this device, retrieves cluster config, loads local components and verifies peers
@@ -34,7 +33,7 @@ func (c *Cluster) Start() {
 }
 
 // UpdatePeers will take a byte slice and POST it to each device
-func (c *Cluster) UpdatePeers(urlPath string, message PeerUpdateMessage, excludeDevices []device.Device) error {
+func (c *Cluster) UpdatePeers(urlPath string, message PeerUpdateMessage, excludeDevices []mc.Microcontroller) error {
 	for i := 0; i < len(c.SlaveDevices); i++ {
 		if !isExcluded(c.SlaveDevices[i], excludeDevices) {
 			body, err := json.Marshal(message)
@@ -61,15 +60,15 @@ func (c *Cluster) UpdatePeers(urlPath string, message PeerUpdateMessage, exclude
 }
 
 //NewDevice -
-func (c *Cluster) NewDevice(host string, port string) (device.Device, error) {
-	dvc := device.Device{
+func (c *Cluster) NewDevice(host string, port string) (mc.Microcontroller, error) {
+	dvc := mc.Microcontroller{
 		ID:   c.generateUniqueID(),
 		Host: host,
 		Port: port,
 	}
 	err := dvc.LoadSolenoids()
 	if err != nil {
-		return device.Device{}, err
+		return mc.Microcontroller{}, err
 	}
 	return dvc, nil
 
@@ -91,9 +90,9 @@ func (c *Cluster) KingMe() {
 }
 
 //AddDevice attempts to add a device to the cluster and returns the response data. This should only be run by the master.
-func (c *Cluster) AddDevice(newDevice device.Device) (response PeerUpdateMessage, err error) {
-	newDevice.ID = c.generateUniqueID()
-	c.SlaveDevices = append(c.SlaveDevices, newDevice)
+func (c *Cluster) AddDevice(newMC mc.Microcontroller) (response PeerUpdateMessage, err error) {
+	newMC.ID = c.generateUniqueID()
+	c.SlaveDevices = append(c.SlaveDevices, newMC)
 	c.PrintClusterInfo()
 
 	response = PeerUpdateMessage{
@@ -101,7 +100,7 @@ func (c *Cluster) AddDevice(newDevice device.Device) (response PeerUpdateMessage
 		Cluster: *c,
 	}
 
-	exclusions := []device.Device{newDevice, c.Me}
+	exclusions := []mc.Microcontroller{newMC, c.Me}
 	err = c.UpdatePeers("/", response, exclusions)
 	if err != nil {
 		log.Println("Unexpected Error during attempt to contact all peers: ", err)
@@ -142,7 +141,7 @@ func (c *Cluster) JoinNetwork(URL string) error {
 	parsedURL, err := url.Parse("http://" + URL + "/join_network")
 	log.Println("Trying to Join: " + parsedURL.String())
 	msg := JoinNetworkMessage{
-		Device: c.Me,
+		ImNewHere: c.Me,
 	}
 	body, err := json.Marshal(msg)
 	if err != nil {
@@ -185,8 +184,8 @@ func (c *Cluster) generateUniqueID() int {
 }
 
 // getSlaveByID find all the slave for a given ID
-func (c *Cluster) getSlavesByID(targetID int) []device.Device {
-	var devices []device.Device
+func (c *Cluster) getSlavesByID(targetID int) []mc.Microcontroller {
+	var devices []mc.Microcontroller
 
 	for i := 0; i < len(c.SlaveDevices); i++ {
 		if c.SlaveDevices[i].ID == targetID {
@@ -198,8 +197,8 @@ func (c *Cluster) getSlavesByID(targetID int) []device.Device {
 }
 
 // GetAllSlavesByIP find all slave device by its IP
-func (c *Cluster) GetAllSlavesByIP(host string) []device.Device {
-	var devices []device.Device
+func (c *Cluster) GetAllSlavesByIP(host string) []mc.Microcontroller {
+	var devices []mc.Microcontroller
 
 	for i := 0; i < len(c.SlaveDevices); i++ {
 		if c.SlaveDevices[i].Host == host {
@@ -234,9 +233,9 @@ func (c *Cluster) LoadCluster(cluster Cluster) {
 	c.PrintClusterInfo()
 }
 
-func isExcluded(device device.Device, exclusions []device.Device) bool {
+func isExcluded(m mc.Microcontroller, exclusions []mc.Microcontroller) bool {
 	for i := 0; i < len(exclusions); i++ {
-		if device.Host == exclusions[i].Host && device.Port == exclusions[i].Port {
+		if m.Host == exclusions[i].Host && m.Port == exclusions[i].Port {
 			return true
 		}
 	}
