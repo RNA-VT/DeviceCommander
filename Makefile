@@ -26,6 +26,4 @@ run-slave:
 
 run-slave2:
 	cd src && GOFIRE_PORT=8002 go run main.go
-
-
-
+  
