@@ -62,7 +62,3 @@ func configureEnvironment() {
 	viper.SetDefault("GOFIRE_MOCK_GPIO", true)
 	viper.SetDefault("CLUSTER_NAME", "MasterOfHot")
 }
-
-func getDeviceConfiguration() error {
-	return nil
-}
