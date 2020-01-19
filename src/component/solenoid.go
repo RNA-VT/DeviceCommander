@@ -96,8 +96,6 @@ type SolenoidModes string
 const (
 	//Supply - tank supply, pilot supply and transport solenoids
 	Supply = "supply"
-	//Igniter - glowfly or other HSI
-	Igniter = "igniter"
 	//Outlet - propane exhaust solenoid
 	Outlet = "outlet"
 )

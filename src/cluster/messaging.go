@@ -1,16 +1,14 @@
 package cluster
 
-import (
-	"firecontroller/device"
-)
+import mc "firecontroller/microcontroller"
 
 //JoinNetworkMessage is the registration request
 type JoinNetworkMessage struct {
-	Device device.Device
+	ImNewHere mc.Microcontroller
 }
 
 //PeerUpdateMessage contains a source and cluster info
 type PeerUpdateMessage struct {
-	Source  device.Device
+	Source  mc.Microcontroller
 	Cluster Cluster
 }

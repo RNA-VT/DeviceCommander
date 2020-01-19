@@ -61,7 +61,7 @@ func (a *Application) joinNetwork(c echo.Context) error {
 		log.Println("Error decoding Request Body", err)
 	}
 
-	response, err := a.Cluster.AddDevice(msg.Device)
+	response, err := a.Cluster.AddDevice(msg.ImNewHere)
 	if err != nil {
 		log.Println("Error Joining Cluster")
 	}

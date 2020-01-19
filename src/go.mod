@@ -9,6 +9,5 @@ require (
 	github.com/stianeikeland/go-rpio/v4 v4.4.0
 	github.com/valyala/fasttemplate v1.1.0 // indirect
 	golang.org/x/crypto v0.0.0-20191108234033-bd318be0434a // indirect
-	google.golang.org/appengine v1.1.0
 	gopkg.in/yaml.v2 v2.2.4
 )
