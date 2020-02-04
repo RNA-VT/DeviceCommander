@@ -3,25 +3,39 @@ package cluster
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
+	"firecontroller/component"
+	"firecontroller/microcontroller"
 	mc "firecontroller/microcontroller"
+	"firecontroller/utilities"
 	"log"
 	"math/rand"
 	"net/http"
 	"net/url"
+	"strconv"
 
 	"github.com/spf13/viper"
 )
 
 //Cluster - This object defines an array of microcontrollers
 type Cluster struct {
-	Name         string
-	SlaveDevices []mc.Microcontroller
-	MasterDevice mc.Microcontroller
-	Me           mc.Microcontroller
+	Name                 string
+	SlaveMicrocontrolers []mc.Microcontroller
+	Master               mc.Microcontroller
+	Me                   mc.Microcontroller
+}
+
+func (c *Cluster) String() string {
+	cluster, err := utilities.StringJSON(c)
+	if err != nil {
+		return ""
+	}
+	return cluster
 }
 
 //Start registers this microcontroller, retrieves cluster config, loads local components and verifies peers
 func (c *Cluster) Start() {
+	//Set global ref to cluster
 	gofireMaster := viper.GetBool("GOFIRE_MASTER")
 	if gofireMaster {
 		log.Println("Master Mode Enabled!")
@@ -33,19 +47,19 @@ func (c *Cluster) Start() {
 }
 
 // UpdatePeers will take a byte slice and POST it to each microcontroller
-func (c *Cluster) UpdatePeers(urlPath string, message PeerUpdateMessage, excludeDevices []mc.Microcontroller) error {
-	for i := 0; i < len(c.SlaveDevices); i++ {
-		if !isExcluded(c.SlaveDevices[i], excludeDevices) {
-			body, err := json.Marshal(message)
+func (c *Cluster) UpdatePeers(urlPath string, message interface{}, exclude []mc.Microcontroller) error {
+	for i := 0; i < len(c.SlaveMicrocontrolers); i++ {
+		if !isExcluded(c.SlaveMicrocontrolers[i], exclude) {
+			body, err := utilities.JSON(message)
 			if err != nil {
 				log.Println("Failed to convert cluster to json: ", c)
 				return err
 			}
-			currURL := "http://" + c.SlaveDevices[i].ToFullAddress() + urlPath
+			currURL := "http://" + c.SlaveMicrocontrolers[i].ToFullAddress() + urlPath
 
 			resp, err := http.Post(currURL, "application/json", bytes.NewBuffer(body))
 			if err != nil {
-				log.Println("WARNING: Failed to POST to Peer: ", c.SlaveDevices[i].String(), currURL)
+				log.Println("WARNING: Failed to POST to Peer: ", c.SlaveMicrocontrolers[i].String(), currURL)
 				log.Println(err)
 			} else {
 				defer resp.Body.Close()
@@ -59,8 +73,8 @@ func (c *Cluster) UpdatePeers(urlPath string, message PeerUpdateMessage, exclude
 	return nil
 }
 
-//NewDevice -
-func (c *Cluster) NewDevice(host string, port string) (mc.Microcontroller, error) {
+//NewMicrocontroller -
+func (c *Cluster) NewMicrocontroller(host string, port string) (mc.Microcontroller, error) {
 	micro := mc.Microcontroller{
 		ID:   c.generateUniqueID(),
 		Host: host,
@@ -74,25 +88,66 @@ func (c *Cluster) NewDevice(host string, port string) (mc.Microcontroller, error
 
 }
 
+//GetMicrocontrollers returns a map[microcontrollerID]microcontroller of all Microcontrollers in the cluster
+func (c *Cluster) GetMicrocontrollers() map[int]microcontroller.Microcontroller {
+	micros := make(map[int]microcontroller.Microcontroller)
+	for i := 0; i < len(c.SlaveMicrocontrolers); i++ {
+		micros[c.SlaveMicrocontrolers[i].ID] = c.SlaveMicrocontrolers[i]
+	}
+	return micros
+}
+
+//GetComponent - gets a component by its id
+func (c *Cluster) GetComponent(id string) (sol component.Solenoid, err error) {
+	components := c.GetComponents()
+	sol, ok := components[id]
+	if !ok {
+		return sol, errors.New("Component Not Found")
+	}
+	return sol, nil
+}
+
+//GetComponents builds a map of all the components in the cluster by a cluster wide unique key
+func (c *Cluster) GetComponents() map[string]component.Solenoid {
+	components := make(map[string]component.Solenoid, c.countComponents())
+	for i := 0; i < len(c.SlaveMicrocontrolers); i++ {
+		for j := 0; j < len(c.SlaveMicrocontrolers[i].Solenoids); j++ {
+			key := strconv.Itoa(c.SlaveMicrocontrolers[i].Solenoids[j].UID)
+			components[key] = c.SlaveMicrocontrolers[i].Solenoids[j]
+		}
+	}
+	return components
+}
+func (c *Cluster) countComponents() int {
+	count := 0
+	for i := 0; i < len(c.SlaveMicrocontrolers); i++ {
+		count += len(c.SlaveMicrocontrolers[i].Solenoids)
+	}
+
+	return count
+}
+
 //******************************************************************************************************
 //*******Master Only Methods****************************************************************************
 //******************************************************************************************************
 
 //KingMe makes this microcontroller the master
 func (c *Cluster) KingMe() {
-	me, err := c.NewDevice(viper.GetString("GOFIRE_MASTER_HOST"), viper.GetString("GOFIRE_MASTER_PORT"))
+	me, err := c.NewMicrocontroller(viper.GetString("GOFIRE_MASTER_HOST"), viper.GetString("GOFIRE_MASTER_PORT"))
 	if err != nil {
-		log.Println("Failed to Create New Device:", err.Error())
+		log.Println("Failed to Create New Microcontroller:", err.Error())
 	}
 	c.Me = me
-	c.MasterDevice = me
+	c.Master = me
+	//The master also serves
+	c.SlaveMicrocontrolers = append(c.SlaveMicrocontrolers, me)
 	//The Master waits ...
 }
 
-//AddDevice attempts to add a microcontroller to the cluster and returns the response data. This should only be run by the master.
-func (c *Cluster) AddDevice(newMC mc.Microcontroller) (response PeerUpdateMessage, err error) {
+//AddMicrocontroller attempts to add a microcontroller to the cluster and returns the response data. This should only be run by the master.
+func (c *Cluster) AddMicrocontroller(newMC mc.Microcontroller) (response PeerUpdateMessage, err error) {
 	newMC.ID = c.generateUniqueID()
-	c.SlaveDevices = append(c.SlaveDevices, newMC)
+	c.SlaveMicrocontrolers = append(c.SlaveMicrocontrolers, newMC)
 	c.PrintClusterInfo()
 
 	response = PeerUpdateMessage{
@@ -116,16 +171,16 @@ func (c *Cluster) AddDevice(newMC mc.Microcontroller) (response PeerUpdateMessag
 
 //ALifeOfServitude is all that awaits this microcontroller
 func (c *Cluster) ALifeOfServitude() {
-	me, err := c.NewDevice(viper.GetString("GOFIRE_HOST"), viper.GetString("GOFIRE_PORT"))
+	me, err := c.NewMicrocontroller(viper.GetString("GOFIRE_HOST"), viper.GetString("GOFIRE_PORT"))
 	if err != nil {
-		log.Println("Failed to Create New Device:", err.Error())
+		log.Println("Failed to Create New Microcontroller:", err.Error())
 	}
 	c.Me = me
 	masterHostname := viper.GetString("GOFIRE_MASTER_HOST") + ":" + viper.GetString("GOFIRE_MASTER_PORT")
 	//Try and Connect to the Master
 	err = test(masterHostname)
 	if err != nil {
-		log.Println("Failed to Reach Master Device: PANIC")
+		log.Println("Failed to Reach Master Microcontroller: PANIC")
 		//TODO: Add Retry or failover maybe? panic for now
 		panic(err)
 	}
@@ -163,7 +218,7 @@ func (c *Cluster) JoinNetwork(URL string) error {
 	var t PeerUpdateMessage
 	err = decoder.Decode(&t)
 	if err != nil {
-		log.Println("Failed to decode response from Master Device")
+		log.Println("Failed to decode response from Master Microcontroller")
 		log.Println(err)
 		return err
 	}
@@ -175,9 +230,10 @@ func (c *Cluster) JoinNetwork(URL string) error {
 
 //generateUniqueID returns a unique id for asigning to a new microcontroller
 func (c *Cluster) generateUniqueID() int {
-	randID := rand.Intn(100)
+	limit := viper.GetInt("MICROCONTORLLER_LIMIT")
+	randID := rand.Intn(limit)
 	for len(c.getSlavesByID(randID)) > 0 {
-		randID = rand.Intn(100)
+		randID = rand.Intn(limit)
 	}
 	return randID
 }
@@ -186,22 +242,9 @@ func (c *Cluster) generateUniqueID() int {
 func (c *Cluster) getSlavesByID(targetID int) []mc.Microcontroller {
 	var micros []mc.Microcontroller
 
-	for i := 0; i < len(c.SlaveDevices); i++ {
-		if c.SlaveDevices[i].ID == targetID {
-			return append(micros, c.SlaveDevices[i])
-		}
-	}
-
-	return micros
-}
-
-// GetAllSlavesByIP find all slave micro by its IP
-func (c *Cluster) GetAllSlavesByIP(host string) []mc.Microcontroller {
-	var micros []mc.Microcontroller
-
-	for i := 0; i < len(c.SlaveDevices); i++ {
-		if c.SlaveDevices[i].Host == host {
-			micros = append(micros, c.SlaveDevices[i])
+	for i := 0; i < len(c.SlaveMicrocontrolers); i++ {
+		if c.SlaveMicrocontrolers[i].ID == targetID {
+			return append(micros, c.SlaveMicrocontrolers[i])
 		}
 	}
 
@@ -212,13 +255,13 @@ func (c *Cluster) GetAllSlavesByIP(host string) []mc.Microcontroller {
 func (c *Cluster) PrintClusterInfo() {
 	log.Println()
 	log.Println("====Master====")
-	log.Println(c.MasterDevice)
+	log.Println(c.Master)
 
 	log.Println()
 
-	for i := 0; i < len(c.SlaveDevices); i++ {
+	for i := 0; i < len(c.SlaveMicrocontrolers); i++ {
 		log.Println("----Peer---")
-		log.Println(c.SlaveDevices[i])
+		log.Println(c.SlaveMicrocontrolers[i])
 	}
 	log.Println()
 }
@@ -227,8 +270,8 @@ func (c *Cluster) PrintClusterInfo() {
 func (c *Cluster) LoadCluster(cluster Cluster) {
 	log.Println("Loading Updated Cluster Data...")
 	c.Name = cluster.Name
-	c.MasterDevice = cluster.MasterDevice
-	c.SlaveDevices = cluster.SlaveDevices
+	c.Master = cluster.Master
+	c.SlaveMicrocontrolers = cluster.SlaveMicrocontrolers
 	c.PrintClusterInfo()
 }
 

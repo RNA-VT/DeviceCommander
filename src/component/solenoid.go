@@ -1,7 +1,6 @@
 package component
 
 import (
-	"encoding/json"
 	"firecontroller/io"
 	"firecontroller/utilities"
 	"log"
@@ -19,18 +18,32 @@ type Solenoid struct {
 
 //Init - Enable, set initial value, log solenoid initial state
 func (s *Solenoid) Init() error {
-	s.Enable(true)
+	err := s.Enable(true)
+	if err != nil {
+		return err
+	}
+	//Create UUID now that GPIO is initilized
+	s.setID()
 	log.Println("Enabled and Initialized Solenoid:", s.String())
-	//TODO: Look into what feedback we can get on gpio init
+
 	return nil
 }
 
+func (s *Solenoid) setID() {
+	//HeaderPin is unique per micro, but this may need to be revisited for components requiring more than 1 HeaderPin
+	s.UID = s.HeaderPin
+}
+
 //Enable and optionally initialize this Solenoid
-func (s *Solenoid) Enable(init bool) {
+func (s *Solenoid) Enable(init bool) error {
 	s.Enabled = true
 	if init {
-		s.GPIO.Init(s.HeaderPin, false)
+		err := s.GPIO.Init(s.HeaderPin, false)
+		if err != nil {
+			return err
+		}
 	}
+	return nil
 }
 
 //Disable this solenoid
@@ -39,51 +52,69 @@ func (s *Solenoid) Disable() {
 }
 
 func (s *Solenoid) String() string {
-	metadata, err := json.Marshal(s.Metadata)
-	metaString := ""
+	metadata, err := utilities.StringJSON(s.Metadata)
 	if err != nil {
 		log.Println("failed to unmarshal metadata: ", string(metadata), err)
-	} else {
-		metaString = utilities.LabelString("Metadata", string(metadata))
 	}
-	return "\nSolenoid Device:" +
+	return "\n[Component]: Solenoid" +
 		utilities.LabelString("UID", strconv.Itoa(s.UID)) +
 		utilities.LabelString("Name", s.Name) +
 		utilities.LabelString("Header Pin", strconv.Itoa(s.HeaderPin)) +
 		utilities.LabelString("Enabled", strconv.FormatBool(s.Enabled)) +
 		utilities.LabelString("Type", string(s.Type)) +
 		utilities.LabelString("Mode", string(s.Mode)) +
-		utilities.LabelString("Gpio", s.GPIO.String()) + metaString
+		utilities.LabelString("Gpio", s.GPIO.String()) +
+		utilities.LabelString("Metadata", metadata)
 
 }
 
 //State returns a string of the current state of this solenoid
 func (s *Solenoid) State() string {
-	return "[GPIO PIN " + strconv.Itoa(s.HeaderPin)
+	return "[GPIO PIN " + strconv.Itoa(s.HeaderPin) + "]: " + s.GPIO.CurrentStateString()
 }
 
-func (s *Solenoid) open(duration int) {
-	if s.healthy() {
+//Open - Open the solenoid
+func (s *Solenoid) Open() {
+	if s.Healthy() {
 		s.GPIO.Pin.High()
-		s.close(duration)
+	} else {
+		//TODO: should we fail the pin/component here?
+		//Log attempt to open unhealthy solenoid
+		log.Println("*Cough* *Cough*, I don't think I'm going to make it in today...")
+	}
+}
+
+//OpenFor - Open the solenoid for a set duration
+func (s *Solenoid) OpenFor(duration int) {
+	if s.Healthy() {
+		s.GPIO.Pin.High()
+		if duration > 0 {
+			s.Close(duration)
+		}
 	} else {
 		//Log attempt to open unhealthy solenoid
 	}
 }
 
-func (s *Solenoid) close(delay int) {
-	if s.healthy() {
+//Close - Close the solenoid, optionally after a delay
+func (s *Solenoid) Close(delay int) {
+	//TODO: Failing to Close a Solenoid is a pretty bad situation
+	if s.Healthy() {
 		if duration, err := time.ParseDuration(strconv.Itoa(delay) + "ms"); err == nil {
 			time.AfterFunc(duration, s.GPIO.Pin.Low)
 		} else {
 			//Log Failure to Close
+			log.Println("[OHNOWHATSENDHELP]: Failed to Close a Solenoid due to an invalid or malformed delay time. \n~~~~Closing now~~~~")
+			s.GPIO.Pin.Low()
 		}
 	} else {
 		//Log attempt to close unhealthy
+		log.Println("[OHNOWHATSENDHELP]: Failed to Close a Solenoid! It's unhealthy and cannot be commanded.")
 	}
 }
 
-func (s *Solenoid) healthy() bool {
+//Healthy - true if this component is healthy
+func (s *Solenoid) Healthy() bool {
 	return s.Enabled && !s.GPIO.Failed
 }
 
@@ -106,3 +137,6 @@ const (
 	//Outlet - propane exhaust solenoid
 	Outlet = "outlet"
 )
+
+//DoNotCloseDuration - placeholder
+const DoNotCloseDuration = -1

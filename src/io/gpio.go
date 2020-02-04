@@ -1,7 +1,6 @@
 package io
 
 import (
-	"encoding/json"
 	"errors"
 	"firecontroller/io/mock"
 	"firecontroller/utilities"
@@ -32,11 +31,9 @@ type GpioPin interface {
 
 func (g *Gpio) String() string {
 	var pinString string
-	json, err := json.Marshal(g.Pin)
+	pinString, err := utilities.StringJSON(g.Pin)
 	if err != nil {
 		pinString = err.Error()
-	} else {
-		pinString = string(json)
 	}
 	return utilities.LabelString("\tFAILED", strconv.FormatBool(g.Failed)) +
 		utilities.LabelString("\tPin", pinString) +
@@ -53,7 +50,7 @@ func (g *Gpio) Init(headerPin int, initHigh bool) error {
 	//This pin theoretically checks out, but is it real?
 	if viper.GetBool("GOFIRE_MOCK_GPIO") {
 		//Nothing is real and this pin, especially, is laughable. Mock it.
-		g.Pin = mock.Pin{
+		g.Pin = &mock.Pin{
 			Pin: g.PinInfo.BcmPin,
 		}
 	} else {
@@ -87,7 +84,7 @@ func (g *Gpio) CurrentStateString() string {
 	if g.Pin.Read() == rpio.High {
 		state = "ON"
 	}
-	return g.PinInfo.String() + "\n\t" + "State: " + state
+	return state
 }
 
 func (g *Gpio) loadPinInfoByHeader(headerPin int) error {

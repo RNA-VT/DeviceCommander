@@ -3,6 +3,7 @@ module firecontroller
 go 1.12
 
 require (
+	github.com/docker/docker v1.13.1 // indirect
 	github.com/labstack/echo v3.3.10+incompatible
 	github.com/labstack/gommon v0.3.0 // indirect
 	github.com/spf13/viper v1.6.1

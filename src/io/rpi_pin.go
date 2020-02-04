@@ -70,7 +70,7 @@ func GetPins() []RpiPinMap {
 		RpiPinMap{
 			HeaderPin: 7,
 			BcmPin:    4,
-			Name:      "GPIO  7",
+			Name:      "GPIO 7",
 		},
 		RpiPinMap{
 			HeaderPin: 9,

@@ -1,4 +1,4 @@
-device:
+microcontroller:
   name: "SignFire Controller"
   description: "Located in the control case on the MindShark Sign"
 solenoids: 

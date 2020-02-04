@@ -3,6 +3,7 @@ package main
 /* Al useful imports */
 import (
 	"firecontroller/app"
+	"firecontroller/app/routes"
 	"firecontroller/cluster"
 	"fmt"
 
@@ -35,10 +36,11 @@ func main() {
 		},
 		Echo: echo.New(),
 	}
-
+	routes.API = routes.APIService{
+		Cluster: &app.Cluster,
+	}
 	app.Cluster.Start()
-
-	app.ConfigureRoutes(fullHostname)
+	routes.ConfigureRoutes(fullHostname, app.Echo)
 }
 
 func configureEnvironment() {
@@ -61,4 +63,5 @@ func configureEnvironment() {
 	viper.SetDefault("GOFIRE_MASTER_HOST", "127.0.0.1")
 	viper.SetDefault("GOFIRE_MOCK_GPIO", true)
 	viper.SetDefault("CLUSTER_NAME", "MasterOfHot")
+	viper.SetDefault("MICROCONTORLLER_LIMIT", 255)
 }
