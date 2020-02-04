@@ -32,7 +32,10 @@ func ConfigureRoutes(listenURL string, e *echo.Echo) {
 	}))
 
 	// Routes
-	e.GET("/", API.defaultGet)
+	e.Static("/public", "../public/dist")
+	// e.File("/", "../public/dist/index.html")
+	e.File("/*", "../public/dist/index.html")
+	// e.GET("/", API.defaultGet)
 	e.GET("/v1", API.defaultGet)
 
 	API.addRegistrationRoutes(e)
