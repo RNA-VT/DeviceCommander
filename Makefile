@@ -1,4 +1,3 @@
-
 build:
 	cd src && go build
 	
@@ -26,4 +25,10 @@ run-slave:
 
 run-slave2:
 	cd src && GOFIRE_PORT=8002 GO111MODULE=on go run main.go
+
+run-js:
+	cd public && npm run start
+
+build-js:
+	cd public && npm run build
   

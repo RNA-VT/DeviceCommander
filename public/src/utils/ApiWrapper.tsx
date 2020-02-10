@@ -2,7 +2,7 @@ class API {
   masterUrl: string;
 
   constructor(url: string) {
-    this.masterUrl = url
+    this.masterUrl = url + '/v1'
 
     this.openSolenoid = this.openSolenoid.bind(this)
   }
