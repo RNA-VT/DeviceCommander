@@ -14,11 +14,10 @@ type APIService struct {
 	Cluster *cluster.Cluster
 }
 
-//API - Container object for API worker methods
-var API APIService
+const apiVersion = "1"
 
 // ConfigureRoutes will use Echo to start listening on the appropriate paths
-func ConfigureRoutes(listenURL string, e *echo.Echo) {
+func ConfigureRoutes(listenURL string, e *echo.Echo, API APIService) {
 
 	// Middleware
 	e.Use(middleware.Logger())
@@ -30,7 +29,6 @@ func ConfigureRoutes(listenURL string, e *echo.Echo) {
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"},
 	}))
-
 	// Routes
 	e.Static("/public", "../public/dist")
 	// e.File("/", "../public/dist/index.html")
@@ -40,6 +38,7 @@ func ConfigureRoutes(listenURL string, e *echo.Echo) {
 
 	API.addRegistrationRoutes(e)
 	API.addInfoRoutes(e)
+	API.addErrorRoutes(e)
 	API.addCommandRoutes(e)
 
 	log.Println("Configure routes listening on " + listenURL)

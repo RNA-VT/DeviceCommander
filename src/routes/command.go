@@ -44,7 +44,7 @@ func (a APIService) fireSolenoid(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, "Component Not Found.")
 	}
 	component.OpenFor(duration)
-	return c.JSON(http.StatusOK, a.Cluster.SlaveMicrocontrolers)
+	return c.JSON(http.StatusOK, a.Cluster.SlaveMicrocontrollers)
 }
 func (a APIService) closeSolenoid(c echo.Context) error {
 	component, err := a.Cluster.GetComponent(c.Param("id"))

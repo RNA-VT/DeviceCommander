@@ -24,7 +24,7 @@ func (a APIService) getClusterInfo(c echo.Context) error {
 }
 
 func (a APIService) getMicrocontrollers(c echo.Context) error {
-	return c.JSON(http.StatusOK, a.Cluster.SlaveMicrocontrolers)
+	return c.JSON(http.StatusOK, a.Cluster.SlaveMicrocontrollers)
 }
 
 func (a APIService) getMicrocontroller(c echo.Context) error {
