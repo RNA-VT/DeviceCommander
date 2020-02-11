@@ -7,6 +7,7 @@ import (
 	"log"
 	"strconv"
 
+	"github.com/spf13/viper"
 	"gopkg.in/yaml.v2"
 )
 
@@ -37,6 +38,8 @@ func (m Microcontroller) GetConfig() (config Config) {
 	config.ID = m.ID
 	config.Host = m.Host
 	config.Port = m.Port
+	config.Name = m.Name
+	config.Description = m.Description
 	config.Solenoids = make([]component.SolenoidConfig, len(m.Solenoids))
 	for i, sol := range m.Solenoids {
 		config.Solenoids[i] = sol.GetConfig()
@@ -47,8 +50,10 @@ func (m Microcontroller) GetConfig() (config Config) {
 //Load -
 func (m *Microcontroller) Load(config Config) {
 	m.ID = config.ID
-	m.Host = config.Host
-	m.Port = config.Port
+	m.Name = config.Name
+	m.Description = config.Description
+	m.Host = viper.GetString("GOFIRE_HOST")
+	m.Port = viper.GetString("GOFIRE_PORT")
 	m.Solenoids = make([]component.Solenoid, len(config.Solenoids))
 	for i, sol := range config.Solenoids {
 		m.Solenoids[i].Load(sol)
