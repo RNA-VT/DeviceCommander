@@ -8,12 +8,65 @@ import (
 	"time"
 )
 
-// Solenoid - base component + solenoid specific metadata
+// Solenoid - SolenoidConfig + GPIO
 type Solenoid struct {
-	BaseComponent `yaml:",inline"`
+	GPIO           io.Gpio
+	SolenoidConfig `yaml:",inline"`
+}
+
+//SolenoidConfig - Static config values for transport and storage
+type SolenoidConfig struct {
 	Type          SolenoidType `yaml:"type"`
 	Mode          SolenoidMode `yaml:"mode"`
-	GPIO          io.Gpio
+	BaseComponent `yaml:",inline"`
+}
+
+// SolenoidType -
+type SolenoidType string
+
+const (
+	// NormallyClosed represents a solenoid that does not allow flow without power
+	NormallyClosed SolenoidType = "NC"
+	// NormallyOpen represents a solenoid that is allows flow without power
+	NormallyOpen = "NO"
+)
+
+//SolenoidMode -
+type SolenoidMode string
+
+const (
+	//Supply - tank supply, pilot supply and transport solenoids
+	Supply SolenoidMode = "supply"
+	//Outlet - propane exhaust solenoid
+	Outlet = "outlet"
+)
+
+//DoNotCloseDuration - placeholder
+const DoNotCloseDuration = -1
+
+//GetConfig -
+func (s Solenoid) GetConfig() SolenoidConfig {
+	config := SolenoidConfig{
+		Type: s.Type,
+		Mode: s.Mode,
+	}
+	config.UID = s.UID
+	config.Enabled = s.Enabled
+	config.Name = s.Name
+	config.HeaderPin = s.HeaderPin
+	config.Metadata = s.Metadata
+	return config
+}
+
+//Load -
+func (s *Solenoid) Load(config SolenoidConfig) {
+	s.UID = config.UID
+	s.Enabled = config.Enabled
+	s.Name = config.Name
+	s.HeaderPin = config.HeaderPin
+	s.Metadata = config.Metadata
+	s.Mode = config.Mode
+	s.Type = config.Type
 }
 
 //Init - Enable, set initial value, log solenoid initial state
@@ -22,28 +75,23 @@ func (s *Solenoid) Init() error {
 	if err != nil {
 		return err
 	}
-	//Create UUID now that GPIO is initilized
-	s.setID()
 	log.Println("Enabled and Initialized Solenoid:", s.String())
 
 	return nil
 }
 
-func (s *Solenoid) setID() {
-	//HeaderPin is unique per micro, but this may need to be revisited for components requiring more than 1 HeaderPin
-	s.UID = s.HeaderPin
-}
-
-//Enable and optionally initialize this Solenoid
-func (s *Solenoid) Enable(init bool) error {
-	s.Enabled = true
+//Enable and optionally initializes the gpio pin
+func (s *Solenoid) Enable(init bool) (err error) {
 	if init {
-		err := s.GPIO.Init(s.HeaderPin, false)
+		err = s.GPIO.Init(s.HeaderPin, false)
 		if err != nil {
-			return err
+			return
 		}
 	}
-	return nil
+	s.Enabled = true
+	//Create UUID now that GPIO is enabled
+	s.setID()
+	return
 }
 
 //Disable this solenoid
@@ -51,7 +99,7 @@ func (s *Solenoid) Disable() {
 	s.Enabled = false
 }
 
-func (s *Solenoid) String() string {
+func (s Solenoid) String() string {
 	metadata, err := utilities.StringJSON(s.Metadata)
 	if err != nil {
 		log.Println("failed to unmarshal metadata: ", string(metadata), err)
@@ -69,8 +117,18 @@ func (s *Solenoid) String() string {
 }
 
 //State returns a string of the current state of this solenoid
-func (s *Solenoid) State() string {
+func (s Solenoid) State() string {
 	return "[GPIO PIN " + strconv.Itoa(s.HeaderPin) + "]: " + s.GPIO.CurrentStateString()
+}
+
+//Healthy - true if this component is healthy
+func (s Solenoid) Healthy() bool {
+	return s.Enabled && !s.GPIO.Failed
+}
+
+func (s *Solenoid) setID() {
+	//HeaderPin is unique per micro, but this may need to be revisited for components requiring more than 1 HeaderPin
+	s.UID = s.HeaderPin
 }
 
 //Open - Open the solenoid
@@ -104,39 +162,11 @@ func (s *Solenoid) Close(delay int) {
 			time.AfterFunc(duration, s.GPIO.Pin.Low)
 		} else {
 			//Log Failure to Close
-			log.Println("[OHNOWHATSENDHELP]: Failed to Close a Solenoid due to an invalid or malformed delay time. \n~~~~Closing now~~~~")
+			log.Println("Failed to Close a Solenoid due to an invalid or malformed delay time. \n~~~~Closing now~~~~")
 			s.GPIO.Pin.Low()
 		}
 	} else {
 		//Log attempt to close unhealthy
-		log.Println("[OHNOWHATSENDHELP]: Failed to Close a Solenoid! It's unhealthy and cannot be commanded.")
+		log.Println("Failed to Close a Solenoid! It's unhealthy and cannot be commanded.")
 	}
 }
-
-//Healthy - true if this component is healthy
-func (s *Solenoid) Healthy() bool {
-	return s.Enabled && !s.GPIO.Failed
-}
-
-// SolenoidType -
-type SolenoidType string
-
-const (
-	// NormallyClosed represents a solenoid that does not allow flow without power
-	NormallyClosed SolenoidType = "NC"
-	// NormallyOpen represents a solenoid that is allows flow without power
-	NormallyOpen = "NO"
-)
-
-//SolenoidMode -
-type SolenoidMode string
-
-const (
-	//Supply - tank supply, pilot supply and transport solenoids
-	Supply SolenoidMode = "supply"
-	//Outlet - propane exhaust solenoid
-	Outlet = "outlet"
-)
-
-//DoNotCloseDuration - placeholder
-const DoNotCloseDuration = -1

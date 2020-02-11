@@ -42,7 +42,7 @@ type RpiPinMap struct {
 	HeaderPin int
 }
 
-func (r *RpiPinMap) String() string {
+func (r RpiPinMap) String() string {
 	return utilities.LabelString("\t\tName", r.Name) +
 		utilities.LabelString("\t\tHeader Pin", strconv.Itoa(r.HeaderPin)) +
 		utilities.LabelString("\t\tBCM Pin", strconv.Itoa(int(r.BcmPin)))

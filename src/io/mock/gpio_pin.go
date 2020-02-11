@@ -13,9 +13,7 @@ type PinState struct {
 var localState PinState
 
 //Pin mocks an rpio.Pin object
-type Pin struct {
-	Pin uint8
-}
+type Pin uint8
 
 // Output - Set pin as Output
 func (pin Pin) Output() {

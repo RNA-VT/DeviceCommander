@@ -51,8 +51,8 @@ func (a APIService) peerUpdate(c echo.Context) error {
 	//TODO: Inform Master of Bad Config
 
 	//Update my cluster
-	a.Cluster.LoadCluster(clustahUpdate.Cluster)
+	a.Cluster.Load(clustahUpdate.Cluster)
 
 	log.Println("Peer Update Completed")
-	return c.JSON(http.StatusOK, "Peer Update Successfully Received by : "+a.Cluster.Me.String())
+	return c.JSON(http.StatusOK, "Peer Update Successfully Received by : "+(*a.Cluster.Me).String())
 }

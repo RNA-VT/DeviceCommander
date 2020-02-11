@@ -11,6 +11,8 @@
   GOFIRE_MASTER Set to true to let this node take on the master role if a master cannot be reached (Default: false)
   GOFIRE_MASTER_HOST Master service hostname (Default: 127.0.0.1) 
   GOFIRE_MASTER_PORT Master service port (Default: 8000)
+	GOFIRE_MOCK_GPIO Activates mock mode for all io modules (Default: true)
+	MICROCONTORLLER_LIMIT sets the maximum number of devices this cluster can accept (Default: 255)
   
 
 ## Example Start
