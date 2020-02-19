@@ -19,22 +19,11 @@ const DeviceManagementPage = () => {
 
             {deviceManager =>
               deviceManager.getMicrocontrollers().map((mc) => (
-                <ListItem key={mc.ID}>
-                  <DeviceCard>
-                    {mc.Host}:{mc.Port}
-
-                    {
-                      mc.Solenoids.map((solenoid) => {
-                        return (
-                          <div key={solenoid.UID}>
-                            {solenoid.Name}
-                          </div>
-                        )
-                      })
-                    }
-                  </DeviceCard>
-
-                </ListItem>
+                <>
+                  <ListItem key={mc.ID}>
+                    <DeviceCard microcontroller={mc} />
+                  </ListItem>
+                </>
               ))
             }
           </Subscribe>

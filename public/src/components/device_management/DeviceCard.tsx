@@ -1,5 +1,14 @@
 import * as React from 'react'
-import { Card, makeStyles } from '@material-ui/core'
+import SolenoidTable from "./SolenoidTable"
+import {
+  Card,
+  makeStyles,
+  Grid,
+  Button
+} from '@material-ui/core'
+
+// import { EditIcon } from '@material-ui/icons'
+import EditIcon from '@material-ui/icons/Edit'
 
 const useStyles = makeStyles({
   card: {
@@ -12,20 +21,28 @@ const useStyles = makeStyles({
     transform: 'scale(0.8)',
   },
   title: {
-    fontSize: 14,
+    margin: 0,
   },
   pos: {
     marginBottom: 12,
   },
 });
 
-const DeviceCard = (props) => {
+const DeviceCard = ({ children, microcontroller }) => {
   const classes = useStyles({})
 
   return (
     <Card className={classes.card}>
-      {props.children}
-    </Card>
+      <p className={classes.title}><strong>ID:</strong> {microcontroller.ID}</p>
+      <p className={classes.title}><strong>URL:</strong> {microcontroller.Host}:{microcontroller.Port}</p>
+      <p className={classes.title}><strong>Description:</strong> {microcontroller.Description}</p>
+      <Grid container spacing={3}>
+        <Grid item sm>
+          <SolenoidTable solenoids={microcontroller.Solenoids} />
+        </Grid>
+      </Grid>
+      {children}
+    </Card >
   )
 }
 

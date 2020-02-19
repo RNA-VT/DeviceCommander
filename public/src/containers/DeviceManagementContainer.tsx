@@ -38,7 +38,7 @@ class DeviceManagement extends Container<DeviceManagementState> {
 
   getMicrocontrollers() {
     if (this.state.slaveMicrocontrollers) {
-      return [...this.state.master, ...this.state.slaveMicrocontrollers]
+      return [...this.state.slaveMicrocontrollers]
     }
 
     return [this.state.master]
