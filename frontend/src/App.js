@@ -5,11 +5,14 @@ import { Provider } from 'unstated-typescript'
 import { normalize } from 'polished'
 import Routes from './Routes'
 
-render(
+function App() {
+  return (
     <Provider>
-        <Router>
-            <Routes />
-        </Router>
-    </Provider>,
-    document.getElementById('app')
-)
+      <Router>
+        <Routes />
+      </Router>
+    </Provider>
+  );
+}
+
+export default App;

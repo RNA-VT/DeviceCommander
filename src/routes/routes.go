@@ -30,9 +30,9 @@ func ConfigureRoutes(listenURL string, e *echo.Echo, API APIService) {
 		AllowOrigins: []string{"*"},
 	}))
 	// Routes
-	e.Static("/public", "../public/dist")
+	e.Static("/static", "../frontend/build/static")
 	// e.File("/", "../public/dist/index.html")
-	e.File("/*", "../public/dist/index.html")
+	e.File("/*", "../frontend/build/index.html")
 	// e.GET("/", API.defaultGet)
 	e.GET("/v1", API.defaultGet)
 
