@@ -7,21 +7,25 @@ import PageHeader from '../components/shared/PageHeader'
 
 import PositionedButtonContainer from "../components/device_management/PositionedButtonContainer"
 
+const DeviceList = () => {
+  return (
+    <Subscribe to={[DeviceManagement]}>
+      {DeviceManagement => (
+        <div>
+          <PositionedButtonContainer
+            deviceManager={DeviceManagement} />
+        </div>
+      )}
+    </Subscribe>
+  )
+}
+
 const DashboardEdit = () => (
   <Wrapper>
     <PageHeader />
     <Container maxWidth="md">
       <List>
-        <Subscribe to={[DeviceManagement]}>
-          {deviceManager => {
-            return (
-              <div>
-                <PositionedButtonContainer
-                  deviceManager={deviceManager} />
-              </div>
-            )
-          }}
-        </Subscribe>
+        <DeviceList />
       </List>
     </Container>
   </Wrapper >

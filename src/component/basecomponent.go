@@ -17,4 +17,5 @@ type Component interface {
 	String() string
 	State() string
 	Healthy() bool
+	Edit(map[string]interface{}) bool
 }

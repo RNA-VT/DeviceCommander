@@ -18,7 +18,7 @@ const DeviceManagementPage = () => {
           <Subscribe to={[DeviceManagement]}>
 
             {deviceManager =>
-              deviceManager.getMicrocontrollers().map((mc) => (
+              deviceManager.getMicrocontrollers().map((mc: any) => (
                 <>
                   <ListItem key={mc.ID}>
                     <DeviceCard microcontroller={mc} />

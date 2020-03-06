@@ -5,7 +5,7 @@ import PageHeader from '../components/shared/PageHeader'
 const Home = () => (
   <Wrapper>
     <PageHeader />
-    <h1>Welcome to LightDash</h1>
+    <h1>Welcome to LightDashCC</h1>
   </Wrapper>
 )
 

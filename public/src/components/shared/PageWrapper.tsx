@@ -7,11 +7,11 @@ const useStyles = makeStyles({
   }
 });
 
-const Wrapper = props => {
+const Wrapper = ({ children }: { children: React.ReactNode }) => {
   const classes = useStyles({})
   return (
     <div className={classes.wrapper}>
-      {props.children}
+      {children}
     </div>
   )
 }

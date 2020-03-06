@@ -8,7 +8,7 @@ const StyledDiv = styled.div`
   display: inline-block;
 `
 
-const SolenoidButton = ({ solenoid, xPos, yPos }) => {
+const SolenoidButton = ({ solenoid, xPos, yPos }: { solenoid: any, xPos: number, yPos: number }) => {
   const [isOpen, setIsOpen] = useState(false)
 
   console.log(solenoid.name, xPos, yPos);

@@ -15,7 +15,7 @@ class API {
     return await response.json()
   }
 
-  openSolenoid(uid) {
+  openSolenoid(uid: string) {
     console.log('open', uid)
     const queryUrl = 'http://' + this.masterUrl + '/component/' + uid + '/open'
     const response = fetch(queryUrl, {
@@ -25,7 +25,7 @@ class API {
     })
   }
 
-  closeSolenoid(uid) {
+  closeSolenoid(uid: string) {
     console.log('close', uid)
     const queryUrl = 'http://' + this.masterUrl + '/component/' + uid + '/close'
     const response = fetch(queryUrl, {

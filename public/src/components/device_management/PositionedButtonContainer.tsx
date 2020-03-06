@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Component } from 'react'
+import { Component, MouseEvent } from 'react'
 import Solenoid from '../../utils/Solenoid'
 import SolenoidButton from './SolenoidButton'
 import DeviceManagement from '../../containers/DeviceManagementContainer'
@@ -32,7 +32,10 @@ class PositionedButtonContainer extends Component<PBCProps, PBCState> {
     }
   }
 
-  handleAddButton(e, target) {
+  handleAddButton(e: React.ChangeEvent<{
+    name?: string | undefined;
+    value: unknown;
+  }>, target: any) {
     if (target) {
       console.log('handleAddButton', target.props.solenoid)
     }
@@ -41,8 +44,8 @@ class PositionedButtonContainer extends Component<PBCProps, PBCState> {
 
   render() {
     console.log('state', this.state)
-    let solenoidComponents = []
-    let solenoidListItems = []
+    let solenoidComponents: Array<any> = []
+    let solenoidListItems: Array<any> = []
     let sf = new SolenoidFactory
 
     if (this.state.deviceManager) {
@@ -64,7 +67,10 @@ class PositionedButtonContainer extends Component<PBCProps, PBCState> {
 
       solenoidListItems = solenoids.map(solenoid => {
         return (
-          <MenuItem key={solenoid.uid} solenoid={solenoid}>{solenoid.name}</MenuItem>
+          <MenuItem key={solenoid.uid}
+          // solenoid={solenoid}
+          >{solenoid.name}
+          </MenuItem>
         )
       })
 

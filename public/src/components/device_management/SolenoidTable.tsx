@@ -3,10 +3,14 @@ import {
   Card,
   makeStyles,
   Grid,
-  Button
+  Button,
+  ExpansionPanel,
+  ExpansionPanelSummary
 } from '@material-ui/core'
 
 import EditIcon from '@material-ui/icons/Edit'
+
+import SolenoidRow from "./SolenoidRow"
 
 const useStyles = makeStyles({
   table: {
@@ -20,7 +24,7 @@ const useStyles = makeStyles({
   }
 });
 
-const SolenoidTable = ({ solenoids }) => {
+const SolenoidTable = ({ solenoids }: { solenoids: Array<any> }) => {
   const classes = useStyles({})
   return (
     <>
@@ -33,16 +37,19 @@ const SolenoidTable = ({ solenoids }) => {
           <th className={classes.cellHeaders}>Enabled</th>
         </tr>
         {
-          solenoids.map((solenoid) => {
+          solenoids.map((solenoid: any) => {
             return (
-              <tr key={solenoid.UID}>
-                <td className={classes.cells}>{solenoid.UID}</td>
-                <td className={classes.cells}>{solenoid.Name}</td>
-                <td className={classes.cells}>{solenoid.HeaderPin}</td>
-                <td className={classes.cells}>{solenoid.Type}</td>
-                <td className={classes.cells}>{solenoid.Enabled ? 'Enabled' : 'Disabled'}</td>
-                <td className={classes.cells}><Button><EditIcon /></Button></td>
-              </tr>
+              <SolenoidRow
+                solenoid={solenoid}
+                cellClasses={classes.cells} />
+              // <tr key={solenoid.UID}>
+              //   <td className={classes.cells}>{solenoid.UID}</td>
+              //   <td className={classes.cells}>{solenoid.Name}</td>
+              //   <td className={classes.cells}>{solenoid.HeaderPin}</td>
+              //   <td className={classes.cells}>{solenoid.Type}</td>
+              //   <td className={classes.cells}>{solenoid.Enabled ? 'Enabled' : 'Disabled'}</td>
+              //   <td className={classes.cells}><Button><EditIcon /></Button></td>
+              // </tr>
             )
           })
         }

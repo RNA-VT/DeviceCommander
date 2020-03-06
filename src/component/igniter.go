@@ -152,3 +152,9 @@ func (i *Igniter) offAfter(duration int) {
 		i.Off()
 	}
 }
+
+//Edit - change things about the igniter.
+func (i *Igniter) Edit(newValues map[string]interface{}) bool {
+
+	return true
+}

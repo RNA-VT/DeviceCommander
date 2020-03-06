@@ -40,6 +40,7 @@ func ConfigureRoutes(listenURL string, e *echo.Echo, API APIService) {
 	API.addInfoRoutes(e)
 	API.addErrorRoutes(e)
 	API.addCommandRoutes(e)
+	API.addManageRoutes(e)
 
 	log.Println("Configure routes listening on " + listenURL)
 

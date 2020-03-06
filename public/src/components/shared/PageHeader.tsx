@@ -17,10 +17,10 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const PageHeader = () => {
-  const [anchorEl, setAnchorEl] = React.useState(null)
+  const [anchorEl, setAnchorEl] = React.useState<any>(null)
   const classes = useStyles({})
 
-  const handleClick = event => {
+  const handleClick = (event: React.MouseEvent<any, MouseEvent>) => {
     setAnchorEl(event.currentTarget);
   };
 
@@ -35,8 +35,8 @@ const PageHeader = () => {
           direction="row"
           justify="flex-end"
           alignItems="center">
-          <Button aria-controls="simple-menu" aria-haspopup="true" onClick={handleClick}>
-            <MenuIcon></MenuIcon>
+          <Button aria-controls="simple-menu" aria-haspopup="true">
+            <MenuIcon onClick={handleClick}></MenuIcon>
           </Button>
           <Menu
             id="simple-menu"

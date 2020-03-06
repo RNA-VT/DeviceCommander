@@ -1,5 +1,6 @@
 import * as React from 'react'
 import SolenoidTable from "./SolenoidTable"
+import Microcontroller from "../../utils/Microcontroller"
 import {
   Card,
   makeStyles,
@@ -28,7 +29,9 @@ const useStyles = makeStyles({
   },
 });
 
-const DeviceCard = ({ children, microcontroller }) => {
+const DeviceCard = (
+  { children, microcontroller }: { children?: React.ReactNode, microcontroller: any }
+) => {
   const classes = useStyles({})
 
   return (

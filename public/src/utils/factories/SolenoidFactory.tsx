@@ -16,7 +16,7 @@ class SolenoidFactory {
   }
 
   makeSolenoidsFromMc(mc: any) {
-    return mc.Solenoids.map(solenoid => {
+    return mc.Solenoids.map((solenoid: any) => {
       return new Solenoid(solenoid, mc)
     })
   }

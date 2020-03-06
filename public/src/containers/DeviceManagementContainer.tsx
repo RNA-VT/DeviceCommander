@@ -1,5 +1,5 @@
 import { Container } from 'unstated-typescript'
-import API from '../utils/apiWrapper'
+import API from '../utils/ApiWrapper'
 
 type DeviceManagementState = {
   isLoaded: boolean,
