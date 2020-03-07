@@ -1,14 +1,5 @@
 import * as React from 'react'
-import {
-  Card,
-  makeStyles,
-  Grid,
-  Button,
-  ExpansionPanel,
-  ExpansionPanelSummary
-} from '@material-ui/core'
-
-import EditIcon from '@material-ui/icons/Edit'
+import { makeStyles } from '@material-ui/core'
 
 import SolenoidRow from "./SolenoidRow"
 
@@ -42,14 +33,6 @@ const SolenoidTable = ({ solenoids }: { solenoids: Array<any> }) => {
               <SolenoidRow
                 solenoid={solenoid}
                 cellClasses={classes.cells} />
-              // <tr key={solenoid.UID}>
-              //   <td className={classes.cells}>{solenoid.UID}</td>
-              //   <td className={classes.cells}>{solenoid.Name}</td>
-              //   <td className={classes.cells}>{solenoid.HeaderPin}</td>
-              //   <td className={classes.cells}>{solenoid.Type}</td>
-              //   <td className={classes.cells}>{solenoid.Enabled ? 'Enabled' : 'Disabled'}</td>
-              //   <td className={classes.cells}><Button><EditIcon /></Button></td>
-              // </tr>
             )
           })
         }

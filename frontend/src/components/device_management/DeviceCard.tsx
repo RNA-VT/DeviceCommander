@@ -1,15 +1,10 @@
 import * as React from 'react'
 import SolenoidTable from "./SolenoidTable"
-import Microcontroller from "../../utils/Microcontroller"
 import {
   Card,
   makeStyles,
-  Grid,
-  Button
+  Grid
 } from '@material-ui/core'
-
-// import { EditIcon } from '@material-ui/icons'
-import EditIcon from '@material-ui/icons/Edit'
 
 const useStyles = makeStyles({
   card: {

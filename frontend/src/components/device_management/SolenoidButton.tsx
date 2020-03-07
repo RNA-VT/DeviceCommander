@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { FunctionComponent, useState } from 'react'
+import { useState } from 'react'
 import { Button } from '@material-ui/core'
 import DraggableCore, { DraggableData, DraggableEvent } from "react-draggable"
 import styled from 'styled-components'

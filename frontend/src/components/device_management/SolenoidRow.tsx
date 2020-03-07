@@ -1,10 +1,8 @@
 import * as React from 'react'
 import { useState } from 'react'
 import { Button, Dialog, makeStyles } from '@material-ui/core'
-import styled from 'styled-components'
 import EditIcon from '@material-ui/icons/Edit'
 
-import Divider from '@material-ui/core/Divider';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';

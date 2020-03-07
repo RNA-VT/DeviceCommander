@@ -1,9 +1,6 @@
 import Solenoid from "../../utils/Solenoid"
 
 class SolenoidFactory {
-  constructor() {
-
-  }
 
   makeSolenoidsFromManyMcs(mcs: Array<any>) {
     let allSolenoids: Solenoid[] = []

@@ -1,6 +1,5 @@
 import * as React from 'react'
-import { Component, MouseEvent } from 'react'
-import Solenoid from '../../utils/Solenoid'
+import { Component } from 'react'
 import SolenoidButton from './SolenoidButton'
 import DeviceManagement from '../../containers/DeviceManagementContainer'
 import SolenoidFactory from '../../utils/factories/SolenoidFactory'
@@ -46,7 +45,7 @@ class PositionedButtonContainer extends Component<PBCProps, PBCState> {
     console.log('state', this.state)
     let solenoidComponents: Array<any> = []
     let solenoidListItems: Array<any> = []
-    let sf = new SolenoidFactory
+    let sf = new SolenoidFactory()
 
     if (this.state.deviceManager) {
       const solenoids = sf.makeSolenoidsFromManyMcs(this.state.deviceManager.getMicrocontrollers())

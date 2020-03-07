@@ -16,9 +16,8 @@ class API {
   }
 
   openSolenoid(uid: string) {
-    console.log('open', uid)
     const queryUrl = 'http://' + this.masterUrl + '/component/' + uid + '/open'
-    const response = fetch(queryUrl, {
+    fetch(queryUrl, {
       method: 'GET'
     }).then(data => {
       console.log('open_solenoid_response', data)
@@ -26,9 +25,8 @@ class API {
   }
 
   closeSolenoid(uid: string) {
-    console.log('close', uid)
     const queryUrl = 'http://' + this.masterUrl + '/component/' + uid + '/close'
-    const response = fetch(queryUrl, {
+    fetch(queryUrl, {
       method: 'GET'
     }).then(data => {
       console.log('close_solenoid_response', data)
