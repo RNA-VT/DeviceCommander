@@ -1,13 +1,14 @@
 import * as React from 'react'
 import { useState } from 'react'
 import { Button, Dialog, makeStyles } from '@material-ui/core'
-import EditIcon from '@material-ui/icons/Edit'
 
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import CloseIcon from '@material-ui/icons/Close';
+
+import BuildOutlinedIcon from '@material-ui/icons/BuildOutlined';
 import Slide from '@material-ui/core/Slide';
 import { TransitionProps } from '@material-ui/core/transitions';
 
@@ -46,7 +47,7 @@ const SolenoidRow = ({ solenoid, cellClasses }: { solenoid: any, cellClasses: an
                 <td className={cellClasses.cells}>{solenoid.Type}</td>
                 <td className={cellClasses.cells}>{solenoid.Enabled ? 'Enabled' : 'Disabled'}</td>
                 <td className={cellClasses.cells}>
-                    <Button onClick={handleEditOpen}><EditIcon /></Button>
+                    <Button onClick={handleEditOpen}><BuildOutlinedIcon /></Button>
                 </td>
             </tr>
             <Dialog fullScreen open={open} onClose={handleClose} TransitionComponent={Transition}>

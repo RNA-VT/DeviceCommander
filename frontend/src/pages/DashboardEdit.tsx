@@ -3,7 +3,6 @@ import { Subscribe } from 'unstated-typescript'
 import { List, Container } from '@material-ui/core'
 import DeviceManagement from '../containers/DeviceManagementContainer'
 import Wrapper from '../components/shared/PageWrapper'
-import PageHeader from '../components/shared/PageHeader'
 
 import PositionedButtonContainer from "../components/device_management/PositionedButtonContainer"
 
@@ -22,8 +21,7 @@ const DeviceList = () => {
 
 const DashboardEdit = () => (
   <Wrapper>
-    <PageHeader />
-    <Container maxWidth="md">
+    <Container>
       <List>
         <DeviceList />
       </List>

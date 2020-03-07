@@ -3,14 +3,11 @@ import { Subscribe } from 'unstated-typescript'
 import { List, ListItem, Container } from '@material-ui/core'
 import DeviceManagement from '../containers/DeviceManagementContainer'
 import Wrapper from '../components/shared/PageWrapper'
-import PageHeader from '../components/shared/PageHeader'
 import DeviceCard from '../components/device_management/DeviceCard'
-
 
 const DeviceManagementPage = () => {
   return (
     <Wrapper>
-      <PageHeader />
       <Container maxWidth="md">
         <h1>Device Management Page</h1>
         <List>
