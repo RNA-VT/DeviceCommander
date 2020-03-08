@@ -15,7 +15,7 @@ import Link from '@material-ui/core/Link';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import NotificationsIcon from '@material-ui/icons/Notifications';
-import { MainListItems, SecondaryListItems } from './LeftMenu';
+import { MainList, SecondaryList } from './LeftMenu';
 
 const drawerWidth = 240;
 
@@ -145,9 +145,9 @@ const Layout = ({ children }: { children: any }) => {
                     </IconButton>
                 </div>
                 <Divider />
-                <List>{MainListItems}</List>
+                <List>{MainList}</List>
                 <Divider />
-                <List>{SecondaryListItems}</List>
+                <List>{SecondaryList}</List>
             </Drawer>
             <main className={classes.content}>
                 <div className={classes.appBarSpacer} />

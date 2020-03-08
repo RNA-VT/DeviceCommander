@@ -15,8 +15,14 @@ const useStyles = makeStyles({
   }
 });
 
-const SolenoidTable = ({ solenoids }: { solenoids: Array<any> }) => {
+type SolenoidTableProps = {
+  solenoids: Array<any>,
+  isEdit: boolean
+}
+
+const SolenoidTable = ({ solenoids, isEdit }: SolenoidTableProps) => {
   const classes = useStyles({})
+
   return (
     <>
       <table className={classes.table}>

@@ -11,11 +11,16 @@ import LayersIcon from '@material-ui/icons/Layers';
 import AssignmentIcon from '@material-ui/icons/Assignment';
 import { Link } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core';
+import PanToolIcon from '@material-ui/icons/PanTool'
+import { red } from '@material-ui/core/colors';
 
 const useMainStyles = makeStyles({
     root: {},
     listItem: {
         color: "rgb(255,255,255)"
+    },
+    warning: {
+        color: "#f44336"
     }
 })
 
@@ -27,12 +32,15 @@ const CustomLink = ({ to, children, renderAs }: { to: any, children: any, render
     )
 }
 
-const MainList = () => {
+const MainListItems = () => {
     const classes = useMainStyles({})
 
     return (
         <div>
-            <ListItem button>
+            <ListItem button
+                className={classes.listItem}
+                component={Link}
+                to="/">
                 <ListItemIcon>
                     <DashboardIcon />
                 </ListItemIcon>
@@ -58,19 +66,19 @@ const MainList = () => {
                 </ListItemIcon>
                 <ListItemText primary="Dashboard Edit" />
             </ListItem>
-            <ListItem button>
+            <ListItem button disabled>
                 <ListItemIcon>
                     <PeopleIcon />
                 </ListItemIcon>
-                <ListItemText primary="Customers" />
+                <ListItemText primary="Users" />
             </ListItem>
-            <ListItem button>
+            <ListItem button disabled>
                 <ListItemIcon>
                     <BarChartIcon />
                 </ListItemIcon>
                 <ListItemText primary="Reports" />
             </ListItem>
-            <ListItem button>
+            <ListItem button disabled>
                 <ListItemIcon>
                     <LayersIcon />
                 </ListItemIcon>
@@ -80,30 +88,27 @@ const MainList = () => {
     )
 }
 
-export const MainListItems = (
-    <MainList />
+export const MainList = (
+    <MainListItems />
 )
 
-export const SecondaryListItems = (
-    <div>
-        <ListSubheader inset>Saved reports</ListSubheader>
-        <ListItem button>
-            <ListItemIcon>
-                <AssignmentIcon />
-            </ListItemIcon>
-            <ListItemText primary="Current month" />
-        </ListItem>
-        <ListItem button>
-            <ListItemIcon>
-                <AssignmentIcon />
-            </ListItemIcon>
-            <ListItemText primary="Last quarter" />
-        </ListItem>
-        <ListItem button>
-            <ListItemIcon>
-                <AssignmentIcon />
-            </ListItemIcon>
-            <ListItemText primary="Year-end sale" />
-        </ListItem>
-    </div>
-);
+const SecondaryListItems = () => {
+    const classes = useMainStyles({})
+
+    return (
+        < div >
+            <ListSubheader inset>Shortcuts</ListSubheader>
+            <ListItem button className={classes.warning}>
+                <ListItemIcon>
+                    <PanToolIcon color="error" />
+                </ListItemIcon>
+                <ListItemText primary="Disable All" />
+            </ListItem>
+        </div >
+
+    )
+}
+
+export const SecondaryList = (
+    <SecondaryListItems />
+)

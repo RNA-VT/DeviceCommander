@@ -1,42 +1,14 @@
 import * as React from 'react'
 import { useState } from 'react'
-import { Button, Dialog, makeStyles } from '@material-ui/core'
+import SolenoidEdit from './SolenoidEdit'
 
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import IconButton from '@material-ui/core/IconButton';
-import Typography from '@material-ui/core/Typography';
-import CloseIcon from '@material-ui/icons/Close';
+type SolenoidRowProps = {
+    solenoid: any,
+    cellClasses: any
+}
 
-import BuildOutlinedIcon from '@material-ui/icons/BuildOutlined';
-import Slide from '@material-ui/core/Slide';
-import { TransitionProps } from '@material-ui/core/transitions';
-
-const useStyles = makeStyles(theme => ({
-    appBar: {
-        position: 'relative',
-    },
-    title: {
-        marginLeft: theme.spacing(2),
-        flex: 1,
-    },
-}))
-
-const Transition = React.forwardRef<unknown, TransitionProps>(function Transition(props, ref) {
-    return <Slide direction="up" ref={ref} {...props} />;
-});
-
-const SolenoidRow = ({ solenoid, cellClasses }: { solenoid: any, cellClasses: any }) => {
-    const classes = useStyles()
+const SolenoidRow = ({ solenoid, cellClasses }: SolenoidRowProps) => {
     const [open, setOpen] = useState(false)
-
-    const handleClose = () => {
-        setOpen(false)
-    }
-
-    const handleEditOpen = () => {
-        setOpen(true)
-    }
 
     return (
         <>
@@ -46,25 +18,7 @@ const SolenoidRow = ({ solenoid, cellClasses }: { solenoid: any, cellClasses: an
                 <td className={cellClasses.cells}>{solenoid.HeaderPin}</td>
                 <td className={cellClasses.cells}>{solenoid.Type}</td>
                 <td className={cellClasses.cells}>{solenoid.Enabled ? 'Enabled' : 'Disabled'}</td>
-                <td className={cellClasses.cells}>
-                    <Button onClick={handleEditOpen}><BuildOutlinedIcon /></Button>
-                </td>
             </tr>
-            <Dialog fullScreen open={open} onClose={handleClose} TransitionComponent={Transition}>
-                <AppBar className={classes.appBar}>
-                    <Toolbar>
-                        <IconButton edge="start" color="inherit" onClick={handleClose} aria-label="close">
-                            <CloseIcon />
-                        </IconButton>
-                        <Typography variant="h6" className={classes.title}>
-                            Sound
-            </Typography>
-                        <Button autoFocus color="inherit" onClick={handleClose}>
-                            save
-            </Button>
-                    </Toolbar>
-                </AppBar>
-            </Dialog>
         </>
     )
 }
