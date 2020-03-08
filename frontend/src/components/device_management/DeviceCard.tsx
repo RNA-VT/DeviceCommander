@@ -8,6 +8,7 @@ import {
   Button
 } from '@material-ui/core'
 import SettingsIcon from '@material-ui/icons/Settings'
+import Microcontroller from '../../utils/Microcontroller'
 
 const useStyles = makeStyles({
   card: {
@@ -35,7 +36,7 @@ const useStyles = makeStyles({
 
 type DeviceCardProps = {
   children?: React.ReactNode,
-  microcontroller: any
+  microcontroller: Microcontroller
 }
 
 const DeviceCard = ({ children, microcontroller }: DeviceCardProps) => {
@@ -48,12 +49,12 @@ const DeviceCard = ({ children, microcontroller }: DeviceCardProps) => {
         <SettingsIcon />
       </Button>
 
-      <p className={classes.title}><strong>ID:</strong> {microcontroller.ID}</p>
-      <p className={classes.title}><strong>URL:</strong> {microcontroller.Host}:{microcontroller.Port}</p>
-      <p className={classes.title}><strong>Description:</strong> {microcontroller.Description}</p>
+      <p className={classes.title}><strong>ID:</strong> {microcontroller.id}</p>
+      <p className={classes.title}><strong>URL:</strong> {microcontroller.host}:{microcontroller.port}</p>
+      <p className={classes.title}><strong>Description:</strong> {microcontroller.description}</p>
       <Grid container spacing={3}>
         <Grid item sm>
-          <SolenoidTable solenoids={microcontroller.Solenoids} isEdit={isEdit} />
+          <SolenoidTable solenoids={microcontroller.solenoids} isEdit={isEdit} />
         </Grid>
       </Grid>
       {children}

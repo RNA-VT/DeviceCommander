@@ -1,10 +1,12 @@
 import { Container } from 'unstated-typescript'
 import API from '../utils/ApiWrapper'
+import Microcontroller from '../utils/Microcontroller'
+import MicrocontrollerFactory from "../utils/factories/MicrocontrollerFactory"
 
 type DeviceManagementState = {
   isLoaded: boolean,
-  slaveMicrocontrollers: Array<object>,
-  master: Array<object>,
+  slaveMicrocontrollers: Array<Microcontroller>,
+  master?: Microcontroller,
   clusterName: String
 }
 
@@ -13,7 +15,7 @@ class DeviceManagement extends Container<DeviceManagementState> {
     super()
     this.state = {
       isLoaded: false,
-      master: [],
+      master: undefined,
       slaveMicrocontrollers: [],
       clusterName: ''
     }
@@ -21,10 +23,12 @@ class DeviceManagement extends Container<DeviceManagementState> {
     this.getMicrocontrollers = this.getMicrocontrollers.bind(this)
     this.getData = this.getData.bind(this)
     this.getData().then((data) => {
+      let mcFactory = new MicrocontrollerFactory()
       console.log(data);
+
       this.setState({
-        slaveMicrocontrollers: data.SlaveMicrocontrollers,
-        master: data.Master,
+        slaveMicrocontrollers: mcFactory.makeManyMcs(data.SlaveMicrocontrollers),
+        master: new Microcontroller(data.Master),
         clusterName: data.Name
       })
     })
@@ -36,12 +40,16 @@ class DeviceManagement extends Container<DeviceManagementState> {
     return api.getClusterInfo()
   }
 
-  getMicrocontrollers() {
+  getMicrocontrollers(): Array<Microcontroller> {
     if (this.state.slaveMicrocontrollers) {
       return [...this.state.slaveMicrocontrollers]
     }
 
-    return [this.state.master]
+    if (this.state.master) {
+      return [this.state.master]
+    }
+
+    return []
   }
 
 

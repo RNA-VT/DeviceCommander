@@ -1,23 +1,21 @@
 import * as React from 'react'
 import { useState } from 'react'
-import SolenoidEdit from './SolenoidEdit'
+import Solenoid from '../../utils/Solenoid'
 
 type SolenoidRowProps = {
-    solenoid: any,
+    solenoid: Solenoid,
     cellClasses: any
 }
 
 const SolenoidRow = ({ solenoid, cellClasses }: SolenoidRowProps) => {
-    const [open, setOpen] = useState(false)
-
     return (
         <>
-            <tr key={solenoid.UID}>
-                <td className={cellClasses.cells}>{solenoid.UID}</td>
-                <td className={cellClasses.cells}>{solenoid.Name}</td>
-                <td className={cellClasses.cells}>{solenoid.HeaderPin}</td>
-                <td className={cellClasses.cells}>{solenoid.Type}</td>
-                <td className={cellClasses.cells}>{solenoid.Enabled ? 'Enabled' : 'Disabled'}</td>
+            <tr key={solenoid.uid}>
+                <td className={cellClasses.cells}>{solenoid.uid}</td>
+                <td className={cellClasses.cells}>{solenoid.name}</td>
+                <td className={cellClasses.cells}>{solenoid.headerPin}</td>
+                <td className={cellClasses.cells}>{solenoid.type}</td>
+                <td className={cellClasses.cells}>{solenoid.enabled ? 'Enabled' : 'Disabled'}</td>
             </tr>
         </>
     )
