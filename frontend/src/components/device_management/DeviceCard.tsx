@@ -1,11 +1,12 @@
 import * as React from 'react'
 import { useState } from 'react'
 import SolenoidTable from './SolenoidTable'
+import MicrocontrollerForm from './MicrocontrollerForm'
 import {
   Card,
   makeStyles,
   Grid,
-  Button
+  Button,
 } from '@material-ui/core'
 import SettingsIcon from '@material-ui/icons/Settings'
 import Microcontroller from '../../utils/Microcontroller'
@@ -36,22 +37,37 @@ const useStyles = makeStyles({
 
 type DeviceCardProps = {
   children?: React.ReactNode,
-  microcontroller: Microcontroller
+  microcontroller: Microcontroller,
+  reload: () => void
 }
 
-const DeviceCard = ({ children, microcontroller }: DeviceCardProps) => {
+const DeviceCard = ({ children, microcontroller, reload }: DeviceCardProps) => {
   const classes = useStyles({})
   const [isEdit, setIsEdit] = useState(false)
+  let basicInfo = null
+
+  if (isEdit) {
+    basicInfo = (
+      <MicrocontrollerForm microcontroller={microcontroller} reload={reload} />
+    )
+  } else {
+    basicInfo = (
+      <>
+        <p className={classes.title}><strong>ID:</strong> {microcontroller.id}</p>
+        <p className={classes.title}><strong>URL:</strong> {microcontroller.host}:{microcontroller.port}</p>
+        <p className={classes.title}><strong>Description:</strong> {microcontroller.description}</p>
+      </>
+    )
+  }
 
   return (
     <Card className={classes.card}>
-      <Button className={classes.settingsButton}>
+      <Button className={classes.settingsButton} onClick={() => setIsEdit(!isEdit)}>
         <SettingsIcon />
       </Button>
+      {basicInfo}
 
-      <p className={classes.title}><strong>ID:</strong> {microcontroller.id}</p>
-      <p className={classes.title}><strong>URL:</strong> {microcontroller.host}:{microcontroller.port}</p>
-      <p className={classes.title}><strong>Description:</strong> {microcontroller.description}</p>
+
       <Grid container spacing={3}>
         <Grid item sm>
           <SolenoidTable solenoids={microcontroller.solenoids} isEdit={isEdit} />

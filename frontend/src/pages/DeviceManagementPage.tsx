@@ -7,6 +7,8 @@ import DeviceCard from '../components/device_management/DeviceCard'
 import Microcontroller from '../utils/Microcontroller'
 
 const DeviceManagementPage = () => {
+
+
   return (
     <Wrapper>
       <Container maxWidth="md">
@@ -17,10 +19,14 @@ const DeviceManagementPage = () => {
             {deviceManager => {
               const mcs: Array<Microcontroller> = deviceManager.getMicrocontrollers()
 
+              const handleReload = () => {
+                deviceManager.getData()
+              }
+
               console.log('MCS', mcs);
               return mcs.map<React.ReactNode>((mc) => (
                 <ListItem key={mc.id}>
-                  <DeviceCard microcontroller={mc} />
+                  <DeviceCard microcontroller={mc} reload={handleReload} />
                 </ListItem>
               ))
             }}

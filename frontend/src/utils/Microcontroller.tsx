@@ -25,7 +25,12 @@ class Microcontroller {
     } else {
       this.solenoids = []
     }
+  }
 
+  editDescription(newString: string) {
+    this.description = newString
+
+    console.log('EDIT DESCRIPTION', newString)
   }
 }
 
