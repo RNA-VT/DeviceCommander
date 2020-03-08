@@ -14,7 +14,7 @@ const useStyles = makeStyles({
 
 type MicrocontrollerProps = {
     microcontroller: Microcontroller,
-    reload: () => void
+    reload: () => Promise<void>
 }
 
 const MicrocontrollerForm = ({ microcontroller, reload }: MicrocontrollerProps) => {
@@ -23,11 +23,14 @@ const MicrocontrollerForm = ({ microcontroller, reload }: MicrocontrollerProps) 
 
     const handleMcSave = (event: any) => {
         event.preventDefault()
-        console.log("handleMcEdit", event)
-        console.log(descriptionValue)
-        reload()
+        microcontroller.edit({
+            description: descriptionValue
+        }).then((data) => {
+            reload().then(() => {
+                setDescription(microcontroller.description)
+            })
 
-
+        })
     }
 
     const handleReset = () => {

@@ -22,7 +22,18 @@ class DeviceManagement extends Container<DeviceManagementState> {
 
     this.getMicrocontrollers = this.getMicrocontrollers.bind(this)
     this.getData = this.getData.bind(this)
-    this.getData().then((data) => {
+    this.loadData()
+  }
+
+  async getData() {
+    const api = new API("http://localhost:8000")
+    return api.getClusterInfo()
+  }
+
+  async loadData() {
+    console.log('LOAD DATA')
+    return this.getData().then((data) => {
+      console.log("SETTING STATE");
       let mcFactory = new MicrocontrollerFactory()
       console.log(data);
 
@@ -32,11 +43,6 @@ class DeviceManagement extends Container<DeviceManagementState> {
         clusterName: data.Name
       })
     })
-  }
-
-  async getData() {
-    const api = new API("http://localhost:8000")
-    return api.getClusterInfo()
   }
 
   getMicrocontrollers(): Array<Microcontroller> {

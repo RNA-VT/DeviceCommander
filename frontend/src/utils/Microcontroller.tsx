@@ -1,8 +1,9 @@
 import Solenoid from "./Solenoid"
 import SolenoidFactory from "./factories/SolenoidFactory"
+import ApiWrapper from "./ApiWrapper"
 
 class Microcontroller {
-  id: string | undefined;
+  id: string;
   host: string | undefined;
   name: string | undefined;
   port: string | undefined;
@@ -27,10 +28,13 @@ class Microcontroller {
     }
   }
 
-  editDescription(newString: string) {
-    this.description = newString
+  myNetworkAddress(): string {
+    return this.host + ':' + this.port
+  }
 
-    console.log('EDIT DESCRIPTION', newString)
+  async edit(newData: any) {
+    const api = new ApiWrapper(this.myNetworkAddress())
+    return api.editComponent(this.id, newData)
   }
 }
 

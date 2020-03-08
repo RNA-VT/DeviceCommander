@@ -38,7 +38,7 @@ const useStyles = makeStyles({
 type DeviceCardProps = {
   children?: React.ReactNode,
   microcontroller: Microcontroller,
-  reload: () => void
+  reload: () => Promise<void>
 }
 
 const DeviceCard = ({ children, microcontroller, reload }: DeviceCardProps) => {

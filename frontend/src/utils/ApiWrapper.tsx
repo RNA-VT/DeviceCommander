@@ -15,6 +15,18 @@ class API {
     return await response.json()
   }
 
+  async editComponent(uid: string, newData: object) {
+    const queryUrl = 'http://' + this.masterUrl + '/component/' + uid
+
+    return fetch(queryUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(newData)
+    })
+  }
+
   openSolenoid(uid: string) {
     const queryUrl = 'http://' + this.masterUrl + '/component/' + uid + '/open'
     fetch(queryUrl, {

@@ -20,10 +20,10 @@ const DeviceManagementPage = () => {
               const mcs: Array<Microcontroller> = deviceManager.getMicrocontrollers()
 
               const handleReload = () => {
-                deviceManager.getData()
+                console.log('handleReload')
+                return deviceManager.loadData()
               }
 
-              console.log('MCS', mcs);
               return mcs.map<React.ReactNode>((mc) => (
                 <ListItem key={mc.id}>
                   <DeviceCard microcontroller={mc} reload={handleReload} />

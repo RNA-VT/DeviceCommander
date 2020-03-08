@@ -12,7 +12,6 @@ class Solenoid {
 
 
   constructor(solenoid: any, mc: any) {
-    console.log('SOLENOID CONSTRUCTOR', solenoid)
     this.uid = solenoid.UID ? solenoid.UID : ''
     this.name = solenoid.Name ? solenoid.Name : ''
     this.type = solenoid.Type ? solenoid.Type : ''
@@ -33,11 +32,6 @@ class Solenoid {
   close() {
     this.apiRoot.closeSolenoid(this.uid)
   }
-
-  // disable() {
-
-  // }
-
 }
 
 export default Solenoid

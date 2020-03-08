@@ -52,8 +52,14 @@ func (m *Microcontroller) Load(config Config) {
 	m.ID = config.ID
 	m.Name = config.Name
 	m.Description = config.Description
-	m.Host = viper.GetString("GOFIRE_HOST")
-	m.Port = viper.GetString("GOFIRE_PORT")
+	if viper.GetBool("GOFIRE_MASTER") {
+		m.Host = viper.GetString("GOFIRE_MASTER_HOST")
+		m.Port = viper.GetString("GOFIRE_MASTER_PORT")
+	} else {
+		m.Host = viper.GetString("GOFIRE_HOST")
+		m.Port = viper.GetString("GOFIRE_PORT")
+	}
+
 	m.Solenoids = make([]component.Solenoid, len(config.Solenoids))
 	for i, sol := range config.Solenoids {
 		m.Solenoids[i].Load(sol)
