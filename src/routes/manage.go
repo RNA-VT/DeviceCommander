@@ -1,6 +1,9 @@
 package routes
 
 import (
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 
@@ -14,39 +17,36 @@ func (a APIService) addManageRoutes(e *echo.Echo) {
 
 func (a APIService) editComponent(c echo.Context) error {
 	log.Println("start editing component")
-	// body, err := c.Request().GetBody()
-	// if err != nil {
-	// 	log.Println("Failed to get warning message body")
-	// }
-	// fmt.Println(body)
 
-	return c.JSON(http.StatusOK, c.Param("id"))
+	body := c.Request().Body
+
+	wholeBody, err := ioutil.ReadAll(body)
+	if err != nil {
+		return echo.NewHTTPError(
+			http.StatusNotAcceptable,
+			"Please provide valid Request Body")
+	}
+
+	message := map[string]interface{}{}
+	err = json.Unmarshal([]byte(wholeBody), &message)
 
 	// component, err := a.Cluster.GetComponent(c.Param("id"))
-	// if err != nil {
-	// 	return err
-	// }
 
-	// body := c.Request().Body
-	// wholeBody, err := ioutil.ReadAll(body)
 	// if err != nil {
 	// 	return echo.NewHTTPError(
 	// 		http.StatusNotAcceptable,
-	// 		"Please provide valid Request Body")
+	// 		"Error getting component")
 	// }
 
-	// message := map[string]interface{}{}
-	// err = json.Unmarshal([]byte(wholeBody), &message)
-	// if err != nil {
-	// 	return err
-	// }
+	for key, value := range message {
+		fmt.Println(key, value)
+		if key == "description" {
+			fmt.Println("CHANGE DESCRIPTION")
+			a.Cluster.Me.Description = value.(string)
+		}
+	}
 
-	// pin = c.Param("newPin")
-	// newPin, err := component.EditPin(pin)
+	fmt.Println(a.Cluster.Me.Description)
 
-	// if err != nil {
-	// 	return err
-	// }
-
-	// return c.JSON(http.StatusOK, component)
+	return c.JSON(http.StatusOK, c.Param("id"))
 }

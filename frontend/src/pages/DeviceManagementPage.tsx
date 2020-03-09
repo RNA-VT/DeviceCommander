@@ -20,7 +20,6 @@ const DeviceManagementPage = () => {
               const mcs: Array<Microcontroller> = deviceManager.getMicrocontrollers()
 
               const handleReload = () => {
-                console.log('handleReload')
                 return deviceManager.loadData()
               }
 
