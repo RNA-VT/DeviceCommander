@@ -26,10 +26,7 @@ const MicrocontrollerForm = ({ microcontroller, reload }: MicrocontrollerProps) 
         microcontroller.edit({
             description: descriptionValue
         }).then((data) => {
-            reload().then(() => {
-                setDescription(microcontroller.description)
-            })
-
+            reload()
         })
     }
 
