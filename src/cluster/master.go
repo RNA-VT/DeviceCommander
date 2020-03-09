@@ -21,7 +21,7 @@ func (c *Cluster) KingMe() {
 	//The master also serves
 	c.SlaveMicrocontrollers = append(c.SlaveMicrocontrollers, me)
 	c.Me = &c.SlaveMicrocontrollers[len(c.SlaveMicrocontrollers)-1]
-	c.Master = me
+	c.Master = c.Me
 	//The Master waits ...
 }
 
