@@ -11,8 +11,7 @@ const DeviceList = () => {
     <Subscribe to={[DeviceManagement]}>
       {DeviceManagement => (
         <div>
-          <PositionedButtonContainer
-            deviceManager={DeviceManagement} />
+          <PositionedButtonContainer deviceManager={DeviceManagement} />
         </div>
       )}
     </Subscribe>

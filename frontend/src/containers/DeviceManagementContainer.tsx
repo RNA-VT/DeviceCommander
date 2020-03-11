@@ -32,11 +32,8 @@ class DeviceManagement extends Container<DeviceManagementState> {
   }
 
   async loadData() {
-    console.log('LOAD DATA')
     return this.getData().then((data) => {
-      console.log("SETTING STATE");
       let mcFactory = new MicrocontrollerFactory()
-      console.log(data);
 
       this.setState({
         slaveMicrocontrollers: mcFactory.makeManyMcs(data.SlaveMicrocontrollers),

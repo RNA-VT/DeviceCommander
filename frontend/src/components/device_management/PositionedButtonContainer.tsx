@@ -62,10 +62,7 @@ class PositionedButtonContainer extends Component<PBCProps, PBCState> {
 
       solenoidListItems = solenoids.map(solenoid => {
         return (
-          <MenuItem key={solenoid.uid}
-          // solenoid={solenoid}
-          >{solenoid.name}
-          </MenuItem>
+          <MenuItem key={solenoid.uid}>{solenoid.name}</MenuItem>
         )
       })
 
