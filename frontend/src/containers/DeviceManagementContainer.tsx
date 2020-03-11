@@ -2,6 +2,7 @@ import { Container } from 'unstated-typescript'
 import API from '../utils/ApiWrapper'
 import Microcontroller from '../utils/Microcontroller'
 import MicrocontrollerFactory from "../utils/factories/MicrocontrollerFactory"
+import Solenoid from '../utils/Solenoid'
 
 type DeviceManagementState = {
   isLoaded: boolean,
@@ -55,6 +56,14 @@ class DeviceManagement extends Container<DeviceManagementState> {
     }
 
     return []
+  }
+
+  getSolenoids(): Array<Solenoid> {
+    let allSolenoids: Solenoid[] = []
+    this.getMicrocontrollers().forEach(mc => {
+      allSolenoids = allSolenoids.concat(mc.solenoids)
+    })
+    return allSolenoids
   }
 
 

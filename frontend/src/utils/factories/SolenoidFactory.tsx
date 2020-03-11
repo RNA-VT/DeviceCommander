@@ -4,7 +4,6 @@ class SolenoidFactory {
 
   makeSolenoidsFromManyMcs(mcs: Array<any>) {
     let allSolenoids: Solenoid[] = []
-
     mcs.forEach(mc => {
       allSolenoids = allSolenoids.concat(this.makeSolenoidsFromMc(mc))
     })
@@ -13,9 +12,20 @@ class SolenoidFactory {
   }
 
   makeSolenoidsFromMc(mc: any) {
-    return mc.Solenoids.map((solenoid: any) => {
-      return new Solenoid(solenoid, mc)
-    })
+    if (mc.solenoids) {
+      return mc.solenoids.map((solenoid: any) => {
+        return new Solenoid(solenoid, mc)
+      })
+    }
+
+    if (mc.Solenoids) {
+      return mc.Solenoids.map((solenoid: any) => {
+        return new Solenoid(solenoid, mc)
+      })
+    }
+
+    return []
+
   }
 }
 

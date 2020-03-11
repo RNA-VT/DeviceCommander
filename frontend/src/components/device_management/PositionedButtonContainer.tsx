@@ -23,8 +23,6 @@ class PositionedButtonContainer extends Component<PBCProps, PBCState> {
   constructor(props: PBCProps) {
     super(props)
 
-    console.log('props', props)
-
     this.state = {
       buttonConfigs: [],
       deviceManager: props.deviceManager
@@ -42,13 +40,11 @@ class PositionedButtonContainer extends Component<PBCProps, PBCState> {
 
 
   render() {
-    console.log('state', this.state)
     let solenoidComponents: Array<any> = []
     let solenoidListItems: Array<any> = []
-    let sf = new SolenoidFactory()
 
     if (this.state.deviceManager) {
-      const solenoids = sf.makeSolenoidsFromManyMcs(this.state.deviceManager.getMicrocontrollers())
+      const solenoids = this.state.deviceManager.getSolenoids()
 
       let tmpXPos = 0
       let tmpYPos = 0
@@ -74,8 +70,6 @@ class PositionedButtonContainer extends Component<PBCProps, PBCState> {
       })
 
     }
-
-    console.log('solenoids', solenoidComponents)
 
     return (
       <div>

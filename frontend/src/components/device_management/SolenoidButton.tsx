@@ -15,6 +15,7 @@ type SolenoidButtonProps = {
 }
 
 const SolenoidButton = ({ solenoid, xPos, yPos }: SolenoidButtonProps) => {
+
   const [isOpen, setIsOpen] = useState(false)
 
   console.log(solenoid.name, xPos, yPos);

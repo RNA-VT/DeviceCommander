@@ -12,7 +12,6 @@ class Microcontroller {
 
 
   constructor(data: any) {
-    console.log('MC Constructor', data)
     this.id = data.ID
     this.name = data.Name
     this.description = data.Description

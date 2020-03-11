@@ -56,6 +56,11 @@ const DeviceCard = ({ children, microcontroller, reload }: DeviceCardProps) => {
         <p className={classes.title}><strong>ID:</strong> {microcontroller.id}</p>
         <p className={classes.title}><strong>URL:</strong> {microcontroller.host}:{microcontroller.port}</p>
         <p className={classes.title}><strong>Description:</strong> {microcontroller.description}</p>
+        <Grid container spacing={3}>
+          <Grid item sm>
+            <SolenoidTable solenoids={microcontroller.solenoids} isEdit={isEdit} />
+          </Grid>
+        </Grid>
       </>
     )
   }
@@ -65,14 +70,9 @@ const DeviceCard = ({ children, microcontroller, reload }: DeviceCardProps) => {
       <Button className={classes.settingsButton} onClick={() => setIsEdit(!isEdit)}>
         <SettingsIcon />
       </Button>
+
       {basicInfo}
 
-
-      <Grid container spacing={3}>
-        <Grid item sm>
-          <SolenoidTable solenoids={microcontroller.solenoids} isEdit={isEdit} />
-        </Grid>
-      </Grid>
       {children}
     </Card >
   )
