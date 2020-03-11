@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useState } from 'react'
+import { TableCell, TableRow } from '@material-ui/core'
 import Solenoid from '../../utils/Solenoid'
 
 type SolenoidRowProps = {
@@ -10,13 +11,13 @@ type SolenoidRowProps = {
 const SolenoidRow = ({ solenoid, cellClasses }: SolenoidRowProps) => {
     return (
         <>
-            <tr key={solenoid.uid}>
-                <td className={cellClasses.cells}>{solenoid.uid}</td>
-                <td className={cellClasses.cells}>{solenoid.name}</td>
-                <td className={cellClasses.cells}>{solenoid.headerPin}</td>
-                <td className={cellClasses.cells}>{solenoid.type}</td>
-                <td className={cellClasses.cells}>{solenoid.enabled ? 'Enabled' : 'Disabled'}</td>
-            </tr>
+            <TableRow key={solenoid.uid}>
+                <TableCell className={cellClasses.cells}>{solenoid.uid}</TableCell>
+                <TableCell className={cellClasses.cells}>{solenoid.name}</TableCell>
+                <TableCell className={cellClasses.cells}>{solenoid.headerPin}</TableCell>
+                <TableCell className={cellClasses.cells}>{solenoid.type}</TableCell>
+                <TableCell className={cellClasses.cells}>{solenoid.enabled ? 'Enabled' : 'Disabled'}</TableCell>
+            </TableRow>
         </>
     )
 }

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { makeStyles } from '@material-ui/core'
+import { makeStyles, Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core'
 
 import SolenoidRow from "./SolenoidRow"
 import Solenoid from '../../utils/Solenoid';
@@ -9,10 +9,13 @@ const useStyles = makeStyles({
     marginTop: '20px'
   },
   cells: {
-    padding: '10px',
+    // padding: '10px',
   },
   cellHeaders: {
-    padding: '10px 10px 0px',
+    // padding: '10px 10px 0px',
+    paddingBottom: '10px',
+    fontWeight: 'bold',
+    fontSize: '1.2em'
   }
 });
 
@@ -26,17 +29,17 @@ const SolenoidTable = ({ solenoids, isEdit }: SolenoidTableProps) => {
 
   return (
     <>
-      <table className={classes.table}>
-        <thead>
-          <tr>
-            <th className={classes.cellHeaders}>UID</th>
-            <th className={classes.cellHeaders}>Name</th>
-            <th className={classes.cellHeaders}>Pin</th>
-            <th className={classes.cellHeaders}>Type</th>
-            <th className={classes.cellHeaders}>Enabled</th>
-          </tr>
-        </thead>
-        <tbody>
+      <Table className={classes.table}>
+        <TableHead>
+          <TableRow>
+            <TableCell className={classes.cellHeaders}>UID</TableCell>
+            <TableCell className={classes.cellHeaders}>Name</TableCell>
+            <TableCell className={classes.cellHeaders}>Pin</TableCell>
+            <TableCell className={classes.cellHeaders}>Type</TableCell>
+            <TableCell className={classes.cellHeaders}>Enabled</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
           {solenoids.map((solenoid: Solenoid) => {
             return (
               <SolenoidRow
@@ -45,10 +48,10 @@ const SolenoidTable = ({ solenoids, isEdit }: SolenoidTableProps) => {
                 cellClasses={classes.cells} />
             )
           })}
-        </tbody>
+        </TableBody>
 
 
-      </table>
+      </Table>
     </>
   )
 }
