@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useState } from 'react'
 import Microcontroller from '../../utils/Microcontroller'
 import { makeStyles, TextField, Button } from '@material-ui/core';
+import SolenoidTable from './SolenoidTable'
 
 const useStyles = makeStyles({
     title: {
@@ -20,6 +21,7 @@ type MicrocontrollerProps = {
 const MicrocontrollerForm = ({ microcontroller, reload }: MicrocontrollerProps) => {
     const classes = useStyles({})
     const [descriptionValue, setDescription] = useState(microcontroller.description)
+    const [solenoids, setSolenoids] = useState(microcontroller.solenoids)
 
     const handleMcSave = (event: any) => {
         event.preventDefault()
@@ -28,6 +30,28 @@ const MicrocontrollerForm = ({ microcontroller, reload }: MicrocontrollerProps) 
         }).then((data) => {
             reload()
         })
+    }
+
+    const handleSolenoidChange = (id: string, newValue: any, target: string) => {
+
+        console.log('handleSolenoidChange', id, newValue, target)
+        const index = solenoids.findIndex((solenoid) => {
+            return solenoid.uid == id
+        })
+
+        console.log('targetIndex', index, solenoids[index])
+
+        switch (target) {
+            case 'name':
+                solenoids[index].name = newValue
+                break;
+        }
+
+        setSolenoids(solenoids)
+
+        console.log(solenoids[index])
+        // 
+
     }
 
     const handleReset = () => {
@@ -43,9 +67,12 @@ const MicrocontrollerForm = ({ microcontroller, reload }: MicrocontrollerProps) 
                 value={descriptionValue}
                 onChange={(e) => setDescription(e.target.value)} />
 
+            <SolenoidTable solenoids={solenoids} isEdit={true} handleEdit={handleSolenoidChange} />
+
             <div className={classes.buttonContainer}>
                 <Button type="submit" variant="outlined">Submit</Button>
                 <Button onClick={handleReset} variant="outlined">Clear Values</Button>
+
             </div>
         </form >
     )

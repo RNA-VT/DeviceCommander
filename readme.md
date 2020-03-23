@@ -38,6 +38,10 @@
 
   run-slave2: run GoFire in Slave mode (port 8002)
 
+  run-js: run the GoFire frontend in dev mode with tooling ()
+
+  build-js: build the GoFire frontend to be served from the production Go endpoint (must run to get served directly from backend)
+
 ## Tips
   Make sure you have your go modules enabled: `export GO111MODULE=on`
   

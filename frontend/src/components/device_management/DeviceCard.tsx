@@ -58,7 +58,7 @@ const DeviceCard = ({ children, microcontroller, reload }: DeviceCardProps) => {
         <p className={classes.title}><strong>Description:</strong> {microcontroller.description}</p>
         <Grid container spacing={3}>
           <Grid item sm>
-            <SolenoidTable solenoids={microcontroller.solenoids} isEdit={isEdit} />
+            <SolenoidTable solenoids={microcontroller.solenoids} isEdit={isEdit} handleEdit={(id: string, newValue: any, target: string) => { }} />
           </Grid>
         </Grid>
       </>

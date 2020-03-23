@@ -2,7 +2,8 @@ import * as React from 'react'
 import { makeStyles, Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core'
 
 import SolenoidRow from "./SolenoidRow"
-import Solenoid from '../../utils/Solenoid';
+import SolenoidEditRow from "./SolenoidEditRow"
+import Solenoid from '../../utils/Solenoid'
 
 const useStyles = makeStyles({
   table: {
@@ -21,11 +22,33 @@ const useStyles = makeStyles({
 
 type SolenoidTableProps = {
   solenoids: Array<Solenoid>,
-  isEdit: boolean
+  isEdit: boolean,
+  handleEdit: (id: string, newValue: any, target: string) => void
 }
 
-const SolenoidTable = ({ solenoids, isEdit }: SolenoidTableProps) => {
+const SolenoidTable = ({ solenoids, isEdit, handleEdit }: SolenoidTableProps) => {
   const classes = useStyles({})
+  let rows = solenoids.map((solenoid: Solenoid) => {
+    return (
+      <SolenoidRow
+        key={solenoid.uid}
+        solenoid={solenoid}
+        cellClasses={classes.cells} />
+    )
+  })
+
+  if (isEdit) {
+    rows = solenoids.map((solenoid: Solenoid) => {
+      return (
+        <SolenoidEditRow
+          key={solenoid.uid}
+          solenoid={solenoid}
+          cellClasses={classes.cells}
+          handleEdit={handleEdit} />
+      )
+    })
+  }
+
 
   return (
     <>
@@ -40,14 +63,7 @@ const SolenoidTable = ({ solenoids, isEdit }: SolenoidTableProps) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {solenoids.map((solenoid: Solenoid) => {
-            return (
-              <SolenoidRow
-                key={solenoid.uid}
-                solenoid={solenoid}
-                cellClasses={classes.cells} />
-            )
-          })}
+          {rows}
         </TableBody>
 
 
