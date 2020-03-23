@@ -170,3 +170,9 @@ func (s *Solenoid) Close(delay int) {
 		log.Println("Failed to Close a Solenoid! It's unhealthy and cannot be commanded.")
 	}
 }
+
+//Edit - change things about the solenoid.
+func (s *Solenoid) Edit(newValues map[string]interface{}) bool {
+
+	return true
+}

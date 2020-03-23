@@ -1,7 +1,6 @@
-
 name: "SignFire Controller"
 description: "Located in the control case on the MindShark Sign"
-solenoids: 
+solenoids:
   - name: main_supply
     type: supply
     mode: NC
@@ -23,6 +22,12 @@ solenoids:
   - name: sign_0
     type: outlet
     header_pin: 15
+    mode: NC
+    metadata:
+      voltage: 120
+  - name: sign_1
+    type: outlet
+    header_pin: 16
     mode: NC
     metadata:
       voltage: 120
@@ -49,19 +54,19 @@ igniters:
     type: glowfly
     header_pin: 22
     metadata:
-      description: 'Left Pillar Pilot Crown'
+      description: "Left Pillar Pilot Crown"
   - name: pillar_crown_1
     type: glowfly
     header_pin: 40
     metadata:
-      description: 'Right Pillar Pilot Crown'
+      description: "Right Pillar Pilot Crown"
   - name: sign_pilot_0
     type: glowfly
     header_pin: 35
     metadata:
-      description: 'Left side pilot lighter'
+      description: "Left side pilot lighter"
   - name: sign_pilot_1
     type: glowfly
     header_pin: 38
     metadata:
-      description: 'Right side pilot lighter'
+      description: "Right side pilot lighter"

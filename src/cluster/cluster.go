@@ -16,7 +16,7 @@ import (
 type Cluster struct {
 	Name                  string
 	SlaveMicrocontrollers []mc.Microcontroller
-	Master                mc.Microcontroller
+	Master                *mc.Microcontroller
 	Me                    *mc.Microcontroller
 }
 

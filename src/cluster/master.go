@@ -18,10 +18,10 @@ func (c *Cluster) KingMe() {
 		log.Println("Failed to Create New Microcontroller:", err.Error())
 	}
 	me.ID = c.generateUniqueID()
-	c.Me = &me
-	c.Master = me
 	//The master also serves
 	c.SlaveMicrocontrollers = append(c.SlaveMicrocontrollers, me)
+	c.Me = &c.SlaveMicrocontrollers[len(c.SlaveMicrocontrollers)-1]
+	c.Master = c.Me
 	//The Master waits ...
 }
 
