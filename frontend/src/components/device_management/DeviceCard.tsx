@@ -53,9 +53,14 @@ const DeviceCard = ({ children, microcontroller, reload }: DeviceCardProps) => {
   } else {
     basicInfo = (
       <>
-        <p className={classes.title}><strong>ID:</strong> {microcontroller.id}</p>
-        <p className={classes.title}><strong>URL:</strong> {microcontroller.host}:{microcontroller.port}</p>
-        <p className={classes.title}><strong>Description:</strong> {microcontroller.description}</p>
+        <Grid
+          container
+          direction="column">
+          <p className={classes.title}><strong>ID:</strong> {microcontroller.id}</p>
+          <p className={classes.title}><strong>URL:</strong> {microcontroller.host}:{microcontroller.port}</p>
+          <p className={classes.title}><strong>Description:</strong> {microcontroller.description}</p>
+        </Grid>
+
         <Grid container spacing={3}>
           <Grid item sm>
             <SolenoidTable solenoids={microcontroller.solenoids} isEdit={isEdit} handleEdit={(id: string, newValue: any, target: string) => { }} />

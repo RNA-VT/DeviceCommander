@@ -17,9 +17,14 @@ class Solenoid {
     this.type = solenoid.Type ? solenoid.Type : ''
     this.enabled = solenoid.Enabled
     this.headerPin = solenoid.HeaderPin
-    this.mcAddress = (mc.Host && mc.Port) ? (mc.Host + ':' + mc.Port) : ''
-    this.apiRoot = new API(this.mcAddress)
 
+    if (solenoid.mcAddress) {
+      this.mcAddress = solenoid.mcAddress
+    } else {
+      this.mcAddress = (mc.Host && mc.Port) ? (mc.Host + ':' + mc.Port) : ''
+    }
+
+    this.apiRoot = new API(this.mcAddress)
 
     this.open = this.open.bind(this)
     this.close = this.close.bind(this)
@@ -31,6 +36,17 @@ class Solenoid {
 
   close() {
     this.apiRoot.closeSolenoid(this.uid)
+  }
+
+  getContructorData() {
+    return {
+      UID: this.uid,
+      Name: this.name,
+      Type: this.type,
+      Enabled: this.enabled,
+      HeaderPin: this.headerPin,
+      mcAddress: this.mcAddress
+    }
   }
 }
 

@@ -1,26 +1,73 @@
 import * as React from 'react'
-import { TableCell, TableRow, TextField } from '@material-ui/core'
+import { useState } from 'react'
+import { makeStyles, Button, Select, MenuItem, TableCell, TableRow, TextField, Grid } from '@material-ui/core'
+import SettingsIcon from '@material-ui/icons/Settings'
+import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
+import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import Solenoid from '../../utils/Solenoid'
 
 type SolenoidRowProps = {
   solenoid: Solenoid,
   cellClasses: any,
-  handleEdit: (id: string, newValue: any, target: string) => void
+  setIsEdit: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-const SolenoidEditRow = ({ solenoid, cellClasses, handleEdit }: SolenoidRowProps) => {
+const useStyles = makeStyles({
+  buttons: {
+  }
+})
+
+const SolenoidEditRow = ({ solenoid, cellClasses, setIsEdit }: SolenoidRowProps) => {
+  const [thisSolenoid, setSolenoid] = useState(solenoid)
+
+  const setName = (text: string) => {
+    const tmpSolenoid = new Solenoid({ ...solenoid.getContructorData(), 'Name': text }, {})
+    setSolenoid(tmpSolenoid)
+  }
+
+  const setStatus = (event: React.ChangeEvent<{ value: unknown }>) => {
+    const choice = event.target.value as string === 'true' ? true : false
+    const tmpSolenoid = new Solenoid({ ...solenoid.getContructorData(), 'Enabled': choice }, {})
+    setSolenoid(tmpSolenoid)
+  }
+
+  const handleCloseAndSave = () => {
+    setIsEdit(false)
+  }
+
+
   return (
     <>
       <TableRow key={solenoid.uid}>
         <TableCell className={cellClasses.cells}>{solenoid.uid}</TableCell>
         <TableCell className={cellClasses.cells}>
           <TextField type="text" fullWidth
-            value={solenoid.name}
-            onChange={(e) => handleEdit(solenoid.uid, e.target.value, 'name')} />
+            value={thisSolenoid.name}
+            onChange={(e) => setName(e.target.value)} />
         </TableCell>
         <TableCell className={cellClasses.cells}>{solenoid.headerPin}</TableCell>
         <TableCell className={cellClasses.cells}>{solenoid.type}</TableCell>
-        <TableCell className={cellClasses.cells}>{solenoid.enabled ? 'Enabled' : 'Disabled'}</TableCell>
+        <TableCell className={cellClasses.cells}>
+          <Select value={thisSolenoid.enabled}
+            onChange={setStatus}>
+            <MenuItem value={'true'}>Enabled</MenuItem>
+            <MenuItem value={'false'}>Disabled</MenuItem>
+          </Select>
+        </TableCell>
+        <TableCell className={cellClasses.cells}>
+          <Grid container
+            direction="column"
+            justify="center"
+            alignItems="center">
+            <Button onClick={() => handleCloseAndSave()}>
+              <CheckCircleOutlineIcon />
+            </Button>
+            <Button onClick={() => setIsEdit(false)}>
+              <HighlightOffIcon />
+            </Button>
+          </Grid>
+
+        </TableCell>
       </TableRow>
     </>
   )

@@ -28,6 +28,7 @@ type SolenoidTableProps = {
 
 const SolenoidTable = ({ solenoids, isEdit, handleEdit }: SolenoidTableProps) => {
   const classes = useStyles({})
+
   let rows = solenoids.map((solenoid: Solenoid) => {
     return (
       <SolenoidRow
@@ -36,18 +37,6 @@ const SolenoidTable = ({ solenoids, isEdit, handleEdit }: SolenoidTableProps) =>
         cellClasses={classes.cells} />
     )
   })
-
-  if (isEdit) {
-    rows = solenoids.map((solenoid: Solenoid) => {
-      return (
-        <SolenoidEditRow
-          key={solenoid.uid}
-          solenoid={solenoid}
-          cellClasses={classes.cells}
-          handleEdit={handleEdit} />
-      )
-    })
-  }
 
 
   return (
