@@ -20,7 +20,7 @@ func (a APIService) addInfoRoutes(e *echo.Echo) {
 }
 
 func (a APIService) getClusterInfo(c echo.Context) error {
-	return c.JSON(http.StatusOK, a.Cluster)
+	return c.JSON(http.StatusOK, a.Cluster.GetConfig())
 }
 
 func (a APIService) getMicrocontrollers(c echo.Context) error {

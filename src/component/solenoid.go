@@ -18,6 +18,8 @@ type Solenoid struct {
 type SolenoidConfig struct {
 	Type          SolenoidType `yaml:"type"`
 	Mode          SolenoidMode `yaml:"mode"`
+	Failed        bool         `yaml:"failed"`
+	PinMap        io.RpiPinMap `yaml:"pinmap"`
 	BaseComponent `yaml:",inline"`
 }
 
@@ -55,6 +57,8 @@ func (s Solenoid) GetConfig() SolenoidConfig {
 	config.Name = s.Name
 	config.HeaderPin = s.HeaderPin
 	config.Metadata = s.Metadata
+	config.Failed = s.GPIO.Failed
+	config.PinMap = s.GPIO.PinInfo
 	return config
 }
 
