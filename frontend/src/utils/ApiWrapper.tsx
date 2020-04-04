@@ -16,7 +16,20 @@ class API {
   }
 
   async editComponent(uid: string, newData: object) {
+    console.log('editComponent')
     const queryUrl = 'http://' + this.masterUrl + '/component/' + uid
+
+    return fetch(queryUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(newData)
+    })
+  }
+
+  async editMicrocontroller(uid: string, newData: object) {
+    const queryUrl = 'http://' + this.masterUrl + '/' + uid
 
     return fetch(queryUrl, {
       method: 'POST',

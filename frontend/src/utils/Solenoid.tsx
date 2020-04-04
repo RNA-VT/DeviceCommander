@@ -1,11 +1,10 @@
-import API from "../utils/ApiWrapper"
+import ApiWrapper from "../utils/ApiWrapper"
 
 class Solenoid {
   uid: string
   name: string
   mcAddress: string
   type: string
-  apiRoot: API
   enabled: boolean
 
   headerPin: number
@@ -24,21 +23,27 @@ class Solenoid {
       this.mcAddress = (mc.Host && mc.Port) ? (mc.Host + ':' + mc.Port) : ''
     }
 
-    this.apiRoot = new API(this.mcAddress)
-
     this.open = this.open.bind(this)
     this.close = this.close.bind(this)
   }
 
   open() {
-    this.apiRoot.openSolenoid(this.uid)
+    const api = new ApiWrapper(this.mcAddress)
+    api.openSolenoid(this.uid)
   }
 
   close() {
-    this.apiRoot.closeSolenoid(this.uid)
+    const api = new ApiWrapper(this.mcAddress)
+    api.closeSolenoid(this.uid)
   }
 
-  getContructorData() {
+  async edit(newData: any) {
+    const api = new ApiWrapper(this.mcAddress)
+    return api.editComponent(this.uid, newData)
+  }
+
+  // Get solenoid data into the shape it needs to be to construct
+  getConfig() {
     return {
       UID: this.uid,
       Name: this.name,

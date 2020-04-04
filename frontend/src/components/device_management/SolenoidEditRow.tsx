@@ -5,6 +5,8 @@ import SettingsIcon from '@material-ui/icons/Settings'
 import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import Solenoid from '../../utils/Solenoid'
+import { diff } from 'deep-object-diff';
+
 
 type SolenoidRowProps = {
   solenoid: Solenoid,
@@ -21,20 +23,32 @@ const SolenoidEditRow = ({ solenoid, cellClasses, setIsEdit }: SolenoidRowProps)
   const [thisSolenoid, setSolenoid] = useState(solenoid)
 
   const setName = (text: string) => {
-    const tmpSolenoid = new Solenoid({ ...solenoid.getContructorData(), 'Name': text }, {})
+    const tmpSolenoid = new Solenoid({ ...thisSolenoid.getConfig(), 'Name': text }, {})
     setSolenoid(tmpSolenoid)
   }
 
   const setStatus = (event: React.ChangeEvent<{ value: unknown }>) => {
     const choice = event.target.value as string === 'true' ? true : false
-    const tmpSolenoid = new Solenoid({ ...solenoid.getContructorData(), 'Enabled': choice }, {})
+    const tmpSolenoid = new Solenoid({ ...thisSolenoid.getConfig(), 'Enabled': choice }, {})
     setSolenoid(tmpSolenoid)
   }
 
   const handleCloseAndSave = () => {
-    setIsEdit(false)
-  }
+    if (thisSolenoid != solenoid) {
+      console.log('SAVE DAT HOOOEEEE')
+      console.log('THIS', thisSolenoid)
+      console.log('OG', solenoid)
+      console.log('DIFF', diff(solenoid.getConfig(), thisSolenoid.getConfig()))
+      const diffData = diff(solenoid.getConfig(), thisSolenoid.getConfig())
+      solenoid.edit(diffData).then((data) => {
+        console.log(data)
+        setIsEdit(false)
+      })
+    } else {
+      setIsEdit(false)
+    }
 
+  }
 
   return (
     <>

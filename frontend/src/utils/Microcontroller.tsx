@@ -10,14 +10,12 @@ class Microcontroller {
   description: string | undefined;
   solenoids: Array<Solenoid>;
 
-
   constructor(data: any) {
     this.id = data.ID
     this.name = data.Name
     this.description = data.Description
     this.host = data.Host
     this.port = data.Port
-
 
     if (data.Solenoids) {
       const sf = new SolenoidFactory()
@@ -33,7 +31,7 @@ class Microcontroller {
 
   async edit(newData: any) {
     const api = new ApiWrapper(this.myNetworkAddress())
-    return api.editComponent(this.id, newData)
+    return api.editMicrocontroller(this.id, newData)
   }
 }
 
