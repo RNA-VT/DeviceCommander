@@ -8,26 +8,20 @@ const StyledDiv = styled.div`
   display: inline-block;
 `
 
-type SolenoidButtonProps = {
-  solenoid: any,
+type ControlButtonProps = {
   xPos: number,
-  yPos: number
+  yPos: number,
+  setPosition: any
 }
 
-const SolenoidButton = ({ solenoid, xPos, yPos }: SolenoidButtonProps) => {
-
+const ControlButton = ({ xPos, yPos, setPosition }: ControlButtonProps) => {
   const [isOpen, setIsOpen] = useState(false)
 
-  console.log(solenoid.name, xPos, yPos);
-
-  console.log(solenoid)
 
   const triggerSolenoid = () => {
     if (isOpen) {
-      solenoid.close()
       setIsOpen(false)
     } else {
-      solenoid.open()
       setIsOpen(true)
     }
   }
@@ -43,15 +37,14 @@ const SolenoidButton = ({ solenoid, xPos, yPos }: SolenoidButtonProps) => {
       defaultPosition={{ x: xPos, y: yPos }}
       grid={[25, 25]}
       scale={1}
-      onStop={onStop}
-      key={solenoid.name + solenoid.uid}>
+      onStop={onStop}>
       <StyledDiv>
         <div className="handle">X</div>
         <Button
           variant="outlined"
           onMouseDown={triggerSolenoid}
           onMouseUp={triggerSolenoid}>
-          <h4>{solenoid.name}</h4>
+          <h4>{"BUT"}</h4>
         </Button>
       </StyledDiv>
 
@@ -59,4 +52,4 @@ const SolenoidButton = ({ solenoid, xPos, yPos }: SolenoidButtonProps) => {
   )
 }
 
-export default SolenoidButton
+export default ControlButton

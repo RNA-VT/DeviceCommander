@@ -35,10 +35,6 @@ const SolenoidEditRow = ({ solenoid, cellClasses, setIsEdit }: SolenoidRowProps)
 
   const handleCloseAndSave = () => {
     if (thisSolenoid != solenoid) {
-      console.log('SAVE DAT HOOOEEEE')
-      console.log('THIS', thisSolenoid)
-      console.log('OG', solenoid)
-      console.log('DIFF', diff(solenoid.getConfig(), thisSolenoid.getConfig()))
       const diffData = diff(solenoid.getConfig(), thisSolenoid.getConfig())
       solenoid.edit(diffData).then((data) => {
         console.log(data)
