@@ -29,12 +29,14 @@ const SubmitButton = styled(Button)`
 `
 
 type PBCProps = {
-  deviceManager: DeviceManagement
+  deviceManager: DeviceManagement,
+  controlPanelManager: ControlPanelContainer
 }
 
 type PBCState = {
   buttonConfigs: Array<any>,
   deviceManager: DeviceManagement,
+  controlPanelManager: ControlPanelContainer,
   componentSelect: any,
   controlTypeSelect: any
 }
@@ -46,6 +48,7 @@ class PositionedButtonContainer extends Component<PBCProps, PBCState> {
     this.state = {
       buttonConfigs: [],
       deviceManager: props.deviceManager,
+      controlPanelManager: props.controlPanelManager,
       componentSelect: "",
       controlTypeSelect: ""
     }
@@ -81,7 +84,14 @@ class PositionedButtonContainer extends Component<PBCProps, PBCState> {
   }
 
   handleAddControl() {
-
+    const newBtn = {
+      componentUID: this.state.componentSelect,
+      controlType: 'something',
+      inputType: this.state.controlTypeSelect,
+      xPos: 0,
+      yPos: 0
+    }
+    this.state.controlPanelManager.addButton(newBtn)
   }
 
   handleBtnMove(uid: string, xPos: number, yPos: number) {
@@ -90,21 +100,25 @@ class PositionedButtonContainer extends Component<PBCProps, PBCState> {
 
   render() {
     let solenoidListItems: Array<any> = []
-    let tmpSolenoidBtnConfigs: Array<any> = []
-
     if (this.state.deviceManager) {
       const solenoids = this.state.deviceManager.getSolenoids()
-
-      let tmpXPos = 0
-      let tmpYPos = 0
-
-
       solenoidListItems = solenoids.map(solenoid => {
         return (
           <MenuItem key={solenoid.uid} value={solenoid.uid}>{solenoid.name}</MenuItem>
         )
       })
+    }
 
+    let controlList: Array<any> = []
+    if (this.state.controlPanelManager) {
+      controlList = this.state.controlPanelManager.getConfigs().map(control => {
+        return (
+          <SolenoidButton
+            xPos={control.xPos}
+            yPos={control.yPos}
+            label={control.componentUID} />
+        )
+      })
     }
 
     console.log(solenoidListItems)
@@ -114,8 +128,6 @@ class PositionedButtonContainer extends Component<PBCProps, PBCState> {
         <div>
           <TitleRow>
             <h1>PositionedButtonContainer</h1>
-
-
           </TitleRow>
           <Grid container spacing={1}>
             <Grid item xs={3}>
@@ -147,21 +159,9 @@ class PositionedButtonContainer extends Component<PBCProps, PBCState> {
                 onClick={this.handleAddControl}>Add Control</SubmitButton>
             </Grid>
           </Grid>
-
         </div>
-
         <div>
-          <Subscribe to={[ControlPanelContainer]}>
-            {controlPanelContainer => {
-              return controlPanelContainer.getConfigs().map<React.ReactNode>((config) => (
-                <SolenoidButton
-                  key={config.componentUID}
-                  xPos={config.xPos}
-                  yPos={config.yPos}
-                  setPosition={this.handleAddControl} />
-              ))
-            }}
-          </Subscribe>
+          {controlList}
         </div>
       </div>
     )

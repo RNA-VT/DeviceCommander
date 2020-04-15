@@ -2,7 +2,7 @@ import { Container } from 'unstated-typescript'
 
 type ControlConfig = {
   componentUID: string,
-  componentType: string,
+  controlType: string,
   inputType: string,
   xPos: number,
   yPos: number
@@ -21,6 +21,13 @@ class ControlPanelContainer extends Container<ControlPanelState> {
     }
   }
 
+  addButton(config: ControlConfig) {
+    this.setState({
+      controlConfigs: [...this.state.controlConfigs, config]
+    })
+
+  }
+
   setConfigs(data: Array<ControlConfig>) {
     this.setState({
       controlConfigs: data
@@ -30,8 +37,6 @@ class ControlPanelContainer extends Container<ControlPanelState> {
   getConfigs(): Array<ControlConfig> {
     return this.state.controlConfigs
   }
-
-
 }
 
 export default ControlPanelContainer

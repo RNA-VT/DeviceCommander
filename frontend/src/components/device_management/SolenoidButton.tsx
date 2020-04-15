@@ -11,10 +11,10 @@ const StyledDiv = styled.div`
 type ControlButtonProps = {
   xPos: number,
   yPos: number,
-  setPosition: any
+  label: string
 }
 
-const ControlButton = ({ xPos, yPos, setPosition }: ControlButtonProps) => {
+const ControlButton = ({ xPos, yPos, label }: ControlButtonProps) => {
   const [isOpen, setIsOpen] = useState(false)
 
 
@@ -44,7 +44,7 @@ const ControlButton = ({ xPos, yPos, setPosition }: ControlButtonProps) => {
           variant="outlined"
           onMouseDown={triggerSolenoid}
           onMouseUp={triggerSolenoid}>
-          <h4>{"BUT"}</h4>
+          <h4>{label}</h4>
         </Button>
       </StyledDiv>
 

@@ -5,13 +5,16 @@ import DeviceManagement from '../containers/DeviceManagementContainer'
 import Wrapper from '../components/shared/PageWrapper'
 
 import PositionedButtonContainer from "../components/device_management/PositionedButtonContainer"
+import ControlPanelContainer from '../containers/ControlPanelContainer'
 
-const DeviceList = () => {
+const ControlPanel = () => {
   return (
-    <Subscribe to={[DeviceManagement]}>
-      {DeviceManagement => (
+    <Subscribe to={[DeviceManagement, ControlPanelContainer]}>
+      {(DeviceManagement, controlPanelManagement) => (
         <div>
-          <PositionedButtonContainer deviceManager={DeviceManagement} />
+          <PositionedButtonContainer
+            deviceManager={DeviceManagement}
+            controlPanelManager={controlPanelManagement} />
         </div>
       )}
     </Subscribe>
@@ -22,7 +25,7 @@ const DashboardEdit = () => (
   <Wrapper>
     <Container>
       <List>
-        <DeviceList />
+        <ControlPanel />
       </List>
     </Container>
   </Wrapper >
