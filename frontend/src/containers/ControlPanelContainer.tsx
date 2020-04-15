@@ -19,6 +19,8 @@ class ControlPanelContainer extends Container<ControlPanelState> {
     this.state = {
       controlConfigs: []
     }
+
+    this.setControlPosition = this.setControlPosition.bind(this)
   }
 
   addButton(config: ControlConfig) {
@@ -32,6 +34,20 @@ class ControlPanelContainer extends Container<ControlPanelState> {
     this.setState({
       controlConfigs: data
     })
+  }
+
+  setControlPosition(uid: string, xPos: number, yPos: number) {
+    console.log('setControlPosition', this.state)
+    this.setState({
+      controlConfigs: this.state.controlConfigs.map((control) => {
+        if (control.componentUID == uid) {
+          control.xPos = xPos
+          control.yPos = yPos
+        }
+        return control
+      })
+    })
+
   }
 
   getConfigs(): Array<ControlConfig> {

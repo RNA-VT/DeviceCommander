@@ -63,7 +63,6 @@ class PositionedButtonContainer extends Component<PBCProps, PBCState> {
     value: unknown;
   }>, target: any) {
     if (target) {
-      console.log('handleAddButton', e)
       this.setState({
         componentSelect: e.target.value
       })
@@ -76,7 +75,6 @@ class PositionedButtonContainer extends Component<PBCProps, PBCState> {
     value: unknown;
   }>, target: any) {
     if (target) {
-      console.log('handleAddButton', e)
       this.setState({
         controlTypeSelect: e.target.value
       })
@@ -114,14 +112,15 @@ class PositionedButtonContainer extends Component<PBCProps, PBCState> {
       controlList = this.state.controlPanelManager.getConfigs().map(control => {
         return (
           <SolenoidButton
+            key={control.componentUID}
+            componentUID={control.componentUID}
             xPos={control.xPos}
             yPos={control.yPos}
-            label={control.componentUID} />
+            label={control.componentUID}
+            setPosition={this.state.controlPanelManager.setControlPosition} />
         )
       })
     }
-
-    console.log(solenoidListItems)
 
     return (
       <div>

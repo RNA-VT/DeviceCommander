@@ -9,12 +9,14 @@ const StyledDiv = styled.div`
 `
 
 type ControlButtonProps = {
+  componentUID: string,
   xPos: number,
   yPos: number,
-  label: string
+  label: string,
+  setPosition: (uid: string, xPos: number, yPos: number) => void
 }
 
-const ControlButton = ({ xPos, yPos, label }: ControlButtonProps) => {
+const ControlButton = ({ componentUID, xPos, yPos, label, setPosition }: ControlButtonProps) => {
   const [isOpen, setIsOpen] = useState(false)
 
 
@@ -28,6 +30,7 @@ const ControlButton = ({ xPos, yPos, label }: ControlButtonProps) => {
 
   const onStop = (e: DraggableEvent, data: DraggableData) => {
     console.log('draggableData onStop', data);
+    setPosition(componentUID, data.x, data.y)
   }
 
   return (

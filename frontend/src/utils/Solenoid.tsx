@@ -6,9 +6,7 @@ class Solenoid {
   mcAddress: string
   type: string
   enabled: boolean
-
   headerPin: number
-
 
   constructor(solenoid: any, mc: any) {
     this.uid = solenoid.UID ? solenoid.UID : ''
