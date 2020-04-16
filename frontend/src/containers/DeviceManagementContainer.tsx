@@ -23,6 +23,7 @@ class DeviceManagement extends Container<DeviceManagementState> {
 
     this.getMicrocontrollers = this.getMicrocontrollers.bind(this)
     this.getData = this.getData.bind(this)
+    this.getSolenoidById = this.getSolenoidById.bind(this)
     this.loadData()
   }
 
@@ -61,6 +62,12 @@ class DeviceManagement extends Container<DeviceManagementState> {
       allSolenoids = allSolenoids.concat(mc.solenoids)
     })
     return allSolenoids
+  }
+
+  getSolenoidById(id: string): Solenoid | undefined {
+    return this.getSolenoids().find((solenoid) => {
+      return solenoid.uid === id
+    })
   }
 
 

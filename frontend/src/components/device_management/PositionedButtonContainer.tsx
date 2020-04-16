@@ -123,8 +123,8 @@ class PositionedButtonContainer extends Component<PBCProps, PBCState> {
 
   render() {
     let solenoidListItems: Array<any> = []
+    const solenoids = this.state.deviceManager.getSolenoids()
     if (this.state.deviceManager) {
-      const solenoids = this.state.deviceManager.getSolenoids()
       solenoidListItems = solenoids.map(solenoid => {
         return (
           <MenuItem key={solenoid.uid} value={solenoid.uid}>{solenoid.name}</MenuItem>
@@ -136,13 +136,16 @@ class PositionedButtonContainer extends Component<PBCProps, PBCState> {
     if (this.state.controlPanelManager) {
       controlList = this.state.controlPanelManager.getConfigs().map(control => {
         if (control.inputType == 'switch') {
+          let thisSolenoid = solenoids.find((solenoid) => {
+            return solenoid.uid === control.componentUID
+          })
           return (
             <ControlSwitch
               key={control.componentUID}
               componentUID={control.componentUID}
               xPos={control.xPos}
               yPos={control.yPos}
-              label={control.componentUID}
+              label={thisSolenoid ? thisSolenoid.name : control.componentUID}
               setPosition={this.state.controlPanelManager.setControlPosition} />
           )
         } else {
@@ -155,7 +158,6 @@ class PositionedButtonContainer extends Component<PBCProps, PBCState> {
               label={control.componentUID}
               setPosition={this.state.controlPanelManager.setControlPosition} />
           )
-
         }
       })
     }

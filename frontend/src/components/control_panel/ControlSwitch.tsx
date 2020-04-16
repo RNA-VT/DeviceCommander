@@ -13,19 +13,15 @@ type ControlSwitchProps = {
   xPos: number,
   yPos: number,
   label: string,
-  setPosition: (uid: string, xPos: number, yPos: number) => void
+  setPosition: (uid: string, xPos: number, yPos: number) => void,
 }
 
 const ControlSwitch = ({ componentUID, xPos, yPos, label, setPosition }: ControlSwitchProps) => {
   const [isOpen, setIsOpen] = useState(false)
 
+  const handleOnChange = () => {
 
-  const triggerSolenoid = () => {
-    if (isOpen) {
-      setIsOpen(false)
-    } else {
-      setIsOpen(true)
-    }
+    setIsOpen(!isOpen)
   }
 
   const onStop = (e: DraggableEvent, data: DraggableData) => {
@@ -46,12 +42,12 @@ const ControlSwitch = ({ componentUID, xPos, yPos, label, setPosition }: Control
         <FormControlLabel
           control={
             <Switch
-              // checked={state.checkedB}
-              // onChange={handleChange}
+              checked={isOpen}
+              onChange={() => handleOnChange()}
               name="checkedB"
             />
           }
-          label={componentUID}
+          label={label}
         />
       </StyledDiv>
 
