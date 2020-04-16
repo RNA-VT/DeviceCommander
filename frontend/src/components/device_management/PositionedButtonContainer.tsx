@@ -1,9 +1,11 @@
 import * as React from 'react'
 import { Component } from 'react'
 import { Subscribe } from 'unstated-typescript'
-import SolenoidButton from './SolenoidButton'
+import ControlButton from '../control_panel/ControlButton'
+import ControlSwitch from '../control_panel/ControlSwitch'
 import DeviceManagement from '../../containers/DeviceManagementContainer'
-import ControlPanelContainer from '../../containers/ControlPanelContainer'
+import ControlPanelContainer, { ControlConfig } from '../../containers/ControlPanelContainer'
+import ControlPanelConfigEdit from '../control_panel/ControlPanelConfigEdit'
 import SolenoidFactory from '../../utils/factories/SolenoidFactory'
 import styled from 'styled-components'
 import {
@@ -13,11 +15,6 @@ import {
   Grid,
   Button,
   FormControl,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions
 } from '@material-ui/core'
 
 const TitleRow = styled.div`
@@ -39,8 +36,7 @@ const ControlPanelGrid = styled.div`
   width: 1000px;
   overflow: hidden;
   border: black 2px solid;
-  margin: 10px auto 0;
-  
+  margin: 10px auto;
 `
 
 type PBCProps = {
@@ -139,15 +135,28 @@ class PositionedButtonContainer extends Component<PBCProps, PBCState> {
     let controlList: Array<any> = []
     if (this.state.controlPanelManager) {
       controlList = this.state.controlPanelManager.getConfigs().map(control => {
-        return (
-          <SolenoidButton
-            key={control.componentUID}
-            componentUID={control.componentUID}
-            xPos={control.xPos}
-            yPos={control.yPos}
-            label={control.componentUID}
-            setPosition={this.state.controlPanelManager.setControlPosition} />
-        )
+        if (control.inputType == 'switch') {
+          return (
+            <ControlSwitch
+              key={control.componentUID}
+              componentUID={control.componentUID}
+              xPos={control.xPos}
+              yPos={control.yPos}
+              label={control.componentUID}
+              setPosition={this.state.controlPanelManager.setControlPosition} />
+          )
+        } else {
+          return (
+            <ControlButton
+              key={control.componentUID}
+              componentUID={control.componentUID}
+              xPos={control.xPos}
+              yPos={control.yPos}
+              label={control.componentUID}
+              setPosition={this.state.controlPanelManager.setControlPosition} />
+          )
+
+        }
       })
     }
 
@@ -186,35 +195,15 @@ class PositionedButtonContainer extends Component<PBCProps, PBCState> {
                 variant="outlined"
                 onClick={this.handleAddControl}>Add Control</SubmitButton>
             </Grid>
-            <Grid item xs={2}>
-              <SubmitButton type="submit"
-                variant="outlined"
-                onClick={this.handleExportConfig}>Export Config</SubmitButton>
-              <Dialog
-                open={this.state.jsonDialogOpen}
-                onClose={this.handleCloseJsonDialog}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-              >
-                <DialogTitle id="alert-dialog-title">Current Layout Config</DialogTitle>
-                <DialogContent>
-                  <DialogContentText id="alert-dialog-description">
-                    <pre>
-                      {JSON.stringify(this.state.controlPanelManager.getConfigs(), null, 2)}
-                    </pre>
-                  </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                  <Button onClick={this.handleCloseJsonDialog} variant="outlined">close</Button>
-                </DialogActions>
-              </Dialog>
-
-            </Grid>
           </Grid>
         </div>
         <ControlPanelGrid>
           {controlList}
         </ControlPanelGrid>
+        <ControlPanelConfigEdit
+          jsonConfig={JSON.stringify(this.state.controlPanelManager.getConfigs(), null, 2)}
+          setControlPanelConfig={this.state.controlPanelManager.setConfigs}
+        />
       </div>
     )
   }

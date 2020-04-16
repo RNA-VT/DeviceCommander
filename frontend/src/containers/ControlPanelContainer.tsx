@@ -1,6 +1,6 @@
 import { Container } from 'unstated-typescript'
 
-type ControlConfig = {
+export type ControlConfig = {
   componentUID: string,
   controlType: string,
   inputType: string,
@@ -21,13 +21,13 @@ class ControlPanelContainer extends Container<ControlPanelState> {
     }
 
     this.setControlPosition = this.setControlPosition.bind(this)
+    this.setConfigs = this.setConfigs.bind(this)
   }
 
   addButton(config: ControlConfig) {
     this.setState({
       controlConfigs: [...this.state.controlConfigs, config]
     })
-
   }
 
   setConfigs(data: Array<ControlConfig>) {
