@@ -14,14 +14,26 @@ type ControlSwitchProps = {
   yPos: number,
   label: string,
   setPosition: (uid: string, xPos: number, yPos: number) => void,
+  onAction: () => void,
+  offAction: () => void
 }
 
-const ControlSwitch = ({ componentUID, xPos, yPos, label, setPosition }: ControlSwitchProps) => {
+const ControlSwitch = ({ componentUID, xPos, yPos, label, setPosition, onAction, offAction }: ControlSwitchProps) => {
   const [isOpen, setIsOpen] = useState(false)
 
-  const handleOnChange = () => {
+  if (isOpen == false) {
+    offAction()
+  } else {
+    onAction()
+  }
 
+  const handleOnChange = () => {
     setIsOpen(!isOpen)
+    if (isOpen == false) {
+      onAction()
+    } else {
+      offAction()
+    }
   }
 
   const onStop = (e: DraggableEvent, data: DraggableData) => {

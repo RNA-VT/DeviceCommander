@@ -135,10 +135,11 @@ class PositionedButtonContainer extends Component<PBCProps, PBCState> {
     let controlList: Array<any> = []
     if (this.state.controlPanelManager) {
       controlList = this.state.controlPanelManager.getConfigs().map(control => {
+        let thisSolenoid = solenoids.find((solenoid) => {
+          return solenoid.uid === control.componentUID
+        })
+
         if (control.inputType == 'switch') {
-          let thisSolenoid = solenoids.find((solenoid) => {
-            return solenoid.uid === control.componentUID
-          })
           return (
             <ControlSwitch
               key={control.componentUID}
@@ -146,7 +147,15 @@ class PositionedButtonContainer extends Component<PBCProps, PBCState> {
               xPos={control.xPos}
               yPos={control.yPos}
               label={thisSolenoid ? thisSolenoid.name : control.componentUID}
-              setPosition={this.state.controlPanelManager.setControlPosition} />
+              setPosition={this.state.controlPanelManager.setControlPosition}
+              onAction={() => {
+                if (thisSolenoid)
+                  thisSolenoid.open()
+              }}
+              offAction={() => {
+                if (thisSolenoid)
+                  thisSolenoid.close()
+              }} />
           )
         } else {
           return (
@@ -155,8 +164,16 @@ class PositionedButtonContainer extends Component<PBCProps, PBCState> {
               componentUID={control.componentUID}
               xPos={control.xPos}
               yPos={control.yPos}
-              label={control.componentUID}
-              setPosition={this.state.controlPanelManager.setControlPosition} />
+              label={thisSolenoid ? thisSolenoid.name : control.componentUID}
+              setPosition={this.state.controlPanelManager.setControlPosition}
+              onClick={() => {
+                if (thisSolenoid)
+                  thisSolenoid.open()
+              }}
+              offClick={() => {
+                if (thisSolenoid)
+                  thisSolenoid.close()
+              }} />
           )
         }
       })
