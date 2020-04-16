@@ -12,7 +12,12 @@ import {
   Select,
   Grid,
   Button,
-  FormControl
+  FormControl,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions
 } from '@material-ui/core'
 
 const TitleRow = styled.div`
@@ -26,6 +31,16 @@ const FormControlStyled = styled(FormControl)`
 
 const SubmitButton = styled(Button)`
   height: 100%;
+  width: 100%;
+`
+
+const ControlPanelGrid = styled.div`
+  height: 1000px;
+  width: 1000px;
+  overflow: hidden;
+  border: black 2px solid;
+  margin: 10px auto 0;
+  
 `
 
 type PBCProps = {
@@ -38,7 +53,8 @@ type PBCState = {
   deviceManager: DeviceManagement,
   controlPanelManager: ControlPanelContainer,
   componentSelect: any,
-  controlTypeSelect: any
+  controlTypeSelect: any,
+  jsonDialogOpen: boolean
 }
 
 class PositionedButtonContainer extends Component<PBCProps, PBCState> {
@@ -50,12 +66,16 @@ class PositionedButtonContainer extends Component<PBCProps, PBCState> {
       deviceManager: props.deviceManager,
       controlPanelManager: props.controlPanelManager,
       componentSelect: "",
-      controlTypeSelect: ""
+      controlTypeSelect: "",
+      jsonDialogOpen: false
     }
 
     this.handleChangeComponentButton = this.handleChangeComponentButton.bind(this)
     this.handleChangeControlType = this.handleChangeControlType.bind(this)
     this.handleAddControl = this.handleAddControl.bind(this)
+    this.handleExportConfig = this.handleExportConfig.bind(this)
+    this.handleCloseJsonDialog = this.handleCloseJsonDialog.bind(this)
+    this.handleExportConfig = this.handleExportConfig.bind(this)
   }
 
   handleChangeComponentButton(e: React.ChangeEvent<{
@@ -92,8 +112,17 @@ class PositionedButtonContainer extends Component<PBCProps, PBCState> {
     this.state.controlPanelManager.addButton(newBtn)
   }
 
-  handleBtnMove(uid: string, xPos: number, yPos: number) {
+  handleCloseJsonDialog() {
+    this.setState({
+      jsonDialogOpen: false
+    })
+  }
 
+  handleExportConfig() {
+    console.log('Control Panel Config', this.state.controlPanelManager.getConfigs())
+    this.setState({
+      jsonDialogOpen: true
+    })
   }
 
   render() {
@@ -129,7 +158,7 @@ class PositionedButtonContainer extends Component<PBCProps, PBCState> {
             <h1>PositionedButtonContainer</h1>
           </TitleRow>
           <Grid container spacing={1}>
-            <Grid item xs={3}>
+            <Grid item xs={4}>
               <FormControlStyled>
                 <InputLabel disableAnimation={true}
                   id="add-btn-label">Add a Button</InputLabel>
@@ -140,7 +169,7 @@ class PositionedButtonContainer extends Component<PBCProps, PBCState> {
                 </Select>
               </FormControlStyled>
             </Grid>
-            <Grid item xs={3}>
+            <Grid item xs={4}>
               <FormControlStyled>
                 <InputLabel disableAnimation={true}
                   id="control-type-label">Control Type</InputLabel>
@@ -152,16 +181,40 @@ class PositionedButtonContainer extends Component<PBCProps, PBCState> {
                 </Select>
               </FormControlStyled>
             </Grid>
-            <Grid item xs={3}>
+            <Grid item xs={2}>
               <SubmitButton type="submit"
                 variant="outlined"
                 onClick={this.handleAddControl}>Add Control</SubmitButton>
             </Grid>
+            <Grid item xs={2}>
+              <SubmitButton type="submit"
+                variant="outlined"
+                onClick={this.handleExportConfig}>Export Config</SubmitButton>
+              <Dialog
+                open={this.state.jsonDialogOpen}
+                onClose={this.handleCloseJsonDialog}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+              >
+                <DialogTitle id="alert-dialog-title">Current Layout Config</DialogTitle>
+                <DialogContent>
+                  <DialogContentText id="alert-dialog-description">
+                    <pre>
+                      {JSON.stringify(this.state.controlPanelManager.getConfigs(), null, 2)}
+                    </pre>
+                  </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={this.handleCloseJsonDialog} variant="outlined">close</Button>
+                </DialogActions>
+              </Dialog>
+
+            </Grid>
           </Grid>
         </div>
-        <div>
+        <ControlPanelGrid>
           {controlList}
-        </div>
+        </ControlPanelGrid>
       </div>
     )
   }
