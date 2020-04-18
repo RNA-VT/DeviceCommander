@@ -15,7 +15,10 @@ import {
   Grid,
   Button,
   FormControl,
+  ListItemIcon,
+  Typography
 } from '@material-ui/core'
+import { GiSpiralBloom } from 'react-icons/gi'
 
 const TitleRow = styled.div`
   // background-color: gray;
@@ -37,6 +40,14 @@ const ControlPanelGrid = styled.div`
   overflow: hidden;
   border: black 2px solid;
   margin: 10px auto;
+`
+
+const StyledListItemIcon = styled(ListItemIcon)`
+  min-width: auto;
+  width: auto;
+  padding-right: 8px;
+  position: relative;
+  top: 1px;
 `
 
 type PBCProps = {
@@ -127,7 +138,12 @@ class PositionedButtonContainer extends Component<PBCProps, PBCState> {
     if (this.state.deviceManager) {
       solenoidListItems = solenoids.map(solenoid => {
         return (
-          <MenuItem key={solenoid.uid} value={solenoid.uid}>{solenoid.name}</MenuItem>
+          <MenuItem key={solenoid.uid} value={solenoid.uid}>
+            <StyledListItemIcon>
+              <GiSpiralBloom />
+            </StyledListItemIcon>
+            <Typography variant="inherit">{solenoid.name}</Typography>
+          </MenuItem>
         )
       })
     }
