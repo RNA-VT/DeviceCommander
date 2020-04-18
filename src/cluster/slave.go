@@ -3,6 +3,7 @@ package cluster
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	mc "firecontroller/microcontroller"
 	"log"
 	"net/http"
@@ -16,12 +17,13 @@ import (
 //******************************************************************************************************
 
 //ALifeOfServitude is all that awaits this microcontroller
-func (c Cluster) ALifeOfServitude() {
+func (c *Cluster) ALifeOfServitude() {
 	me, err := mc.NewMicrocontroller(viper.GetString("GOFIRE_HOST"), viper.GetString("GOFIRE_PORT"))
 	if err != nil {
 		log.Println("Failed to Create New Microcontroller:", err.Error())
 	}
 	me.ID = c.generateUniqueID()
+	me.Master = false
 	c.Me = &me
 	masterHostname := viper.GetString("GOFIRE_MASTER_HOST") + ":" + viper.GetString("GOFIRE_MASTER_PORT")
 	//Try and Connect to the Master
@@ -53,11 +55,12 @@ func (c *Cluster) JoinNetwork(URL string) error {
 		return err
 	}
 	resp, err := http.Post(parsedURL.String(), "application/json", bytes.NewBuffer(body))
-
 	if err != nil {
-		log.Println("[test] Couldn't connect to master.", c.Me.ID)
+		log.Println("Something went wrong connecting to the Master", c.Me)
 		log.Println(err)
 		return err
+	} else if resp.StatusCode >= 400 {
+		return errors.New("Registration request was rejected by the Master")
 	}
 	log.Println("Connected to master. Sending message to peers.")
 

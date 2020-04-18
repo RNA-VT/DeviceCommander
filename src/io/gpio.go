@@ -48,7 +48,7 @@ func (g *Gpio) Init(headerPin int, initHigh bool) error {
 	}
 	log.Println("BCM Pin:", g.PinInfo.BcmPin)
 	//This pin theoretically checks out, but is it real?
-	if viper.GetBool("GOFIRE_MOCK_GPIO") {
+	if viper.GetBool("GOFIRE_MOCK_GPIO") || viper.GetString("ENV") == "local" {
 		//Nothing is real and this pin, especially, is laughable. Mock it.
 		g.Pin = mock.Pin(g.PinInfo.BcmPin)
 	} else {

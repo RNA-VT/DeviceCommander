@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-//generateUniqueID returns a unique id for asigning to a new microcontroller
+//generateUniqueID returns a unique id for assigning to a new microcontroller
 func (c Cluster) generateUniqueID() int {
 	limit := viper.GetInt("MICROCONTORLLER_LIMIT")
 	randID := rand.Intn(limit)
@@ -24,9 +24,9 @@ func (c Cluster) generateUniqueID() int {
 func (c Cluster) getSlavesByID(targetID int) []mc.Microcontroller {
 	var micros []mc.Microcontroller
 
-	for i := 0; i < len(c.SlaveMicrocontrollers); i++ {
-		if c.SlaveMicrocontrollers[i].ID == targetID {
-			return append(micros, c.SlaveMicrocontrollers[i])
+	for i := 0; i < len(c.Microcontrollers); i++ {
+		if c.Microcontrollers[i].ID == targetID {
+			return append(micros, c.Microcontrollers[i])
 		}
 	}
 
@@ -46,13 +46,13 @@ func isExcluded(m mc.Microcontroller, exclusions []mc.Microcontroller) bool {
 func PrintClusterInfo(c Cluster) {
 	log.Println()
 	log.Println("====Master====")
-	log.Println(c.Master)
+	log.Println(c.Master())
 
 	log.Println()
 
-	for i := 0; i < len(c.SlaveMicrocontrollers); i++ {
+	for i := 0; i < len(c.Microcontrollers); i++ {
 		log.Println("----Peer---")
-		log.Println(c.SlaveMicrocontrollers[i])
+		log.Println(c.Microcontrollers[i])
 	}
 	log.Println()
 }

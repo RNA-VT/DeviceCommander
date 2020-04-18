@@ -1,6 +1,7 @@
 package cluster
 
 import (
+	"errors"
 	mc "firecontroller/microcontroller"
 	"log"
 
@@ -18,10 +19,11 @@ func (c *Cluster) KingMe() {
 		log.Println("Failed to Create New Microcontroller:", err.Error())
 	}
 	me.ID = c.generateUniqueID()
+	me.Master = true
 	//The master also serves
-	c.SlaveMicrocontrollers = append(c.SlaveMicrocontrollers, me)
-	c.Me = &c.SlaveMicrocontrollers[len(c.SlaveMicrocontrollers)-1]
-	c.Master = c.Me
+	c.Microcontrollers = append(c.Microcontrollers, me)
+	c.Me = c.Master()
+
 	//The Master waits ...
 }
 
@@ -30,10 +32,18 @@ func (c *Cluster) AddMicrocontroller(newMC mc.Config) (response PeerUpdateMessag
 	var newGuy mc.Microcontroller
 	newGuy.Load(newMC)
 	newGuy.ID = c.generateUniqueID()
+	if viper.GetString("ENV") == "production" {
+		for _, micro := range c.Microcontrollers {
+			if micro.Host == newGuy.Host {
+				//This guy ain't so new!
+				return PeerUpdateMessage{}, errors.New("Requesting instance is running on a microcontroller already registered to this cluster")
+			}
+		}
+	}
 
-	c.SlaveMicrocontrollers = append(c.SlaveMicrocontrollers, newGuy)
+	c.Microcontrollers = append(c.Microcontrollers, newGuy)
+
 	PrintClusterInfo(*c)
-
 	response = PeerUpdateMessage{
 		Cluster: c.GetConfig(),
 		Header:  c.GetHeader(),
@@ -51,12 +61,12 @@ func (c *Cluster) AddMicrocontroller(newMC mc.Config) (response PeerUpdateMessag
 
 //RemoveMicrocontroller -
 func (c *Cluster) RemoveMicrocontroller(ImDoneHere mc.Microcontroller) {
-	for index, mc := range c.SlaveMicrocontrollers {
+	for index, mc := range c.Microcontrollers {
 		if mc.ID == ImDoneHere.ID {
-			s := c.SlaveMicrocontrollers
-			count := len(c.SlaveMicrocontrollers)
+			s := c.Microcontrollers
+			count := len(c.Microcontrollers)
 			s[count-1], s[index] = s[index], s[count-1]
-			c.SlaveMicrocontrollers = s[:len(s)-1]
+			c.Microcontrollers = s[:len(s)-1]
 			return
 		}
 	}

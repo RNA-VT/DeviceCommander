@@ -1,6 +1,7 @@
 package microcontroller
 
 import (
+	"errors"
 	"firecontroller/component"
 	"firecontroller/utilities"
 	"io/ioutil"
@@ -18,6 +19,7 @@ type Microcontroller struct {
 	Description string
 	Host        string
 	Port        string
+	Master      bool
 	Solenoids   []component.Solenoid
 	Igniters    []component.Igniter
 }
@@ -29,6 +31,7 @@ type Config struct {
 	Description string                     `yaml:"description"`
 	Host        string                     `yaml:"host"`
 	Port        string                     `yaml:"port"`
+	Master      bool                       `yaml:"master"`
 	Solenoids   []component.SolenoidConfig `yaml:"solenoids"`
 	Igniters    []component.IgniterConfig  `yaml:"igniters"`
 }
@@ -40,9 +43,14 @@ func (m Microcontroller) GetConfig() (config Config) {
 	config.Port = m.Port
 	config.Name = m.Name
 	config.Description = m.Description
+	config.Master = m.Master
 	config.Solenoids = make([]component.SolenoidConfig, len(m.Solenoids))
 	for i, sol := range m.Solenoids {
 		config.Solenoids[i] = sol.GetConfig()
+	}
+	config.Igniters = make([]component.IgniterConfig, len(m.Igniters))
+	for i, igniter := range m.Igniters {
+		config.Igniters[i] = igniter.GetConfig()
 	}
 	return
 }
@@ -52,6 +60,7 @@ func (m *Microcontroller) Load(config Config) {
 	m.ID = config.ID
 	m.Name = config.Name
 	m.Description = config.Description
+	m.Master = config.Master
 	if viper.GetBool("GOFIRE_MASTER") {
 		m.Host = viper.GetString("GOFIRE_MASTER_HOST")
 		m.Port = viper.GetString("GOFIRE_MASTER_PORT")
@@ -59,14 +68,17 @@ func (m *Microcontroller) Load(config Config) {
 		m.Host = viper.GetString("GOFIRE_HOST")
 		m.Port = viper.GetString("GOFIRE_PORT")
 	}
-
-	m.Solenoids = make([]component.Solenoid, len(config.Solenoids))
-	for i, sol := range config.Solenoids {
-		m.Solenoids[i].Load(sol)
+	if length := len(config.Solenoids); length > 0 {
+		m.Solenoids = make([]component.Solenoid, length)
+		for i, sol := range config.Solenoids {
+			m.Solenoids[i].Load(sol)
+		}
 	}
-	m.Igniters = make([]component.Igniter, len(config.Igniters))
-	for i, igniter := range config.Igniters {
-		m.Igniters[i].Load(igniter)
+	if length := len(config.Igniters); length > 0 {
+		m.Igniters = make([]component.Igniter, length)
+		for i, igniter := range config.Igniters {
+			m.Igniters[i].Load(igniter)
+		}
 	}
 }
 
@@ -101,6 +113,26 @@ func (m *Microcontroller) GetComponentMap() map[string]component.Component {
 		components["Igniter_"+strconv.Itoa(i)] = &m.Igniters[i]
 	}
 	return components
+}
+
+//GetSolenoid -
+func (m *Microcontroller) GetSolenoid(id int) (sol component.Solenoid, err error) {
+	for _, sol := range m.Solenoids {
+		if sol.UID == id {
+			return sol, nil
+		}
+	}
+	return component.Solenoid{}, errors.New("id not found")
+}
+
+//GetIgniter -
+func (m *Microcontroller) GetIgniter(id int) (sol component.Igniter, err error) {
+	for _, igniter := range m.Igniters {
+		if igniter.UID == id {
+			return igniter, nil
+		}
+	}
+	return component.Igniter{}, errors.New("id not found")
 }
 
 //NewMicrocontroller -
