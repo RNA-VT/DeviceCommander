@@ -62,7 +62,7 @@ func (c *Cluster) JoinNetwork(URL string) error {
 	} else if resp.StatusCode >= 400 {
 		return errors.New("Registration request was rejected by the Master")
 	}
-	log.Println("Connected to master. Sending message to peers.")
+	log.Println("Registration request sent to the Master successfully.")
 
 	defer resp.Body.Close()
 

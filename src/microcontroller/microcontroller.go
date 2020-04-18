@@ -61,13 +61,8 @@ func (m *Microcontroller) Load(config Config) {
 	m.Name = config.Name
 	m.Description = config.Description
 	m.Master = config.Master
-	if viper.GetBool("GOFIRE_MASTER") {
-		m.Host = viper.GetString("GOFIRE_MASTER_HOST")
-		m.Port = viper.GetString("GOFIRE_MASTER_PORT")
-	} else {
-		m.Host = viper.GetString("GOFIRE_HOST")
-		m.Port = viper.GetString("GOFIRE_PORT")
-	}
+	m.Host = config.Host
+	m.Port = config.Port
 	if length := len(config.Solenoids); length > 0 {
 		m.Solenoids = make([]component.Solenoid, length)
 		for i, sol := range config.Solenoids {
@@ -167,6 +162,13 @@ func (m *Microcontroller) LoadConfigFromFile() error {
 	if err != nil {
 		log.Fatalf("Unmarshal: %v", err)
 		return err
+	}
+	if viper.GetBool("GOFIRE_MASTER") {
+		microConfig.Host = viper.GetString("GOFIRE_MASTER_HOST")
+		microConfig.Port = viper.GetString("GOFIRE_MASTER_PORT")
+	} else {
+		microConfig.Host = viper.GetString("GOFIRE_HOST")
+		microConfig.Port = viper.GetString("GOFIRE_PORT")
 	}
 	m.Load(microConfig)
 	log.Println("Loaded the Following Components: ", m.ComponentString())

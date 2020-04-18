@@ -35,7 +35,7 @@ type PeerUpdateMessage struct {
 	Header  GoFireHeader
 }
 
-//Command -
+//CommandMessage -
 type CommandMessage struct {
 	Command string
 }
@@ -61,14 +61,15 @@ func (c Cluster) ClusterError(panicAfterWarning bool, panicCluster bool, Microco
 	message.Panic = panicCluster
 	message.DeregisterMe = MicrocontrollerToRemove
 	message.Header = c.GetHeader()
-	c.UpdatePeers("errors", message, []mc.Microcontroller{*c.Me})
+	c.UpdatePeers("/errors", message, []mc.Config{c.Me.GetConfig()})
 	if panicAfterWarning {
 		panic(notGoodThings)
 	}
 }
 
 // UpdatePeers will take a byte slice and POST it to each microcontroller
-func (c Cluster) UpdatePeers(urlPath string, message interface{}, exclude []mc.Microcontroller) error {
+
+func (c Cluster) UpdatePeers(urlPath string, message interface{}, exclude []mc.Config) error {
 	for i := 0; i < len(c.Microcontrollers); i++ {
 		if !isExcluded(c.Microcontrollers[i], exclude) {
 			body, err := utilities.JSON(message)
@@ -76,7 +77,7 @@ func (c Cluster) UpdatePeers(urlPath string, message interface{}, exclude []mc.M
 				log.Println("Failed to convert cluster to json: ", c)
 				return err
 			}
-			currURL := "http://" + c.Microcontrollers[i].ToFullAddress() + "/v1/" + urlPath
+			currURL := "http://" + c.Microcontrollers[i].ToFullAddress() + "/v1" + urlPath
 
 			resp, err := http.Post(currURL, "application/json", bytes.NewBuffer(body))
 			if err != nil {
@@ -87,7 +88,7 @@ func (c Cluster) UpdatePeers(urlPath string, message interface{}, exclude []mc.M
 				var result string
 				decoder := json.NewDecoder(resp.Body)
 				decoder.Decode(&result)
-				log.Println("Result:", result)
+				log.Println("Peer Update Response:", result)
 			}
 		}
 	}
@@ -111,5 +112,6 @@ func (c *Cluster) ReceiveError(msg PeerErrorMessage) {
 		//Deregister Microcontroller
 		log.Println("Deregistering Microcontroller From Cluster: ", msg.DeregisterMe.String())
 		c.RemoveMicrocontroller(msg.DeregisterMe)
+		c.SendClusterUpdate([]mc.Config{})
 	}
 }

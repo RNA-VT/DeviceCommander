@@ -17,8 +17,12 @@ func (a *APIService) addInfoRoutes(e *echo.Echo) {
 	api.GET("/component", a.getComponents)
 	api.GET("/component/:id", a.getComponent)
 	api.GET("/config", a.getComponentConfig)
+	api.GET("/health", a.health)
 }
 
+func (a APIService) health(c echo.Context) error {
+	return c.JSON(http.StatusOK, "I'm Alive")
+}
 func (a APIService) getClusterInfo(c echo.Context) error {
 	return c.JSON(http.StatusOK, a.Cluster.GetConfig())
 }

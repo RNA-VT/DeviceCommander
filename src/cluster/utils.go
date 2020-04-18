@@ -33,7 +33,7 @@ func (c Cluster) getSlavesByID(targetID int) []mc.Microcontroller {
 	return micros
 }
 
-func isExcluded(m mc.Microcontroller, exclusions []mc.Microcontroller) bool {
+func isExcluded(m mc.Microcontroller, exclusions []mc.Config) bool {
 	for i := 0; i < len(exclusions); i++ {
 		if m.Host == exclusions[i].Host && m.Port == exclusions[i].Port {
 			return true
