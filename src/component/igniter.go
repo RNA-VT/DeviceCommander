@@ -17,6 +17,7 @@ type Igniter struct {
 //IgniterConfig -
 type IgniterConfig struct {
 	Type          IgniterType `yaml:"type"`
+	PinMap        io.RpiPinMap
 	BaseComponent `yaml:",inline"`
 }
 
@@ -32,12 +33,14 @@ const (
 
 //GetConfig - A transportable and marshalable version of this igniter
 func (i Igniter) GetConfig() (config IgniterConfig) {
+
 	config.UID = i.UID
 	config.Enabled = i.Enabled
 	config.Name = i.Name
 	config.HeaderPin = i.HeaderPin
 	config.Metadata = i.Metadata
 	config.Type = i.Type
+	config.PinMap = i.GPIO.PinInfo
 	return
 }
 
@@ -108,6 +111,20 @@ func (i Igniter) Healthy() bool {
 func (i *Igniter) setID() {
 	//HeaderPin is unique per micro, but this may need to be revisited for components requiring more than 1 HeaderPin
 	i.UID = i.HeaderPin
+}
+
+//Command - process a command request for this solenoid
+func (i *Igniter) Command(cmd string) {
+	switch cmd {
+	case "on":
+		i.On()
+	case "off":
+		i.Off()
+	case "enable":
+		i.Enable(false)
+	case "disable":
+		i.Disable()
+	}
 }
 
 //On - hawt

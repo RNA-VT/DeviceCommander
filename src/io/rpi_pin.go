@@ -43,9 +43,9 @@ type RpiPinMap struct {
 }
 
 func (r RpiPinMap) String() string {
-	return utilities.LabelString("\t\tName", r.Name) +
-		utilities.LabelString("\t\tHeader Pin", strconv.Itoa(r.HeaderPin)) +
-		utilities.LabelString("\t\tBCM Pin", strconv.Itoa(int(r.BcmPin)))
+	return "\t" + utilities.LabelString("Name", r.Name) + "\t" +
+		utilities.LabelString("Header Pin", strconv.Itoa(r.HeaderPin)) + "\t" +
+		utilities.LabelString("BCM Pin", strconv.Itoa(int(r.BcmPin)))
 }
 
 //GetPins - Returns Pins for Raspi 4

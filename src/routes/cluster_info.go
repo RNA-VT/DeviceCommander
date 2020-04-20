@@ -9,7 +9,7 @@ import (
 	"github.com/labstack/echo"
 )
 
-func (a APIService) addInfoRoutes(e *echo.Echo) {
+func (a *APIService) addInfoRoutes(e *echo.Echo) {
 	api := e.Group("/v1")
 	api.GET("/cluster_info", a.getClusterInfo)
 	api.GET("/microcontroller", a.getMicrocontrollers)
@@ -17,14 +17,18 @@ func (a APIService) addInfoRoutes(e *echo.Echo) {
 	api.GET("/component", a.getComponents)
 	api.GET("/component/:id", a.getComponent)
 	api.GET("/config", a.getComponentConfig)
+	api.GET("/health", a.health)
 }
 
+func (a APIService) health(c echo.Context) error {
+	return c.JSON(http.StatusOK, "I'm Alive")
+}
 func (a APIService) getClusterInfo(c echo.Context) error {
-	return c.JSON(http.StatusOK, a.Cluster)
+	return c.JSON(http.StatusOK, a.Cluster.GetConfig())
 }
 
 func (a APIService) getMicrocontrollers(c echo.Context) error {
-	return c.JSON(http.StatusOK, a.Cluster.SlaveMicrocontrollers)
+	return c.JSON(http.StatusOK, a.Cluster.Microcontrollers)
 }
 
 func (a APIService) getMicrocontroller(c echo.Context) error {
@@ -41,7 +45,7 @@ func (a APIService) getMicrocontroller(c echo.Context) error {
 }
 
 func (a APIService) getComponents(c echo.Context) error {
-	return c.JSON(http.StatusOK, a.Cluster.GetComponents())
+	return c.JSON(http.StatusOK, a.Cluster.Me.GetComponentMap())
 }
 
 func (a APIService) getComponent(c echo.Context) error {
@@ -58,7 +62,7 @@ func (a APIService) getComponent(c echo.Context) error {
 }
 
 func (a APIService) getComponentConfig(c echo.Context) error {
-	yamlFile, err := ioutil.ReadFile("./app/config/solenoids.yaml")
+	yamlFile, err := ioutil.ReadFile("./app/config/microcontroller.yaml")
 	if err != nil {
 		log.Printf("yamlFile.Get err   #%v ", err)
 		return err

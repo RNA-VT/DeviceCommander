@@ -18,6 +18,8 @@ type Solenoid struct {
 type SolenoidConfig struct {
 	Type          SolenoidType `yaml:"type"`
 	Mode          SolenoidMode `yaml:"mode"`
+	Failed        bool         `yaml:"failed"`
+	PinMap        io.RpiPinMap `yaml:"pinmap"`
 	BaseComponent `yaml:",inline"`
 }
 
@@ -55,6 +57,8 @@ func (s Solenoid) GetConfig() SolenoidConfig {
 	config.Name = s.Name
 	config.HeaderPin = s.HeaderPin
 	config.Metadata = s.Metadata
+	config.Failed = s.GPIO.Failed
+	config.PinMap = s.GPIO.PinInfo
 	return config
 }
 
@@ -80,6 +84,11 @@ func (s *Solenoid) Init() error {
 	return nil
 }
 
+//Disable this solenoid
+func (s *Solenoid) Disable() {
+	s.Enabled = false
+}
+
 //Enable and optionally initializes the gpio pin
 func (s *Solenoid) Enable(init bool) (err error) {
 	if init {
@@ -92,11 +101,6 @@ func (s *Solenoid) Enable(init bool) (err error) {
 	//Create UUID now that GPIO is enabled
 	s.setID()
 	return
-}
-
-//Disable this solenoid
-func (s *Solenoid) Disable() {
-	s.Enabled = false
 }
 
 func (s Solenoid) String() string {
@@ -129,6 +133,20 @@ func (s Solenoid) Healthy() bool {
 func (s *Solenoid) setID() {
 	//HeaderPin is unique per micro, but this may need to be revisited for components requiring more than 1 HeaderPin
 	s.UID = s.HeaderPin
+}
+
+//Command - process a command request for this solenoid
+func (s *Solenoid) Command(cmd string) {
+	switch cmd {
+	case "open":
+		s.Open()
+	case "close":
+		s.Close(0)
+	case "enable":
+		s.Enable(false)
+	case "disable":
+		s.Disable()
+	}
 }
 
 //Open - Open the solenoid
