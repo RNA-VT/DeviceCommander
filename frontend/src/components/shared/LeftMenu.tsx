@@ -35,7 +35,6 @@ const CustomLink = ({ to, children, renderAs }: { to: any, children: any, render
 const MainListItems = () => {
     const classes = useMainStyles({})
 
-
     return (
         <div>
             <ListItem button

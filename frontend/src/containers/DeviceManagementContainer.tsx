@@ -16,14 +16,12 @@ class DeviceManagement extends Container<DeviceManagementState> {
     super()
     this.state = {
       isLoaded: false,
-      master: undefined,
       slaveMicrocontrollers: [],
       clusterName: ''
     }
 
     this.getMicrocontrollers = this.getMicrocontrollers.bind(this)
     this.getData = this.getData.bind(this)
-    this.getSolenoidById = this.getSolenoidById.bind(this)
     this.loadData()
   }
 
@@ -34,11 +32,11 @@ class DeviceManagement extends Container<DeviceManagementState> {
 
   async loadData() {
     return this.getData().then((data) => {
+      console.log('load data', data);
       let mcFactory = new MicrocontrollerFactory()
 
       this.setState({
-        slaveMicrocontrollers: mcFactory.makeManyMcs(data.SlaveMicrocontrollers),
-        master: new Microcontroller(data.Master),
+        slaveMicrocontrollers: mcFactory.makeManyMcs(data.Microcontrollers),
         clusterName: data.Name
       })
     })
@@ -47,10 +45,6 @@ class DeviceManagement extends Container<DeviceManagementState> {
   getMicrocontrollers(): Array<Microcontroller> {
     if (this.state.slaveMicrocontrollers) {
       return [...this.state.slaveMicrocontrollers]
-    }
-
-    if (this.state.master) {
-      return [this.state.master]
     }
 
     return []
@@ -62,12 +56,6 @@ class DeviceManagement extends Container<DeviceManagementState> {
       allSolenoids = allSolenoids.concat(mc.solenoids)
     })
     return allSolenoids
-  }
-
-  getSolenoidById(id: string): Solenoid | undefined {
-    return this.getSolenoids().find((solenoid) => {
-      return solenoid.uid === id
-    })
   }
 
 
