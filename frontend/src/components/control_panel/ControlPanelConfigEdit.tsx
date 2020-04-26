@@ -32,8 +32,6 @@ const ControlPanelConfigEdit = ({ jsonConfig, setControlPanelConfig }: ControlPa
   const [jsonInput, setJsonInput] = useState("")
 
   const handleLoadJson = () => {
-    console.log('load the json!', jsonInput);
-    console.log('load the json! (parsed)', JSON.parse(jsonInput));
     setControlPanelConfig(JSON.parse(jsonInput))
     setImportJsonDialogOpen(false)
   }

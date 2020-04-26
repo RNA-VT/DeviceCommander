@@ -46,12 +46,6 @@ const MicrocontrollerForm = ({ microcontroller, reload }: MicrocontrollerProps) 
         solenoids[index].name = newValue
         break;
     }
-
-    // setSolenoids(solenoids)
-
-    console.log(solenoids[index])
-    // 
-
   }
 
   const handleReset = () => {

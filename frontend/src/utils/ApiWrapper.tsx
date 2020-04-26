@@ -16,7 +16,6 @@ class API {
   }
 
   async editComponent(uid: string, newData: object) {
-    console.log('editComponent')
     const queryUrl = 'http://' + this.masterUrl + '/component/' + uid
 
     return fetch(queryUrl, {
