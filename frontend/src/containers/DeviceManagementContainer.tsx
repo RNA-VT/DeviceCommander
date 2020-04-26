@@ -26,7 +26,7 @@ class DeviceManagement extends Container<DeviceManagementState> {
   }
 
   async getData() {
-    const api = new API("http://localhost:8000")
+    const api = new API("")
     return api.getClusterInfo()
   }
 
