@@ -52,7 +52,7 @@ class API {
         'ComponentType': 'solenoid'
       })
     }).then(data => {
-      console.log('open_solenoid_response', data)
+      console.log('open_solenoid_response', data.json())
     })
   }
 

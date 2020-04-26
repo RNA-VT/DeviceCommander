@@ -23,7 +23,6 @@ func (a APIService) processCommand(c echo.Context) error {
 	}
 	body := c.Request().Body
 
-	fmt.Println(body)
 	decoder := json.NewDecoder(body)
 
 	var msg cluster.CommandMessage
@@ -31,6 +30,7 @@ func (a APIService) processCommand(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, "Malformatted Command")
 	}
+	fmt.Println(msg)
 
 	if msg.ComponentType == "solenoid" {
 		sol, err := a.Cluster.Me.GetSolenoid(id)
@@ -51,7 +51,7 @@ func (a APIService) processCommand(c echo.Context) error {
 		return c.JSON(http.StatusOK, "Igniter has been commanded")
 	}
 
-	return c.JSON(http.StatusOK, id)
+	return c.JSON(http.StatusOK, "No components have been commanded")
 }
 
 func (a APIService) getCommands(c echo.Context) error {

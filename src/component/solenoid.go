@@ -151,13 +151,13 @@ func (s *Solenoid) Command(cmd string) {
 
 //Open - Open the solenoid
 func (s *Solenoid) Open() {
-	// if s.Healthy() {
-	// 	s.GPIO.Pin.High()
-	// } else {
-	// 	//TODO: should we fail the pin/component here?
-	// 	//Log attempt to open unhealthy solenoid
-	// 	log.Println("*Cough* *Cough*, I don't think I'm going to make it in today...")
-	// }
+	if s.Healthy() {
+		s.GPIO.Pin.High()
+	} else {
+		//TODO: should we fail the pin/component here?
+		//Log attempt to open unhealthy solenoid
+		log.Println("*Cough* *Cough*, I don't think I'm going to make it in today...")
+	}
 }
 
 //OpenFor - Open the solenoid for a set duration
