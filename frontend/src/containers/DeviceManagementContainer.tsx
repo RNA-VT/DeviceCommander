@@ -16,7 +16,6 @@ class DeviceManagement extends Container<DeviceManagementState> {
     super()
     this.state = {
       isLoaded: false,
-      master: undefined,
       slaveMicrocontrollers: [],
       clusterName: ''
     }
@@ -27,17 +26,17 @@ class DeviceManagement extends Container<DeviceManagementState> {
   }
 
   async getData() {
-    const api = new API("http://localhost:8000")
+    const api = new API("")
     return api.getClusterInfo()
   }
 
   async loadData() {
     return this.getData().then((data) => {
+      console.log('load data', data);
       let mcFactory = new MicrocontrollerFactory()
 
       this.setState({
-        slaveMicrocontrollers: mcFactory.makeManyMcs(data.SlaveMicrocontrollers),
-        master: new Microcontroller(data.Master),
+        slaveMicrocontrollers: mcFactory.makeManyMcs(data.Microcontrollers),
         clusterName: data.Name
       })
     })
@@ -46,10 +45,6 @@ class DeviceManagement extends Container<DeviceManagementState> {
   getMicrocontrollers(): Array<Microcontroller> {
     if (this.state.slaveMicrocontrollers) {
       return [...this.state.slaveMicrocontrollers]
-    }
-
-    if (this.state.master) {
-      return [this.state.master]
     }
 
     return []

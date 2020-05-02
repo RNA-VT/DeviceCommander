@@ -1,22 +1,67 @@
 import * as React from 'react'
 import { Component } from 'react'
-import SolenoidButton from './SolenoidButton'
+import { Subscribe } from 'unstated-typescript'
+import ControlButton from '../control_panel/ControlButton'
+import ControlSwitch from '../control_panel/ControlSwitch'
 import DeviceManagement from '../../containers/DeviceManagementContainer'
+import ControlPanelContainer, { ControlConfig } from '../../containers/ControlPanelContainer'
+import ControlPanelConfigEdit from '../control_panel/ControlPanelConfigEdit'
 import SolenoidFactory from '../../utils/factories/SolenoidFactory'
 import styled from 'styled-components'
-import { MenuItem, InputLabel, Select } from '@material-ui/core'
+import {
+  MenuItem,
+  InputLabel,
+  Select,
+  Grid,
+  Button,
+  FormControl,
+  ListItemIcon,
+  Typography
+} from '@material-ui/core'
+import { GiSpiralBloom } from 'react-icons/gi'
 
 const TitleRow = styled.div`
   // background-color: gray;
 `
 
+const FormControlStyled = styled(FormControl)`
+  min-width: 140px;
+  width: 100%;
+`
+
+const SubmitButton = styled(Button)`
+  height: 100%;
+  width: 100%;
+`
+
+const ControlPanelGrid = styled.div`
+  height: 1000px;
+  width: 1000px;
+  overflow: hidden;
+  border: black 2px solid;
+  margin: 10px auto;
+`
+
+const StyledListItemIcon = styled(ListItemIcon)`
+  min-width: auto;
+  width: auto;
+  padding-right: 8px;
+  position: relative;
+  top: 1px;
+`
+
 type PBCProps = {
-  deviceManager: DeviceManagement
+  deviceManager: DeviceManagement,
+  controlPanelManager: ControlPanelContainer
 }
 
 type PBCState = {
   buttonConfigs: Array<any>,
-  deviceManager: DeviceManagement
+  deviceManager: DeviceManagement,
+  controlPanelManager: ControlPanelContainer,
+  componentSelect: any,
+  controlTypeSelect: any,
+  jsonDialogOpen: boolean
 }
 
 class PositionedButtonContainer extends Component<PBCProps, PBCState> {
@@ -25,61 +70,175 @@ class PositionedButtonContainer extends Component<PBCProps, PBCState> {
 
     this.state = {
       buttonConfigs: [],
-      deviceManager: props.deviceManager
+      deviceManager: props.deviceManager,
+      controlPanelManager: props.controlPanelManager,
+      componentSelect: "",
+      controlTypeSelect: "",
+      jsonDialogOpen: false
     }
+
+    this.handleChangeComponentButton = this.handleChangeComponentButton.bind(this)
+    this.handleChangeControlType = this.handleChangeControlType.bind(this)
+    this.handleAddControl = this.handleAddControl.bind(this)
+    this.handleExportConfig = this.handleExportConfig.bind(this)
+    this.handleCloseJsonDialog = this.handleCloseJsonDialog.bind(this)
+    this.handleExportConfig = this.handleExportConfig.bind(this)
   }
 
-  handleAddButton(e: React.ChangeEvent<{
+  handleChangeComponentButton(e: React.ChangeEvent<{
     name?: string | undefined;
     value: unknown;
   }>, target: any) {
     if (target) {
-      console.log('handleAddButton', target.props.solenoid)
+      this.setState({
+        componentSelect: e.target.value
+      })
+    }
+
+  }
+
+  handleChangeControlType(e: React.ChangeEvent<{
+    name?: string | undefined;
+    value: unknown;
+  }>, target: any) {
+    if (target) {
+      this.setState({
+        controlTypeSelect: e.target.value
+      })
     }
   }
 
+  handleAddControl() {
+    const newBtn = {
+      componentUID: this.state.componentSelect,
+      controlType: 'something',
+      inputType: this.state.controlTypeSelect,
+      xPos: 0,
+      yPos: 0
+    }
+    this.state.controlPanelManager.addButton(newBtn)
+  }
+
+  handleCloseJsonDialog() {
+    this.setState({
+      jsonDialogOpen: false
+    })
+  }
+
+  handleExportConfig() {
+    console.log('Control Panel Config', this.state.controlPanelManager.getConfigs())
+    this.setState({
+      jsonDialogOpen: true
+    })
+  }
 
   render() {
-    let solenoidComponents: Array<any> = []
     let solenoidListItems: Array<any> = []
-
+    const solenoids = this.state.deviceManager.getSolenoids()
     if (this.state.deviceManager) {
-      const solenoids = this.state.deviceManager.getSolenoids()
-
-      let tmpXPos = 0
-      let tmpYPos = 0
-      solenoidComponents = solenoids.map(solenoid => {
-        tmpXPos += 20
-        tmpYPos += 100
-        return (
-          <SolenoidButton
-            key={solenoid.uid}
-            solenoid={solenoid}
-            xPos={tmpXPos}
-            yPos={tmpYPos} />
-        )
-      })
-
       solenoidListItems = solenoids.map(solenoid => {
         return (
-          <MenuItem key={solenoid.uid}>{solenoid.name}</MenuItem>
+          <MenuItem key={solenoid.uid} value={solenoid.uid}>
+            <StyledListItemIcon>
+              <GiSpiralBloom />
+            </StyledListItemIcon>
+            <Typography variant="inherit">{solenoid.name}</Typography>
+          </MenuItem>
         )
       })
+    }
 
+    let controlList: Array<any> = []
+    if (this.state.controlPanelManager) {
+      controlList = this.state.controlPanelManager.getConfigs().map(control => {
+        let thisSolenoid = solenoids.find((solenoid) => {
+          return solenoid.uid === control.componentUID
+        })
+
+        if (control.inputType == 'switch') {
+          return (
+            <ControlSwitch
+              key={control.componentUID}
+              componentUID={control.componentUID}
+              xPos={control.xPos}
+              yPos={control.yPos}
+              label={thisSolenoid ? thisSolenoid.name : control.componentUID}
+              setPosition={this.state.controlPanelManager.setControlPosition}
+              onAction={() => {
+                if (thisSolenoid)
+                  thisSolenoid.open()
+              }}
+              offAction={() => {
+                if (thisSolenoid)
+                  thisSolenoid.close()
+              }} />
+          )
+        } else {
+          return (
+            <ControlButton
+              key={control.componentUID}
+              componentUID={control.componentUID}
+              xPos={control.xPos}
+              yPos={control.yPos}
+              label={thisSolenoid ? thisSolenoid.name : control.componentUID}
+              setPosition={this.state.controlPanelManager.setControlPosition}
+              onClick={() => {
+                if (thisSolenoid)
+                  thisSolenoid.open()
+              }}
+              offClick={() => {
+                if (thisSolenoid)
+                  thisSolenoid.close()
+              }} />
+          )
+        }
+      })
     }
 
     return (
       <div>
-        <TitleRow>
-          <h1>PositionedButtonContainer</h1>
-          <InputLabel id="add-btn">Add a Button</InputLabel>
-          <Select labelId="add-btn" id="select" onChange={this.handleAddButton}>
-            {solenoidListItems}
-          </Select>
-        </TitleRow>
         <div>
-          {solenoidComponents}
+          <TitleRow>
+            <h1>PositionedButtonContainer</h1>
+          </TitleRow>
+          <Grid container spacing={1}>
+            <Grid item xs={4}>
+              <FormControlStyled>
+                <InputLabel disableAnimation={true}
+                  id="add-btn-label">Add a Button</InputLabel>
+                <Select labelId="add-btn-label"
+                  value={this.state.componentSelect}
+                  onChange={this.handleChangeComponentButton}>
+                  {solenoidListItems}
+                </Select>
+              </FormControlStyled>
+            </Grid>
+            <Grid item xs={4}>
+              <FormControlStyled>
+                <InputLabel disableAnimation={true}
+                  id="control-type-label">Control Type</InputLabel>
+                <Select labelId="control-type-label"
+                  value={this.state.controlTypeSelect}
+                  onChange={this.handleChangeControlType}>
+                  <MenuItem value={"button"}>Button</MenuItem>
+                  <MenuItem value={"switch"}>Switch</MenuItem>
+                </Select>
+              </FormControlStyled>
+            </Grid>
+            <Grid item xs={2}>
+              <SubmitButton type="submit"
+                variant="outlined"
+                onClick={this.handleAddControl}>Add Control</SubmitButton>
+            </Grid>
+          </Grid>
         </div>
+        <ControlPanelGrid>
+          {controlList}
+        </ControlPanelGrid>
+        <ControlPanelConfigEdit
+          jsonConfig={JSON.stringify(this.state.controlPanelManager.getConfigs(), null, 2)}
+          setControlPanelConfig={this.state.controlPanelManager.setConfigs}
+        />
       </div>
     )
   }

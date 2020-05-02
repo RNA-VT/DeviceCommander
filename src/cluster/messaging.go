@@ -37,7 +37,8 @@ type PeerUpdateMessage struct {
 
 //CommandMessage -
 type CommandMessage struct {
-	Command string
+	Command       string
+	ComponentType string
 }
 
 //GoFireHeader -

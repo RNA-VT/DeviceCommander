@@ -8,32 +8,31 @@ const StyledDiv = styled.div`
   display: inline-block;
 `
 
-type SolenoidButtonProps = {
-  solenoid: any,
+type ControlButtonProps = {
+  componentUID: string,
   xPos: number,
-  yPos: number
+  yPos: number,
+  label: string,
+  setPosition: (uid: string, xPos: number, yPos: number) => void,
+  onClick: () => void,
+  offClick: () => void,
 }
 
-const SolenoidButton = ({ solenoid, xPos, yPos }: SolenoidButtonProps) => {
-
+const ControlButton = ({ componentUID, xPos, yPos, label, setPosition, onClick, offClick }: ControlButtonProps) => {
   const [isOpen, setIsOpen] = useState(false)
 
-  console.log(solenoid.name, xPos, yPos);
-
-  console.log(solenoid)
 
   const triggerSolenoid = () => {
     if (isOpen) {
-      solenoid.close()
       setIsOpen(false)
     } else {
-      solenoid.open()
       setIsOpen(true)
     }
   }
 
   const onStop = (e: DraggableEvent, data: DraggableData) => {
     console.log('draggableData onStop', data);
+    setPosition(componentUID, data.x, data.y)
   }
 
   return (
@@ -43,15 +42,14 @@ const SolenoidButton = ({ solenoid, xPos, yPos }: SolenoidButtonProps) => {
       defaultPosition={{ x: xPos, y: yPos }}
       grid={[25, 25]}
       scale={1}
-      onStop={onStop}
-      key={solenoid.name + solenoid.uid}>
+      onStop={onStop}>
       <StyledDiv>
         <div className="handle">X</div>
         <Button
           variant="outlined"
-          onMouseDown={triggerSolenoid}
-          onMouseUp={triggerSolenoid}>
-          <h4>{solenoid.name}</h4>
+          onMouseDown={onClick}
+          onMouseUp={offClick}>
+          <h4>{label}</h4>
         </Button>
       </StyledDiv>
 
@@ -59,4 +57,4 @@ const SolenoidButton = ({ solenoid, xPos, yPos }: SolenoidButtonProps) => {
   )
 }
 
-export default SolenoidButton
+export default ControlButton

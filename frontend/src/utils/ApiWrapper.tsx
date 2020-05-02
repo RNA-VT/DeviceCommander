@@ -27,19 +27,45 @@ class API {
     })
   }
 
+  async editMicrocontroller(uid: string, newData: object) {
+    const queryUrl = 'http://' + this.masterUrl + '/' + uid
+
+    return fetch(queryUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(newData)
+    })
+  }
+
   openSolenoid(uid: string) {
-    const queryUrl = 'http://' + this.masterUrl + '/component/' + uid + '/open'
+    const queryUrl = 'http://' + this.masterUrl + '/component/' + uid + '/cmd'
     fetch(queryUrl, {
-      method: 'GET'
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        'Command': 'open',
+        'ComponentType': 'solenoid'
+      })
     }).then(data => {
-      console.log('open_solenoid_response', data)
+      console.log('open_solenoid_response', data.json())
     })
   }
 
   closeSolenoid(uid: string) {
-    const queryUrl = 'http://' + this.masterUrl + '/component/' + uid + '/close'
+    const queryUrl = 'http://' + this.masterUrl + '/component/' + uid + '/cmd'
     fetch(queryUrl, {
-      method: 'GET'
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        'Command': 'close',
+        'ComponentType': 'solenoid'
+      })
     }).then(data => {
       console.log('close_solenoid_response', data)
     })
