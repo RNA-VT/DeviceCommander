@@ -42,7 +42,7 @@ Options:
 Options:
 
 1. 1 log table
-   - 1 enum defining event types
+   - 1 enum type defining event types
    - dump to file and truncate table periodically
 2. many log tables
    - 1 Model per EventType
