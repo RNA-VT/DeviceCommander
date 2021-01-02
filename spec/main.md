@@ -6,8 +6,6 @@ Device Commander is a utility for the management and control of RNA- [ ]VT devic
 - [ ] ArtNet LED Drivers
 - [ ] Sensors
 
-## Functional Breakdown
-
 ### Device Registration
 
 - [ ] DeviceCommander will periodically probe every ip address in the configured subnet for a `/registration` endpoint
@@ -30,7 +28,7 @@ Device Commander is a utility for the management and control of RNA- [ ]VT devic
 - [ ] For each device, it displays:
   - [ ] Device Name
   - [ ] Serial No
-  - [ ] (Stretch) Board
+  - [ ] (stretch) Board
   - [ ] Health Status
     - [ ] (stretch) Drill down to see paginated health check response, ordered by time
   - [ ] Configuration status
@@ -55,3 +53,8 @@ Device Commander is a utility for the management and control of RNA- [ ]VT devic
 - [ ] Registered & healthy devices are available to add to an open layout
 - [ ] Layout config export
 - [ ] Save layout config to database
+
+
+### Data Layer
+- [ ] gorm
+- [ ] sqlite
