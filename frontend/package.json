@@ -32,7 +32,7 @@
     "react-draggable": "^4.2.0",
     "react-icons": "^3.9.0",
     "react-router-dom": "^5.1.2",
-    "react-scripts": "3.4.0",
+    "react-scripts": "^4.0.1",
     "styled-components": "^5.0.0",
     "typescript": "^3.8.3",
     "unstated": "^2.1.1",

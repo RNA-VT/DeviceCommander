@@ -1,6 +1,6 @@
 module firecontroller
 
-go 1.12
+go 1.15
 
 require (
 	github.com/labstack/echo v3.3.10+incompatible
