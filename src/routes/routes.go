@@ -49,6 +49,6 @@ func ConfigureRoutes(listenURL string, e *echo.Echo, API APIService) {
 }
 
 func (a APIService) defaultGet(c echo.Context) error {
-	log.Println("Someone is touching me", a.Cluster.GetConfig())
+	log.Println("Someone is touching me", a.Cluster)
 	return c.String(http.StatusOK, "Help Me! I'm trapped in the Server! You're the only one receiving this message.")
 }

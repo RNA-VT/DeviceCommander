@@ -2,7 +2,6 @@ package cluster
 
 import (
 	device "devicecommander/device"
-	"devicecommander/utilities"
 	"errors"
 	"log"
 	"net/http"
@@ -16,48 +15,6 @@ import (
 type Cluster struct {
 	Name    string
 	Devices []device.Device
-	Me      *device.Device
-}
-
-//Config -
-type Config struct {
-	Name    string `yaml:"Name"`
-	Devices []device.Config
-}
-
-//GetConfig -
-func (c Cluster) GetConfig() (config Config) {
-	config.Name = c.Name
-	config.Devices = make([]device.Config, len(c.Devices))
-	for i, micro := range c.Devices {
-		config.Devices[i] = micro.GetConfig()
-	}
-
-	return
-}
-
-//Load -
-func (c *Cluster) Load(config Config) {
-	c.Name = config.Name
-	newPeers := []device.Device{
-		*c.Me,
-	}
-	//c.Devices = make([]device.Device, len(config.Devices))
-	for _, dev := range config.Devices {
-		if c.Me.ID != dev.ID {
-			newPeers = append(newPeers, device.Device{})
-			newPeers[len(newPeers)-1].Load(dev)
-		}
-	}
-	c.Devices = newPeers
-}
-
-func (c Cluster) String() string {
-	cluster, err := utilities.StringJSON(c)
-	if err != nil {
-		return ""
-	}
-	return cluster
 }
 
 //GetDevices returns a map of all registered
@@ -70,19 +27,16 @@ func (c Cluster) GetDevices() map[int]device.Device {
 }
 
 //AddDevice attempts to add a device to the cluster and returns the response data. This should only be run by the master.
-func (c *Cluster) AddDevice(newdevice device.Config) error {
-	var newGuy device.Device
-	newGuy.Load(newdevice)
+func (c *Cluster) AddDevice(newDevice device.Device) error {
 	if viper.GetString("ENV") == "production" {
 		for _, micro := range c.Devices {
-			if micro.Host == newGuy.Host {
-				//This guy ain't so new!
-				return errors.New("Requesting instance is running on a device already registered to this cluster")
+			if micro.Host == newDevice.Host && newDevice.Port == micro.Port {
+				return errors.New("This host & port combination are already registered to this cluster")
 			}
 		}
 	}
 
-	c.Devices = append(c.Devices, newGuy)
+	c.Devices = append(c.Devices, newDevice)
 
 	PrintClusterInfo(*c)
 	return nil

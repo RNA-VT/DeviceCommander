@@ -1,7 +1,7 @@
 package cluster
 
 import (
-	mc "devicecommander/device"
+	dev "devicecommander/device"
 	"log"
 	"math/rand"
 	"net/http"
@@ -21,8 +21,8 @@ func (c Cluster) generateUniqueID() int {
 }
 
 // getSlaveByID find all the slave for a given ID
-func (c Cluster) getDeviceByID(targetID int) []mc.Device {
-	var micros []mc.Device
+func (c Cluster) getDeviceByID(targetID int) []dev.Device {
+	var micros []dev.Device
 
 	for i := 0; i < len(c.Devices); i++ {
 		if c.Devices[i].ID == targetID {
@@ -33,7 +33,7 @@ func (c Cluster) getDeviceByID(targetID int) []mc.Device {
 	return micros
 }
 
-func isExcluded(m mc.Device, exclusions []mc.Config) bool {
+func isExcluded(m dev.Device, exclusions []dev.Device) bool {
 	for i := 0; i < len(exclusions); i++ {
 		if m.Host == exclusions[i].Host && m.Port == exclusions[i].Port {
 			return true

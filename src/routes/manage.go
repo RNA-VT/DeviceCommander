@@ -45,11 +45,9 @@ func (a APIService) editComponent(c echo.Context) error {
 			fmt.Println("CHANGE enabled")
 			fmt.Println(c.Param("id"))
 			// GET COMPONENT AND MAKE EDIT
-			a.Cluster.Me.Description = value.(string)
+			//a.Cluster.Me.Description = value.(string)
 		}
 	}
-
-	fmt.Println(a.Cluster.Me.Description)
 
 	return c.JSON(http.StatusOK, c.Param("id"))
 }
@@ -73,11 +71,9 @@ func (a APIService) editDevice(c echo.Context) error {
 		fmt.Println(key, value)
 		if key == "description" {
 			fmt.Println("CHANGE DESCRIPTION")
-			a.Cluster.Me.Description = value.(string)
+			//a.Cluster.Me.Description = value.(string)
 		}
 	}
-
-	fmt.Println(a.Cluster.Me.Description)
 
 	return c.JSON(http.StatusOK, c.Param("id"))
 }

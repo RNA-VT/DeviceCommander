@@ -19,7 +19,7 @@ func (a APIService) health(c echo.Context) error {
 	return c.JSON(http.StatusOK, "I'm Alive")
 }
 func (a APIService) getClusterInfo(c echo.Context) error {
-	return c.JSON(http.StatusOK, a.Cluster.GetConfig())
+	return c.JSON(http.StatusOK, a.Cluster)
 }
 
 func (a APIService) getDevices(c echo.Context) error {
