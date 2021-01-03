@@ -1,7 +1,7 @@
 package app
 
 import (
-	"firecontroller/cluster"
+	"devicecommander/cluster"
 
 	"github.com/labstack/echo"
 )

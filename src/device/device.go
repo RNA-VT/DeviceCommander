@@ -1,7 +1,7 @@
 package device
 
 import (
-	"firecontroller/utilities"
+	"devicecommander/utilities"
 	"io/ioutil"
 	"log"
 	"strconv"
@@ -10,7 +10,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-//Device represents the machine running the firecontroller and the micros connected to it. Currently only Raspberry Pis are supported
+//Device represents the machine running the devicecommander and the micros connected to it. Currently only Raspberry Pis are supported
 type Device struct {
 	ID          int
 	Name        string

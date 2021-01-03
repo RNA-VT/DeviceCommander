@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"firecontroller/cluster"
+	"devicecommander/cluster"
 	"log"
 	"net/http"
 

@@ -1,7 +1,7 @@
 package cluster
 
 import (
-	mc "firecontroller/device"
+	mc "devicecommander/device"
 	"time"
 )
 

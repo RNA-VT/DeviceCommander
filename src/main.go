@@ -2,9 +2,9 @@ package main
 
 /* Al useful imports */
 import (
-	"firecontroller/app"
-	"firecontroller/cluster"
-	"firecontroller/routes"
+	"devicecommander/app"
+	"devicecommander/cluster"
+	"devicecommander/routes"
 	"fmt"
 
 	"github.com/labstack/echo"

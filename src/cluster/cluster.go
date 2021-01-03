@@ -1,9 +1,9 @@
 package cluster
 
 import (
+	device "devicecommander/device"
+	"devicecommander/utilities"
 	"errors"
-	device "firecontroller/device"
-	"firecontroller/utilities"
 	"log"
 	"net/http"
 	"strconv"

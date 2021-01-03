@@ -1,8 +1,8 @@
 package routes
 
 import (
+	"devicecommander/cluster"
 	"encoding/json"
-	"firecontroller/cluster"
 	"log"
 	"net/http"
 
