@@ -1,4 +1,4 @@
-package microcontroller
+package device
 
 import (
 	"firecontroller/utilities"
@@ -47,8 +47,8 @@ func (m *Device) Load(config Config) {
 	m.Port = config.Port
 }
 
-//NewMicrocontroller -
-func NewMicrocontroller(host string, port string) (Device, error) {
+//NewDevice -
+func NewDevice(host string, port string) (Device, error) {
 	micro := Device{
 		Host: host,
 		Port: port,
@@ -63,7 +63,7 @@ func NewMicrocontroller(host string, port string) (Device, error) {
 //LoadConfigFromFile - Load Solenoid Array from config
 func (m *Device) LoadConfigFromFile() error {
 	//TODO: replace this with a sqlite store
-	yamlFile, err := ioutil.ReadFile("./app/config/microcontroller.yaml")
+	yamlFile, err := ioutil.ReadFile("./app/config/device.yaml")
 	if err != nil {
 		log.Printf("yamlFile.Get err   #%v ", err)
 		return err
@@ -91,9 +91,9 @@ func (m Device) ToFullAddress() string {
 	return m.Host + ":" + m.Port
 }
 
-/*String Just for pretty printing the Microcontroller info */
+/*String Just for pretty printing the Device info */
 func (m Device) String() string {
-	return utilities.LabelString("Microcontroller",
+	return utilities.LabelString("Device",
 		utilities.LabelString("Id", strconv.Itoa(m.ID))+
 			utilities.LabelString("Host", m.Host)+
 			utilities.LabelString("Port", m.Port))

@@ -12,7 +12,7 @@ import (
 
 func (a APIService) addManageRoutes(e *echo.Echo) {
 	api := e.Group("/v1")
-	api.POST("/:id", a.editMicrocontroller)
+	api.POST("/:id", a.editDevice)
 	api.POST("/component/:id", a.editComponent)
 }
 
@@ -54,8 +54,8 @@ func (a APIService) editComponent(c echo.Context) error {
 	return c.JSON(http.StatusOK, c.Param("id"))
 }
 
-func (a APIService) editMicrocontroller(c echo.Context) error {
-	log.Println("start editing microcontroller")
+func (a APIService) editDevice(c echo.Context) error {
+	log.Println("start editing device")
 
 	body := c.Request().Body
 

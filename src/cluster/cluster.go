@@ -1,62 +1,55 @@
 package cluster
 
 import (
-	"firecontroller/microcontroller"
-	mc "firecontroller/microcontroller"
+	"errors"
+	device "firecontroller/device"
 	"firecontroller/utilities"
 	"log"
+	"net/http"
+	"strconv"
+	"time"
 
 	"github.com/spf13/viper"
 )
 
-//Cluster - This object defines an array of microcontrollers
+//Cluster - This object defines an array of Devices
 type Cluster struct {
-	Name             string
-	Microcontrollers []mc.Microcontroller
-	Me               *mc.Microcontroller
+	Name    string
+	Devices []device.Device
+	Me      *device.Device
 }
 
 //Config -
 type Config struct {
-	Name             string `yaml:"Name"`
-	Microcontrollers []mc.Config
+	Name    string `yaml:"Name"`
+	Devices []device.Config
 }
 
 //GetConfig -
 func (c Cluster) GetConfig() (config Config) {
 	config.Name = c.Name
-	config.Microcontrollers = make([]mc.Config, len(c.Microcontrollers))
-	for i, micro := range c.Microcontrollers {
-		config.Microcontrollers[i] = micro.GetConfig()
+	config.Devices = make([]device.Config, len(c.Devices))
+	for i, micro := range c.Devices {
+		config.Devices[i] = micro.GetConfig()
 	}
 
 	return
 }
 
-//Master - returns a pointer to the Master micro
-func (c *Cluster) Master() *mc.Microcontroller {
-	for _, micro := range c.Microcontrollers {
-		if micro.Master {
-			return &micro
-		}
-	}
-	return &mc.Microcontroller{}
-}
-
 //Load -
 func (c *Cluster) Load(config Config) {
 	c.Name = config.Name
-	newPeers := []mc.Microcontroller{
+	newPeers := []device.Device{
 		*c.Me,
 	}
-	//c.Microcontrollers = make([]mc.Microcontroller, len(config.Microcontrollers))
-	for _, micro := range config.Microcontrollers {
-		if c.Me.ID != micro.ID {
-			newPeers = append(newPeers, mc.Microcontroller{})
-			newPeers[len(newPeers)-1].Load(micro)
+	//c.Devices = make([]device.Device, len(config.Devices))
+	for _, dev := range config.Devices {
+		if c.Me.ID != dev.ID {
+			newPeers = append(newPeers, device.Device{})
+			newPeers[len(newPeers)-1].Load(dev)
 		}
 	}
-	c.Microcontrollers = newPeers
+	c.Devices = newPeers
 }
 
 func (c Cluster) String() string {
@@ -67,24 +60,110 @@ func (c Cluster) String() string {
 	return cluster
 }
 
-//Start registers this microcontroller, retrieves cluster config, loads local components and verifies peers
-func (c *Cluster) Start() {
-	//Set global ref to cluster
-	gofireMaster := viper.GetBool("GOFIRE_MASTER")
-	if gofireMaster {
-		log.Println("Master Mode Enabled!")
-		c.KingMe()
-	} else {
-		log.Println("Slave Mode Enabled.")
-		c.ALifeOfServitude()
+//GetDevices returns a map of all registered
+func (c Cluster) GetDevices() map[int]device.Device {
+	micros := make(map[int]device.Device)
+	for i := 0; i < len(c.Devices); i++ {
+		micros[c.Devices[i].ID] = c.Devices[i]
+	}
+	return micros
+}
+
+//AddDevice attempts to add a device to the cluster and returns the response data. This should only be run by the master.
+func (c *Cluster) AddDevice(newdevice device.Config) error {
+	var newGuy device.Device
+	newGuy.Load(newdevice)
+	if viper.GetString("ENV") == "production" {
+		for _, micro := range c.Devices {
+			if micro.Host == newGuy.Host {
+				//This guy ain't so new!
+				return errors.New("Requesting instance is running on a device already registered to this cluster")
+			}
+		}
+	}
+
+	c.Devices = append(c.Devices, newGuy)
+
+	PrintClusterInfo(*c)
+	return nil
+}
+
+//RemoveDevice -
+func (c *Cluster) RemoveDevice(ImDoneHere device.Device) {
+	for index, device := range c.Devices {
+		if device.ID == ImDoneHere.ID {
+			s := c.Devices
+			count := len(c.Devices)
+			s[count-1], s[index] = s[index], s[count-1]
+			c.Devices = s[:len(s)-1]
+			return
+		}
 	}
 }
 
-//GetMicrocontrollers returns a map[microcontrollerID]microcontroller of all Microcontrollers in the cluster
-func (c Cluster) GetMicrocontrollers() map[int]microcontroller.Microcontroller {
-	micros := make(map[int]microcontroller.Microcontroller)
-	for i := 0; i < len(c.Microcontrollers); i++ {
-		micros[c.Microcontrollers[i].ID] = c.Microcontrollers[i]
+//Start begins the registration and health check go processes
+func (c *Cluster) Start() {
+	// Device Discovery
+	go func() {
+		ticker := time.NewTicker(30 * time.Second)
+		for {
+			select {
+			case t := <-ticker.C:
+				log.Println("Begin Device Discovery...", t)
+				for i := 1; i < 255; i++ {
+
+					host := viper.Get("SUBNET_ROOT").(string) + strconv.Itoa(i)
+					unregistered := !c.isRegistered(host)
+
+					if unregistered {
+						resp, err := http.Get("http://" + host + "/registration")
+						if err != nil || resp.StatusCode != 200 {
+							log.Println(host + " failed to respond to a registration request.")
+						} else {
+							log.Println(host + " is ready to register!")
+
+						}
+					}
+				}
+			}
+		}
+	}()
+
+	// Health Check
+	go func() {
+		ticker := time.NewTicker(10 * time.Second)
+		failCount := 0
+		failThreshold := 5
+		for {
+			select {
+			case t := <-ticker.C:
+				log.Println("Begin Heartbeat Check", t)
+				for _, m := range c.Devices {
+					log.Println("Checking Peer:", m.Name, m.ToFullAddress())
+					url := "http://" + m.ToFullAddress() + "/v1/health"
+					resp, err := http.Get(url)
+					if err != nil || resp.StatusCode != 200 {
+						log.Println(m.Name + " @" + m.ToFullAddress() + " is NOT ok")
+						failCount++
+						if failCount >= failThreshold {
+							log.Println("Failure Threshold Reached. Deregistering Device...")
+							c.RemoveDevice(m)
+							failCount = 0
+						}
+					} else {
+						log.Println(m.Name + " @" + m.ToFullAddress() + " is ok")
+					}
+				}
+			}
+		}
+	}()
+}
+
+func (c Cluster) isRegistered(address string) bool {
+	for _, m := range c.Devices {
+		if address == m.ToFullAddress() {
+			return true
+		}
 	}
-	return micros
+	return false
 }
