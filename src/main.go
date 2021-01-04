@@ -52,7 +52,7 @@ func configureEnvironment() {
 	viper.AutomaticEnv()
 
 	viper.SetDefault("ENV", "local") // local or production only
-	viper.SetDefault("HOST", "127.0.0.1")
+	viper.SetDefault("HOST", "0.0.0.0")
 	viper.SetDefault("PORT", 8001)
 	viper.SetDefault("CLUSTER_NAME", "MasterOfHot")
 	viper.SetDefault("SUBNET_ROOT", "192.16.1.")
