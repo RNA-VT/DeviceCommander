@@ -26,7 +26,7 @@ func (c Cluster) GetDevices() map[int]device.Device {
 	return micros
 }
 
-//AddDevice attempts to add a device to the cluster and returns the response data. This should only be run by the master.
+//AddDevice attempts to add a device to the cluster and returns the response data. 
 func (c *Cluster) AddDevice(newDevice device.Device) error {
 	if viper.GetString("ENV") == "production" {
 		for _, micro := range c.Devices {
