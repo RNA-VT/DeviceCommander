@@ -85,7 +85,7 @@ func (c *Cluster) Start() {
 						case 404:
 							log.Println("[Registration] Host Not Found: " + host)
 						default:
-							log.Println("[Registration] Attempt to register " + host + " resulted in an unexpected response:" + resp.StatusCode)
+							log.Println("[Registration] Attempt to register " + host + " resulted in an unexpected response:" + strconv.Itoa(resp.StatusCode))
 						}
 
 					}
