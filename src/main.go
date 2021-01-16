@@ -16,12 +16,8 @@ func main() {
 	/* Load Config from Env Vars */
 	configureEnvironment()
 
-	//Pick Listening Port
-	port := "8001"
-	host := "device1.mindshark.io"
-
-	host = viper.GetString("HOST")
-	port = viper.GetString("PORT")
+	host := viper.GetString("HOST")
+	port := viper.GetString("PORT")
 
 	fullHostname := host + ":" + port
 
