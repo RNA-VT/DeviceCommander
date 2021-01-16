@@ -26,7 +26,7 @@ func (c Cluster) GetDevices() map[int]device.Device {
 	return micros
 }
 
-//AddDevice attempts to add a device to the cluster and returns the response data. 
+//AddDevice attempts to add a device to the cluster and returns the response data.
 func (c *Cluster) AddDevice(newDevice device.Device) error {
 	if viper.GetString("ENV") == "production" {
 		for _, micro := range c.Devices {
@@ -66,7 +66,7 @@ func (c *Cluster) Start() {
 				log.Println("Begin Device Discovery...", t)
 				for i := 1; i < 255; i++ {
 
-					host := viper.Get("SUBNET_ROOT").(string) + strconv.Itoa(i)
+					host := viper.Get("IP_ADDRESS_ROOT").(string) + strconv.Itoa(i)
 					unregistered := !c.isRegistered(host)
 
 					if unregistered {
