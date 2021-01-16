@@ -70,13 +70,24 @@ func (c *Cluster) Start() {
 					unregistered := !c.isRegistered(host)
 
 					if unregistered {
-						resp, err := http.Get("http://" + host + "/registration")
-						if err != nil || resp.StatusCode != 200 {
-							log.Println(host + " failed to respond to a registration request.")
-						} else {
-							log.Println(host + " is ready to register!")
-
+						url := "http://" + host + "/registration"
+						log.Println("[Registration] Attempting to Register: " + url)
+						resp, err := http.Get(url)
+						if err != nil {
+							log.Println("[Registration] Attempt to register " + host + " resulted in an error:")
+							log.Println(err)
 						}
+						switch resp.StatusCode {
+						case 200:
+							log.Println("[Registration] Registration Request Accepted: " + host)
+							log.Println("[Registration] Adding New Device...")
+							c.AddDevice(DecodeRegistrationRequest(resp.Body))
+						case 404:
+							log.Println("[Registration] Host Not Found: " + host)
+						default:
+							log.Println("[Registration] Attempt to register " + host + " resulted in an unexpected response:" + resp.StatusCode)
+						}
+
 					}
 				}
 			}
@@ -111,13 +122,4 @@ func (c *Cluster) Start() {
 			}
 		}
 	}()
-}
-
-func (c Cluster) isRegistered(address string) bool {
-	for _, m := range c.Devices {
-		if address == m.ToFullAddress() {
-			return true
-		}
-	}
-	return false
 }
