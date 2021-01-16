@@ -4,8 +4,6 @@ import (
 	device "devicecommander/device"
 	"errors"
 	"log"
-	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/spf13/viper"
@@ -55,68 +53,32 @@ func (c *Cluster) RemoveDevice(ImDoneHere device.Device) {
 	}
 }
 
-//Start begins the registration and health check go processes
+//Start begins the registration and health check goroutines
 func (c *Cluster) Start() {
+	discoveryPeriod := viper.GetInt("DISCOVERY_PERIOD")
+	healthCheckPeriod := viper.GetInt("HEALTH_CHECK_PERIOD")
+
 	// Device Discovery
 	go func() {
-		ticker := time.NewTicker(30 * time.Second)
+		ticker := time.NewTicker(time.Duration(discoveryPeriod) * time.Second)
 		for {
 			select {
 			case t := <-ticker.C:
-				log.Println("Begin Device Discovery...", t)
-				for i := 1; i < 255; i++ {
-
-					host := viper.Get("IP_ADDRESS_ROOT").(string) + strconv.Itoa(i)
-					unregistered := !c.isRegistered(host)
-
-					if unregistered {
-						url := "http://" + host + "/registration"
-						log.Println("[Registration] Attempting to Register: " + url)
-						resp, err := http.Get(url)
-						if err != nil {
-							log.Println("[Registration] Attempt to register " + host + " resulted in an error:")
-							log.Println(err)
-						}
-						switch resp.StatusCode {
-						case 200:
-							log.Println("[Registration] Registration Request Accepted: " + host)
-							log.Println("[Registration] Adding New Device...")
-							c.AddDevice(DecodeRegistrationRequest(resp.Body))
-						case 404:
-							log.Println("[Registration] Host Not Found: " + host)
-						default:
-							log.Println("[Registration] Attempt to register " + host + " resulted in an unexpected response:" + strconv.Itoa(resp.StatusCode))
-						}
-					}
-				}
+				log.Println("Begin Device Discovery... ", t)
+				DeviceDiscovery(c)
 			}
 		}
 	}()
 
 	// Health Check
 	go func() {
-		ticker := time.NewTicker(10 * time.Second)
-		failCount := 0
-		failThreshold := 5
+		ticker := time.NewTicker(time.Duration(healthCheckPeriod) * time.Second)
 		for {
 			select {
 			case t := <-ticker.C:
-				log.Println("Begin Heartbeat Check", t)
-				for _, m := range c.Devices {
-					log.Println("Checking Peer:", m.Name, m.ToFullAddress())
-					url := "http://" + m.ToFullAddress() + "/v1/health"
-					resp, err := http.Get(url)
-					if err != nil || resp.StatusCode != 200 {
-						log.Println(m.Name + " @" + m.ToFullAddress() + " is NOT ok")
-						failCount++
-						if failCount >= failThreshold {
-							log.Println("Failure Threshold Reached. Deregistering Device...")
-							c.RemoveDevice(m)
-							failCount = 0
-						}
-					} else {
-						log.Println(m.Name + " @" + m.ToFullAddress() + " is ok")
-					}
+				log.Println("Begin Health Checks... ", t)
+				for _, device := range c.Devices {
+					c.DeviceHealthCheck(device)
 				}
 			}
 		}

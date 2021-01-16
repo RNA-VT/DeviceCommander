@@ -54,6 +54,8 @@ func configureEnvironment() {
 	viper.SetDefault("ENV", "local") // local or production only
 	viper.SetDefault("HOST", "0.0.0.0")
 	viper.SetDefault("PORT", 8001)
-	viper.SetDefault("CLUSTER_NAME", "MasterOfHot")
+	viper.SetDefault("CLUSTER_NAME", "Flaming Hot Fleet Directory")
 	viper.SetDefault("IP_ADDRESS_ROOT", "192.16.1.")
+	viper.SetDefault("DISCOVERY_PERIOD", 30)
+	viper.SetDefault("HEALTH_CHECK_PERIOD", 5)
 }
