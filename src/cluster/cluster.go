@@ -87,7 +87,6 @@ func (c *Cluster) Start() {
 						default:
 							log.Println("[Registration] Attempt to register " + host + " resulted in an unexpected response:" + strconv.Itoa(resp.StatusCode))
 						}
-
 					}
 				}
 			}
