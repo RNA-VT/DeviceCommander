@@ -1,13 +1,20 @@
 package device
 
+import "strconv"
+
 //Device represents a compliant physical component & its web address.
 type Device struct {
-	ID          string `json:"id"`
-	Name        string `json:"name"`
+	//ID is the serial nummber of the connecting device
+	ID string `json:"id"`
+	//Name - Optional Device Nickname
+	Name string `json:"name"`
+	//Description - Optional text describing this device
 	Description string `json:"description"`
-	Host        string `json:"host"`
-	Port        int    `json:"port"`
-	failures    int
+	//Host - Device Api Host
+	Host string `json:"host"`
+	//Port - Device Api Port. Set to 443 for https
+	Port     int `json:"port"`
+	failures int
 }
 
 //NewDevice -
@@ -21,9 +28,19 @@ func NewDevice(host string, port int) (Device, error) {
 	return dev, nil
 }
 
-//ToFullAddress returns a network address including the ip address and port that this micro is listening on
-func (d Device) ToFullAddress() string {
-	return d.Host + ":" + d.Port
+//URL returns a network address including the ip address and port that this micro is listening on
+func (d Device) URL() string {
+	return d.protocol() + "://" + d.Host + ":" + strconv.Itoa(d.Port)
+}
+
+func (d Device) protocol() string {
+	var protocol string
+	if d.Port == 443 {
+		protocol = "https"
+	} else {
+		protocol = "http"
+	}
+	return protocol
 }
 
 //ProcessHealthCheckResult - updates health check failure count & returns

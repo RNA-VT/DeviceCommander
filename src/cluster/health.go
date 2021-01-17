@@ -10,7 +10,7 @@ import (
 
 //DeviceHealthCheck -
 func (c *Cluster) DeviceHealthCheck(dev *device.Device) {
-	url := "http://" + dev.ToFullAddress() + "/v1/health"
+	url := dev.URL() + "/health"
 
 	log.Println("[Health] Checking Device:", dev.ID, url)
 	resp, err := http.Get(url)
@@ -28,7 +28,6 @@ func (c *Cluster) DeviceHealthCheck(dev *device.Device) {
 		log.Println("[Health] [Deregistration] Removing Device: " + dev.ID)
 		c.RemoveDevice(dev.ID)
 	}
-
 }
 
 func evaluateHealthCheckResponse(resp *http.Response, dev *device.Device) bool {
