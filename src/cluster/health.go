@@ -20,7 +20,7 @@ func (c *Cluster) DeviceHealthCheck(dev *device.Device) {
 		log.Println("[Health] [Error] Message: " + err.Error())
 	}
 
-	result := evaluateHealthCheckResponse(resp, dev)
+	result := evaluateHealthCheckResponse(resp, *dev)
 	dev.ProcessHealthCheckResult(result)
 
 	if dev.Failed() {
@@ -30,7 +30,7 @@ func (c *Cluster) DeviceHealthCheck(dev *device.Device) {
 	}
 }
 
-func evaluateHealthCheckResponse(resp *http.Response, dev *device.Device) bool {
+func evaluateHealthCheckResponse(resp *http.Response, dev device.Device) bool {
 	defer resp.Body.Close()
 	body, _ := ioutil.ReadAll(resp.Body)
 	healthy := false

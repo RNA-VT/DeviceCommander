@@ -14,11 +14,12 @@ import (
 //DeviceDiscovery -
 func DeviceDiscovery(c *Cluster) {
 	for i := 1; i < 255; i++ {
-
 		host := viper.Get("IP_ADDRESS_ROOT").(string) + strconv.Itoa(i)
 		unregistered := !c.isRegistered(host)
 
 		if unregistered {
+			//TODO: Hit ports other than 80
+			//TODO: Scan https for /registration
 			url := "http://" + host + "/registration"
 			log.Println("[Registration] Attempting to Register: " + url)
 			resp, err := http.Get(url)
