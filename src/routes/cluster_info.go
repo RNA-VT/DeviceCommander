@@ -2,7 +2,6 @@ package routes
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/labstack/echo"
 )
@@ -27,14 +26,10 @@ func (a APIService) getDevices(c echo.Context) error {
 }
 
 func (a APIService) getDevice(c echo.Context) error {
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		return c.JSON(http.StatusTeapot, "Fuck")
-	}
-	micros := a.Cluster.GetDevices()
-	micro, ok := micros[id]
+	devices := a.Cluster.GetDevices()
+	dev, ok := devices[c.Param("id")]
 	if !ok {
-		return c.JSON(http.StatusTeapot, "Fuck")
+		return c.JSON(http.StatusNotFound, "ID Not Found")
 	}
-	return c.JSON(http.StatusOK, micro)
+	return c.JSON(http.StatusOK, dev)
 }

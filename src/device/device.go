@@ -2,7 +2,7 @@ package device
 
 //Device represents a compliant physical component & its web address.
 type Device struct {
-	ID          int
+	ID          string
 	Name        string
 	Description string
 	Host        string
@@ -15,7 +15,7 @@ func NewDevice(host string, port string) (Device, error) {
 		Host: host,
 		Port: port,
 	}
-	//TODO: Load Device Data fro db
+	//TODO: Load Device Data from db
 	return dev, nil
 }
 

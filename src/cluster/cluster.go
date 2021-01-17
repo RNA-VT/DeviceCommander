@@ -16,12 +16,12 @@ type Cluster struct {
 }
 
 //GetDevices returns a map of all registered
-func (c Cluster) GetDevices() map[int]device.Device {
-	micros := make(map[int]device.Device)
+func (c Cluster) GetDevices() map[string]device.Device {
+	devices := make(map[string]device.Device)
 	for i := 0; i < len(c.Devices); i++ {
-		micros[c.Devices[i].ID] = c.Devices[i]
+		devices[c.Devices[i].ID] = c.Devices[i]
 	}
-	return micros
+	return devices
 }
 
 //AddDevice attempts to add a device to the cluster and returns the response data.

@@ -43,12 +43,12 @@ func DeviceDiscovery(c *Cluster) {
 //DecodeRegistrationRequest - helper to get new device details from a registration request msg body
 func DecodeRegistrationRequest(body io.ReadCloser) device.Device {
 	decoder := json.NewDecoder(body)
-	var msg JoinNetworkMessage
-	err := decoder.Decode(&msg)
+	var dev device.Device
+	err := decoder.Decode(&dev)
 	if err != nil {
 		log.Println("Error decoding Request Body", err)
 	}
-	return msg.ImNewHere
+	return dev
 }
 
 func (c Cluster) isRegistered(address string) bool {
