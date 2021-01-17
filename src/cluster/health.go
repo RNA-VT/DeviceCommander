@@ -8,7 +8,7 @@ import (
 	"strconv"
 )
 
-var failCount int = 0
+var failCounts map[string]int
 
 //DeviceHealthCheck -
 func (c *Cluster) DeviceHealthCheck(dev device.Device) {
@@ -25,14 +25,14 @@ func (c *Cluster) DeviceHealthCheck(dev device.Device) {
 	healthy := evaluateHealthCheckResponse(resp, url)
 
 	if healthy {
-		failCount = 0
+		failCounts[dev.ID] = 0
 	} else {
-		failCount++
-		if failCount >= failThreshold {
+		failCounts[dev.ID]++
+		if failCounts[dev.ID] >= failThreshold {
 			log.Println("[Health] [Deregistration] Failure Threshold Reached.")
 			log.Println("[Health] [Deregistration] Removing Device: " + dev.ID)
 			c.RemoveDevice(dev)
-			failCount = 0
+			failCounts[dev.ID] = 0
 		}
 	}
 }
