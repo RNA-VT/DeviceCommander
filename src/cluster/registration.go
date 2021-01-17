@@ -23,30 +23,31 @@ func DeviceDiscovery(c *Cluster) {
 			log.Println("[Registration] Attempting to Register: " + url)
 			resp, err := http.Get(url)
 			if err != nil {
-				log.Println("[Registration] Attempt to register " + host + " resulted in an error:")
+				log.Println("[Registration] [Error] Attempt to register " + host + " resulted in an error:")
 				log.Println(err)
 			}
 			switch resp.StatusCode {
 			case 200:
-				log.Println("[Registration] Registration Request Accepted: " + host)
-				log.Println("[Registration] Adding New Device...")
-				c.AddDevice(DecodeRegistrationRequest(resp.Body))
+				log.Println("[Registration] [Success] Registration Request Accepted: " + host)
+				log.Println("[Registration] [Success] Adding New Device...")
+				dev := DeviceFromRegistrationRequestBody(resp.Body)
+				c.AddDevice(dev)
 			case 404:
-				log.Println("[Registration] Host Not Found: " + host)
+				log.Println("[Registration] [Warning] Host Not Found: " + host)
 			default:
-				log.Println("[Registration] Attempt to register " + host + " resulted in an unexpected response:" + strconv.Itoa(resp.StatusCode))
+				log.Println("[Registration] [Warning] Attempt to register " + host + " resulted in an unexpected response:" + strconv.Itoa(resp.StatusCode))
 			}
 		}
 	}
 }
 
-//DecodeRegistrationRequest - helper to get new device details from a registration request msg body
-func DecodeRegistrationRequest(body io.ReadCloser) device.Device {
+//DeviceFromRegistrationRequestBody - helper to get new device details from a registration request msg body
+func DeviceFromRegistrationRequestBody(body io.ReadCloser) device.Device {
 	decoder := json.NewDecoder(body)
 	var dev device.Device
 	err := decoder.Decode(&dev)
 	if err != nil {
-		log.Println("Error decoding Request Body", err)
+		log.Println("[Registration] [Error] Failed to decode device config from body", err)
 	}
 	return dev
 }

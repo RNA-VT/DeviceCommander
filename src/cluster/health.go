@@ -13,8 +13,8 @@ var failCounts map[string]int
 //DeviceHealthCheck -
 func (c *Cluster) DeviceHealthCheck(dev device.Device) {
 	failThreshold := 3
-	log.Println("[Health] Checking Device:", dev.ID, dev.ToFullAddress())
 	url := "http://" + dev.ToFullAddress() + "/v1/health"
+	log.Println("[Health] Checking Device:", dev.ID, url)
 	resp, err := http.Get(url)
 	if err != nil {
 		log.Println("[Health] [Error] : " + url)

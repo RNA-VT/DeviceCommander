@@ -16,7 +16,8 @@ func (a *APIService) addRegistrationRoutes(e *echo.Echo) {
 func (a *APIService) joinNetwork(c echo.Context) error {
 	log.Println("Device asked to join cluster")
 
-	a.Cluster.AddDevice(cluster.DecodeRegistrationRequest(c.Request().Body))
+	dev := cluster.DeviceFromRegistrationRequestBody(c.Request().Body)
+	a.Cluster.AddDevice(dev)
 
 	return c.JSON(http.StatusOK, "Registered.")
 }
