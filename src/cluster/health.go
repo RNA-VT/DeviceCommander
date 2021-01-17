@@ -8,12 +8,10 @@ import (
 	"strconv"
 )
 
-var failCounts map[string]int
-
 //DeviceHealthCheck -
-func (c *Cluster) DeviceHealthCheck(dev device.Device) {
-	failThreshold := 3
+func (c *Cluster) DeviceHealthCheck(dev *device.Device) {
 	url := "http://" + dev.ToFullAddress() + "/v1/health"
+
 	log.Println("[Health] Checking Device:", dev.ID, url)
 	resp, err := http.Get(url)
 	if err != nil {
@@ -22,32 +20,29 @@ func (c *Cluster) DeviceHealthCheck(dev device.Device) {
 		log.Println("[Health] [Error] Message: " + err.Error())
 	}
 
-	healthy := evaluateHealthCheckResponse(resp, url)
+	result := evaluateHealthCheckResponse(resp, dev)
+	dev.ProcessHealthCheckResult(result)
 
-	if healthy {
-		failCounts[dev.ID] = 0
-	} else {
-		failCounts[dev.ID]++
-		if failCounts[dev.ID] >= failThreshold {
-			log.Println("[Health] [Deregistration] Failure Threshold Reached.")
-			log.Println("[Health] [Deregistration] Removing Device: " + dev.ID)
-			c.RemoveDevice(dev)
-			failCounts[dev.ID] = 0
-		}
+	if dev.Failed() {
+		log.Println("[Health] [Deregistration] Failure Threshold Reached.")
+		log.Println("[Health] [Deregistration] Removing Device: " + dev.ID)
+		c.RemoveDevice(dev.ID)
 	}
+
 }
 
-func evaluateHealthCheckResponse(resp *http.Response, url string) bool {
+func evaluateHealthCheckResponse(resp *http.Response, dev *device.Device) bool {
 	defer resp.Body.Close()
 	body, _ := ioutil.ReadAll(resp.Body)
 	healthy := false
 	switch resp.StatusCode {
 	case 200:
-		log.Println("[Health] [Success]: " + url)
+		log.Println("[Health] [Success] " + dev.ID + " is Healthy")
+		healthy = true
 	case 404:
-		log.Println("[Health] [Failure] Registed Device Not Found: " + url)
+		log.Println("[Health] [Failure] Registered Device Not Found: " + dev.ID)
 	default:
-		log.Println("[Health] [Failure] Unexpected Result: " + url)
+		log.Println("[Health] [Failure] Unexpected Result: " + dev.ID)
 		log.Println("[Health] [Failure] Status Code: " + strconv.Itoa(resp.StatusCode))
 		log.Println("[Health] [Failure] Response: " + string(body))
 	}

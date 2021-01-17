@@ -41,9 +41,9 @@ func (c *Cluster) AddDevice(newDevice device.Device) error {
 }
 
 //RemoveDevice -
-func (c *Cluster) RemoveDevice(ImDoneHere device.Device) {
+func (c *Cluster) RemoveDevice(deviceID string) {
 	for index, device := range c.Devices {
-		if device.ID == ImDoneHere.ID {
+		if device.ID == deviceID {
 			s := c.Devices
 			count := len(c.Devices)
 			s[count-1], s[index] = s[index], s[count-1]
@@ -78,7 +78,7 @@ func (c *Cluster) Start() {
 			case t := <-ticker.C:
 				log.Println("Begin Health Checks... ", t)
 				for _, device := range c.Devices {
-					c.DeviceHealthCheck(device)
+					c.DeviceHealthCheck(&device)
 				}
 			}
 		}

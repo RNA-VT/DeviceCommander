@@ -43,6 +43,7 @@ func DeviceDiscovery(c *Cluster) {
 
 //DeviceFromRegistrationRequestBody - helper to get new device details from a registration request msg body
 func DeviceFromRegistrationRequestBody(body io.ReadCloser) device.Device {
+	defer body.Close()
 	decoder := json.NewDecoder(body)
 	var dev device.Device
 	err := decoder.Decode(&dev)
@@ -52,9 +53,9 @@ func DeviceFromRegistrationRequestBody(body io.ReadCloser) device.Device {
 	return dev
 }
 
-func (c Cluster) isRegistered(address string) bool {
-	for _, m := range c.Devices {
-		if address == m.ToFullAddress() {
+func (c Cluster) isRegistered(host, port string) bool {
+	for _, dev := range c.Devices {
+		if host == dev.Host && port == dev.Port {
 			return true
 		}
 	}
