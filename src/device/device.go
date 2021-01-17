@@ -6,12 +6,12 @@ type Device struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	Host        string `json:"host"`
-	Port        string `json:"port"`
+	Port        int    `json:"port"`
 	failures    int
 }
 
 //NewDevice -
-func NewDevice(host string, port string) (Device, error) {
+func NewDevice(host string, port int) (Device, error) {
 	dev := Device{
 		Host:     host,
 		Port:     port,

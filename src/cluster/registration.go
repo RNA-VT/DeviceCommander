@@ -53,9 +53,9 @@ func DeviceFromRegistrationRequestBody(body io.ReadCloser) device.Device {
 	return dev
 }
 
-func (c Cluster) isRegistered(host, port string) bool {
+func (c Cluster) isRegistered(host string) bool {
 	for _, dev := range c.Devices {
-		if host == dev.Host && port == dev.Port {
+		if host == dev.Host {
 			return true
 		}
 	}
