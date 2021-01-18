@@ -1,0 +1,29 @@
+version: 2.1
+executors:
+  docker-publisher:
+    docker:
+      - image: circleci/buildpack-deps:stretch
+jobs:
+  publish-devicecommander:
+    description: Publish the DeviceCommander docker image to Docker Hub.
+    executor: docker-publisher
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Publish the DeviceCommander docker image to Docker Hub.
+          working_directory: .
+          command: |
+            echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+            SHORT_SHA=${CIRCLE_SHA1:0:7}
+            docker build . -t rnavt/devicecommander:$SHORT_SHA -t rnavt/devicecommander:latest
+            docker push rnavt/devicecommander:$SHORT_SHA
+            docker push rnavt/devicecommander:latest
+workflows:
+  version: 2
+  devicecommander-build:
+    jobs:
+      - publish-devicecommander:
+          name: publish-devicecommander
+          context: docker_hub
+      
