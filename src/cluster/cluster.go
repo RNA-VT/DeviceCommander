@@ -27,8 +27,8 @@ func (c Cluster) GetDevices() map[string]device.Device {
 //AddDevice attempts to add a device to the cluster and returns the response data.
 func (c *Cluster) AddDevice(newDevice device.Device) error {
 	if viper.GetString("ENV") == "production" {
-		for _, micro := range c.Devices {
-			if micro.Host == newDevice.Host && newDevice.Port == micro.Port {
+		for _, dev := range c.Devices {
+			if dev.URL() == newDevice.URL() {
 				return errors.New("This host & port combination are already registered to this cluster")
 			}
 		}
