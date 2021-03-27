@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useState } from 'react'
 import SolenoidTable from './SolenoidTable'
-import MicrocontrollerForm from './MicrocontrollerForm'
+import DeviceForm from './DeviceForm'
 import {
   Card,
   makeStyles,
@@ -9,7 +9,7 @@ import {
   Button,
 } from '@material-ui/core'
 import SettingsIcon from '@material-ui/icons/Settings'
-import Microcontroller from '../../utils/Microcontroller'
+import Device from '../../utils/Device'
 
 const useStyles = makeStyles({
   card: {
@@ -37,18 +37,18 @@ const useStyles = makeStyles({
 
 type DeviceCardProps = {
   children?: React.ReactNode,
-  microcontroller: Microcontroller,
+  device: Device,
   reload: () => Promise<void>
 }
 
-const DeviceCard = ({ children, microcontroller, reload }: DeviceCardProps) => {
+const DeviceCard = ({ children, device: device, reload }: DeviceCardProps) => {
   const classes = useStyles({})
   const [isEdit, setIsEdit] = useState(false)
   let basicInfo = null
 
   if (isEdit) {
     basicInfo = (
-      <MicrocontrollerForm microcontroller={microcontroller} reload={reload} />
+      <DeviceForm device={device} reload={reload} />
     )
   } else {
     basicInfo = (
@@ -56,14 +56,14 @@ const DeviceCard = ({ children, microcontroller, reload }: DeviceCardProps) => {
         <Grid
           container
           direction="column">
-          <p className={classes.title}><strong>ID:</strong> {microcontroller.id}</p>
-          <p className={classes.title}><strong>URL:</strong> {microcontroller.host}:{microcontroller.port}</p>
-          <p className={classes.title}><strong>Description:</strong> {microcontroller.description}</p>
+          <p className={classes.title}><strong>ID:</strong> {device.id}</p>
+          <p className={classes.title}><strong>URL:</strong> {device.host}:{device.port}</p>
+          <p className={classes.title}><strong>Description:</strong> {device.description}</p>
         </Grid>
 
         <Grid container spacing={3}>
           <Grid item sm>
-            <SolenoidTable solenoids={microcontroller.solenoids} isEdit={isEdit} handleEdit={(id: string, newValue: any, target: string) => { }} />
+            <SolenoidTable solenoids={device.solenoids} isEdit={isEdit} handleEdit={(id: string, newValue: any, target: string) => { }} />
           </Grid>
         </Grid>
       </>

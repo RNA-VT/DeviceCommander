@@ -4,7 +4,7 @@ import { List, ListItem, Container } from '@material-ui/core'
 import DeviceManagement from '../containers/DeviceManagementContainer'
 import Wrapper from '../components/shared/PageWrapper'
 import DeviceCard from '../components/device_management/DeviceCard'
-import Microcontroller from '../utils/Microcontroller'
+import Device from '../utils/Device'
 
 const DeviceManagementPage = () => {
 
@@ -17,15 +17,15 @@ const DeviceManagementPage = () => {
           <Subscribe to={[DeviceManagement]}>
 
             {deviceManager => {
-              const mcs: Array<Microcontroller> = deviceManager.getMicrocontrollers()
+              const devs: Array<Device> = deviceManager.getDevices()
 
               const handleReload = () => {
                 return deviceManager.loadData()
               }
 
-              return mcs.map<React.ReactNode>((mc) => (
-                <ListItem key={mc.id}>
-                  <DeviceCard microcontroller={mc} reload={handleReload} />
+              return devs.map<React.ReactNode>((dev) => (
+                <ListItem key={dev.id}>
+                  <DeviceCard device={dev} reload={handleReload} />
                 </ListItem>
               ))
             }}
