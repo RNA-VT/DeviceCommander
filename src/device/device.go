@@ -28,7 +28,7 @@ func NewDevice(host string, port int) (Device, error) {
 	return dev, nil
 }
 
-//URL returns a network address including the ip address and port that this micro is listening on
+//URL returns a network address including the ip address and port that this device is listening on
 func (d Device) URL() string {
 	return d.protocol() + "://" + d.Host + ":" + strconv.Itoa(d.Port)
 }
