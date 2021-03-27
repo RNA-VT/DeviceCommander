@@ -1,34 +1,17 @@
-build:
-	cd src && go build
-	
-distribute:
-	./environment/build-scripts/distribute-executables.sh
-
-fix-permissions:
-	chmod u+x ./environment/build-scripts/install-dependencies.sh
-	chmod u+x ./environment/build-scripts/distribute-executables.sh
-
 help:
 	cd src && go run main.go -h
 
-install:
-	./environment/build-scripts/install-dependencies.sh
+build\:server:
+	cd src && go build
 
-run-docker:
-	cd environment && docker-compose up
+build:\client:
+	cd frontend && npm run build
 
-run-master:
-	cd src && GOFIRE_MASTER=true go run main.go
+run\:server:
+	cd src &&  go run main.go
 
-run-slave:
-	cd src && go run main.go
-
-run-slave2:
-	cd src && PORT=8002 GO111MODULE=on go run main.go
-
-run-js:
+run\:client:
 	cd frontend && npm run start
 
-build-js:
-	cd frontend && npm run build
-  
+run\:docker:
+	cd environment && docker-compose up
