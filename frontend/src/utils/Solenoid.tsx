@@ -3,22 +3,22 @@ import ApiWrapper from "../utils/ApiWrapper"
 class Solenoid {
   uid: string
   name: string
-  mcAddress: string
+  devAddress: string
   type: string
   enabled: boolean
   headerPin: number
 
-  constructor(solenoid: any, mc: any) {
+  constructor(solenoid: any, dev: any) {
     this.uid = solenoid.UID ? solenoid.UID : ''
     this.name = solenoid.Name ? solenoid.Name : ''
     this.type = solenoid.Type ? solenoid.Type : ''
     this.enabled = solenoid.Enabled
     this.headerPin = solenoid.HeaderPin
 
-    if (solenoid.mcAddress) {
-      this.mcAddress = solenoid.mcAddress
+    if (solenoid.devAddress) {
+      this.devAddress = solenoid.devAddress
     } else {
-      this.mcAddress = (mc.Host && mc.Port) ? (mc.Host + ':' + mc.Port) : ''
+      this.devAddress = (dev.Host && dev.Port) ? (dev.Host + ':' + dev.Port) : ''
     }
 
     this.open = this.open.bind(this)
@@ -26,17 +26,17 @@ class Solenoid {
   }
 
   open() {
-    const api = new ApiWrapper(this.mcAddress)
+    const api = new ApiWrapper(this.devAddress)
     api.openSolenoid(this.uid)
   }
 
   close() {
-    const api = new ApiWrapper(this.mcAddress)
+    const api = new ApiWrapper(this.devAddress)
     api.closeSolenoid(this.uid)
   }
 
   async edit(newData: any) {
-    const api = new ApiWrapper(this.mcAddress)
+    const api = new ApiWrapper(this.devAddress)
     return api.editComponent(this.uid, newData)
   }
 
@@ -48,7 +48,7 @@ class Solenoid {
       Type: this.type,
       Enabled: this.enabled,
       HeaderPin: this.headerPin,
-      mcAddress: this.mcAddress
+      devAddress: this.devAddress
     }
   }
 }

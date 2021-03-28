@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"firecontroller/cluster"
+	"devicecommander/cluster"
 	"log"
 	"net/http"
 
@@ -42,21 +42,19 @@ func ConfigureRoutes(listenURL string, e *echo.Echo, API APIService) {
 
 	API.addRegistrationRoutes(e)
 	API.addInfoRoutes(e)
-	API.addErrorRoutes(e)
-	API.addCommandRoutes(e)
 	API.addManageRoutes(e)
 
 	log.Println("Configure routes listening on " + listenURL)
 
-	log.Println("***************************************")
-	log.Println("~Rejoice~ GoFire Lives Again! ~Rejoice~")
-	log.Println("***************************************")
+	log.Println("*****************************************************")
+	log.Println("~Rejoice~ The Device Commander Lives Again! ~Rejoice~")
+	log.Println("*****************************************************")
 
 	// Start server
 	e.Logger.Fatal(e.Start(listenURL))
 }
 
 func (a APIService) defaultGet(c echo.Context) error {
-	log.Println("Someone is touching me", a.Cluster.GetConfig())
+	log.Println("Someone is touching me", a.Cluster)
 	return c.String(http.StatusOK, "Help Me! I'm trapped in the Server! You're the only one receiving this message.")
 }

@@ -1,13 +1,13 @@
 import { Container } from 'unstated-typescript'
 import API from '../utils/ApiWrapper'
-import Microcontroller from '../utils/Microcontroller'
-import MicrocontrollerFactory from "../utils/factories/MicrocontrollerFactory"
+import Device from '../utils/Device'
+import DeviceFactory from "../utils/factories/DeviceFactory"
 import Solenoid from '../utils/Solenoid'
 
 type DeviceManagementState = {
   isLoaded: boolean,
-  slaveMicrocontrollers: Array<Microcontroller>,
-  master?: Microcontroller,
+  devices: Array<Device>,
+  master?: Device,
   clusterName: String
 }
 
@@ -16,11 +16,11 @@ class DeviceManagement extends Container<DeviceManagementState> {
     super()
     this.state = {
       isLoaded: false,
-      slaveMicrocontrollers: [],
+      devices: [],
       clusterName: ''
     }
 
-    this.getMicrocontrollers = this.getMicrocontrollers.bind(this)
+    this.getDevices = this.getDevices.bind(this)
     this.getData = this.getData.bind(this)
     this.loadData()
   }
@@ -33,18 +33,18 @@ class DeviceManagement extends Container<DeviceManagementState> {
   async loadData() {
     return this.getData().then((data) => {
       console.log('load data', data);
-      let mcFactory = new MicrocontrollerFactory()
+      let devFactory = new DeviceFactory()
 
       this.setState({
-        slaveMicrocontrollers: mcFactory.makeManyMcs(data.Microcontrollers),
+        devices: devFactory.makeManyDevices(data.Devices),
         clusterName: data.Name
       })
     })
   }
 
-  getMicrocontrollers(): Array<Microcontroller> {
-    if (this.state.slaveMicrocontrollers) {
-      return [...this.state.slaveMicrocontrollers]
+  getDevices(): Array<Device> {
+    if (this.state.devices) {
+      return [...this.state.devices]
     }
 
     return []
@@ -52,8 +52,8 @@ class DeviceManagement extends Container<DeviceManagementState> {
 
   getSolenoids(): Array<Solenoid> {
     let allSolenoids: Solenoid[] = []
-    this.getMicrocontrollers().forEach(mc => {
-      allSolenoids = allSolenoids.concat(mc.solenoids)
+    this.getDevices().forEach(dev => {
+      allSolenoids = allSolenoids.concat(dev.solenoids)
     })
     return allSolenoids
   }

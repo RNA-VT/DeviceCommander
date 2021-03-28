@@ -2,7 +2,7 @@ import Solenoid from "./Solenoid"
 import SolenoidFactory from "./factories/SolenoidFactory"
 import ApiWrapper from "./ApiWrapper"
 
-class Microcontroller {
+class Device {
   id: string;
   host: string | undefined;
   name: string | undefined;
@@ -19,7 +19,7 @@ class Microcontroller {
 
     if (data.Solenoids) {
       const sf = new SolenoidFactory()
-      this.solenoids = sf.makeSolenoidsFromMc(data)
+      this.solenoids = sf.makeSolenoidsFromDevice(data)
     } else {
       this.solenoids = []
     }
@@ -31,8 +31,8 @@ class Microcontroller {
 
   async edit(newData: any) {
     const api = new ApiWrapper(this.myNetworkAddress())
-    return api.editMicrocontroller(this.id, newData)
+    return api.editDevice(this.id, newData)
   }
 }
 
-export default Microcontroller
+export default Device

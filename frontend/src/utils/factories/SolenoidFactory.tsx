@@ -2,25 +2,25 @@ import Solenoid from "../../utils/Solenoid"
 
 class SolenoidFactory {
 
-  makeSolenoidsFromManyMcs(mcs: Array<any>) {
+  makeSolenoidsFromManyDevs(devs: Array<any>) {
     let allSolenoids: Solenoid[] = []
-    mcs.forEach(mc => {
-      allSolenoids = allSolenoids.concat(this.makeSolenoidsFromMc(mc))
+    devs.forEach(dev => {
+      allSolenoids = allSolenoids.concat(this.makeSolenoidsFromDev(dev))
     })
 
     return allSolenoids
   }
 
-  makeSolenoidsFromMc(mc: any) {
-    if (mc.solenoids) {
-      return mc.solenoids.map((solenoid: any) => {
-        return new Solenoid(solenoid, mc)
+  makeSolenoidsFromDev(dev: any) {
+    if (dev.solenoids) {
+      return dev.solenoids.map((solenoid: any) => {
+        return new Solenoid(solenoid, dev)
       })
     }
 
-    if (mc.Solenoids) {
-      return mc.Solenoids.map((solenoid: any) => {
-        return new Solenoid(solenoid, mc)
+    if (dev.Solenoids) {
+      return dev.Solenoids.map((solenoid: any) => {
+        return new Solenoid(solenoid, dev)
       })
     }
 

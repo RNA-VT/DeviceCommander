@@ -1,7 +1,7 @@
 package app
 
 import (
-	"firecontroller/cluster"
+	"devicecommander/cluster"
 
 	"github.com/labstack/echo"
 )
@@ -14,5 +14,5 @@ type Application struct {
 
 //SystemInfo returns a stringified version of this api
 func (a *Application) SystemInfo() string {
-	return "Cluster: " + a.Cluster.String() + "\nEcho Server: " + a.Echo.Server.TLSConfig.ServerName
+	return "Cluster: " + a.Cluster.Name + "\nEcho Server: " + a.Echo.Server.TLSConfig.ServerName
 }
