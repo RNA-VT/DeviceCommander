@@ -4,7 +4,7 @@ help:
 build\:server:
 	cd src && go build
 
-build:\client:
+build\:client:
 	cd frontend && npm run build
 
 run\:server:
