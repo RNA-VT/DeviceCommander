@@ -19,7 +19,7 @@ class Device {
 
     if (data.Solenoids) {
       const sf = new SolenoidFactory()
-      this.solenoids = sf.makeSolenoidsFromDevice(data)
+      this.solenoids = sf.makeSolenoidsFromDev(data)
     } else {
       this.solenoids = []
     }
