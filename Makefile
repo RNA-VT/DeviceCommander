@@ -11,7 +11,7 @@ run\:server:
 	cd src &&  go run main.go
 
 run\:client:
-	cd frontend && npm run start
+	cd frontend && && yarn && yarn run start
 
 run\:docker:
 	cd environment && docker-compose up
