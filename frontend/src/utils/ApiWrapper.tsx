@@ -27,7 +27,7 @@ class API {
     })
   }
 
-  async editMicrocontroller(uid: string, newData: object) {
+  async editDevice(uid: string, newData: object) {
     const queryUrl = 'http://' + this.masterUrl + '/' + uid
 
     return fetch(queryUrl, {

@@ -17,15 +17,8 @@ class SolenoidFactory {
         return new Solenoid(solenoid, mc)
       })
     }
-
-    if (mc.Solenoids) {
-      return mc.Solenoids.map((solenoid: any) => {
-        return new Solenoid(solenoid, mc)
-      })
-    }
-
+    
     return []
-
   }
 }
 
