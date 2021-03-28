@@ -2,7 +2,7 @@ version: 2.1
 executors:
   docker-publisher:
     docker:
-      - image: circleci/buildpack-deps:stretch
+      - image: circleci/buildpack-deps:latest
 jobs:
   publish-devicecommander:
     description: Publish the DeviceCommander docker image to Docker Hub.
