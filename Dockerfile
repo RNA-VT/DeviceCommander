@@ -12,7 +12,7 @@ RUN ls
 
 RUN chmod +x device-commander
 
-FROM node:14.15.4 as node-builder
+FROM node:15.11 as node-builder
 
 ADD /frontend /src
 
@@ -20,7 +20,6 @@ WORKDIR /src
 
 RUN npm install
 
-RUN mkdir build
 RUN npm run build
 
 # Build final image
