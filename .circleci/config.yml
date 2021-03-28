@@ -9,7 +9,8 @@ jobs:
     executor: docker-publisher
     steps:
       - checkout
-      - setup_remote_docker
+      - setup_remote_docker:
+        version: 19.03.13
       - run:
           name: Publish the DeviceCommander docker image to Docker Hub.
           working_directory: .
