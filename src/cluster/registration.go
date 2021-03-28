@@ -26,17 +26,18 @@ func DeviceDiscovery(c *Cluster) {
 			if err != nil {
 				log.Println("[Registration] [Error] Attempt to register " + host + " resulted in an error:")
 				log.Println(err)
-			}
-			switch resp.StatusCode {
-			case 200:
-				log.Println("[Registration] [Success] Registration Request Accepted: " + host)
-				log.Println("[Registration] [Success] Adding New Device...")
-				dev := DeviceFromRegistrationRequestBody(resp.Body)
-				c.AddDevice(dev)
-			case 404:
-				log.Println("[Registration] [Warning] Host Not Found: " + host)
-			default:
-				log.Println("[Registration] [Warning] Attempt to register " + host + " resulted in an unexpected response:" + strconv.Itoa(resp.StatusCode))
+			} else {
+				switch resp.StatusCode {
+				case 200:
+					log.Println("[Registration] [Success] Registration Request Accepted: " + host)
+					log.Println("[Registration] [Success] Adding New Device...")
+					dev := DeviceFromRegistrationRequestBody(resp.Body)
+					c.AddDevice(dev)
+				case 404:
+					log.Println("[Registration] [Warning] Host Not Found: " + host)
+				default:
+					log.Println("[Registration] [Warning] Attempt to register " + host + " resulted in an unexpected response:" + strconv.Itoa(resp.StatusCode))
+				}
 			}
 		}
 	}
