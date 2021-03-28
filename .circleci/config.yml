@@ -2,7 +2,7 @@ version: 2.1
 parameters:
   device-commander-version:
     type: string
-    default: "1.5.16"
+    default: "0.0.1"
 executors:
   docker-publisher:
     docker:
