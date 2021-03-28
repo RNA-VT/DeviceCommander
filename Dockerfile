@@ -1,15 +1,36 @@
-FROM golang:1.13.5
+FROM golang:1.13.5 as go-builder
 
-RUN mkdir -p /go/src/GoFire/
+RUN mkdir -p /go/src/DeviceCommander/
 
-RUN export GOFIRE_MASTER_HOST=`/sbin/ip route|awk '/default/ { print $3 }'` && export GOFIRE_MASTER=true
+ADD /src /go/src/DeviceCommander/
 
-ADD /src /go/src/GoFire/
+WORKDIR /go/src/DeviceCommander/
 
-WORKDIR /go/src/GoFire/
+RUN go build -o device-commander
 
-RUN go build
+RUN ls
 
-RUN chmod +x firecontroller
+RUN chmod +x device-commander
 
-RUN GOFIRE_MASTER=true ./firecontroller
+FROM node:15.11 as node-builder
+
+ADD /frontend /src
+
+WORKDIR /src
+
+RUN npm install
+
+RUN npm run build
+
+# Build final image
+FROM debian:10.4-slim
+
+COPY --from=go-builder /go/src/DeviceCommander/device-commander /usr/local/bin/device-commander
+COPY --from=node-builder /src/build /src/build
+
+RUN touch /config.yaml
+
+ENV ENV "production"
+
+EXPOSE 8000
+

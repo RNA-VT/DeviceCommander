@@ -7,6 +7,7 @@ import (
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+	"github.com/spf13/viper"
 )
 
 //APIService -
@@ -29,8 +30,15 @@ func ConfigureRoutes(listenURL string, e *echo.Echo, API APIService) {
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"},
 	}))
+
+	frontendRoot := "../frontend/build/"
+	if viper.GetString("ENV") == "production" {
+		frontendRoot = "/src/build/"
+	}
 	// Routes
-	addBaseRoutes(e, API)
+	e.Static("/static", frontendRoot+"static")
+	e.File("/*", frontendRoot+"index.html")
+	e.GET("/v1", API.defaultGet)
 
 	API.addRegistrationRoutes(e)
 	API.addInfoRoutes(e)
@@ -44,13 +52,6 @@ func ConfigureRoutes(listenURL string, e *echo.Echo, API APIService) {
 
 	// Start server
 	e.Logger.Fatal(e.Start(listenURL))
-}
-
-func addBaseRoutes(e *echo.Echo, API APIService) {
-	e.Static("static", "../frontend/build/static")
-	e.File("*", "../frontend/build/index.html")
-	api := e.Group("/v1")
-	api.GET("/", API.defaultGet)
 }
 
 func (a APIService) defaultGet(c echo.Context) error {

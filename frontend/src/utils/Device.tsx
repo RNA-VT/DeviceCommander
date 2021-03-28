@@ -31,7 +31,8 @@ class Device {
 
   async edit(newData: any) {
     const api = new ApiWrapper(this.myNetworkAddress())
-    return api.editDevice(this.id, newData)
+    // return api.editDevice(this.id, newData)
+    return
   }
 }
 
