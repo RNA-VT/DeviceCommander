@@ -20,6 +20,7 @@ WORKDIR /src
 
 RUN npm install
 
+RUN mkdir build
 RUN npm run build
 
 # Build final image
