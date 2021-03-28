@@ -1,6 +1,8 @@
 package device
 
-import "strconv"
+import (
+	"strconv"
+)
 
 //Device represents a compliant physical component & its web address.
 type Device struct {
@@ -13,8 +15,10 @@ type Device struct {
 	//Host - Device Api Host
 	Host string `json:"host"`
 	//Port - Device Api Port. Set to 443 for https
-	Port     int `json:"port"`
-	failures int
+	Port int `json:"port"`
+	//ControlConfig - frontend control config
+	ControlConfig ControlConfiguration
+	failures      int
 }
 
 //NewDevice -
