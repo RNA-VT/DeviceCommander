@@ -17,7 +17,7 @@ type Device struct {
 	//Port - Device Api Port. Set to 443 for https
 	Port int `json:"port"`
 	//ControlConfig - frontend control config
-	ControlConfig ControlConfiguration
+	ControlConfig ControlConfiguration `json:"controlConfig"`
 	failures      int
 }
 

@@ -14,8 +14,8 @@ const (
 )
 
 type ControlConfiguration struct {
-	Type        string
-	Description string
+	Type        string `json:"type"`
+	Description string `json:"description"`
 }
 
 func ValidateControlType(t string) bool {
