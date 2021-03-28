@@ -2,9 +2,9 @@ package main
 
 /* Al useful imports */
 import (
-	"firecontroller/app"
-	"firecontroller/cluster"
-	"firecontroller/routes"
+	"devicecommander/app"
+	"devicecommander/cluster"
+	"devicecommander/routes"
 	"fmt"
 
 	"github.com/labstack/echo"
@@ -16,17 +16,8 @@ func main() {
 	/* Load Config from Env Vars */
 	configureEnvironment()
 
-	//Pick Listening Port
-	port := "8001"
-	host := "device1.mindshark.io"
-
-	if viper.GetBool("GOFIRE_MASTER") {
-		host = viper.GetString("GOFIRE_MASTER_HOST")
-		port = viper.GetString("GOFIRE_MASTER_PORT")
-	} else {
-		host = viper.GetString("GOFIRE_HOST")
-		port = viper.GetString("GOFIRE_PORT")
-	}
+	host := viper.GetString("HOST")
+	port := viper.GetString("PORT")
 
 	fullHostname := host + ":" + port
 
@@ -57,12 +48,10 @@ func configureEnvironment() {
 	viper.AutomaticEnv()
 
 	viper.SetDefault("ENV", "local") // local or production only
-	viper.SetDefault("GOFIRE_MASTER", false)
-	viper.SetDefault("GOFIRE_HOST", "127.0.0.1")
-	viper.SetDefault("GOFIRE_PORT", 8001)
-	viper.SetDefault("GOFIRE_MASTER_PORT", 8000)
-	viper.SetDefault("GOFIRE_MASTER_HOST", "127.0.0.1")
-	viper.SetDefault("GOFIRE_MOCK_GPIO", true)
-	viper.SetDefault("CLUSTER_NAME", "MasterOfHot")
-	viper.SetDefault("MICROCONTORLLER_LIMIT", 255)
+	viper.SetDefault("HOST", "0.0.0.0")
+	viper.SetDefault("PORT", 8001)
+	viper.SetDefault("CLUSTER_NAME", "Flaming Hot Fleet Directory")
+	viper.SetDefault("IP_ADDRESS_ROOT", "192.16.1.")
+	viper.SetDefault("DISCOVERY_PERIOD", 30)
+	viper.SetDefault("HEALTH_CHECK_PERIOD", 5)
 }
