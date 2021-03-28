@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useState } from 'react'
-import Microcontroller from '../../utils/Microcontroller'
+import Device from '../../utils/Device'
 import { makeStyles, TextField, Button } from '@material-ui/core';
 import SolenoidTable from './SolenoidTable'
 
@@ -13,19 +13,19 @@ const useStyles = makeStyles({
   }
 });
 
-type MicrocontrollerProps = {
-  microcontroller: Microcontroller,
+type DeviceProps = {
+  device: Device,
   reload: () => Promise<void>
 }
 
-const MicrocontrollerForm = ({ microcontroller, reload }: MicrocontrollerProps) => {
+const DeviceForm = ({ device: device, reload }: DeviceProps) => {
   const classes = useStyles({})
-  const [descriptionValue, setDescription] = useState(microcontroller.description)
-  const [solenoids, setSolenoids] = useState(microcontroller.solenoids)
+  const [descriptionValue, setDescription] = useState(device.description)
+  const [solenoids, setSolenoids] = useState(device.solenoids)
 
-  const handleMcSave = (event: any) => {
+  const handleDeviceSave = (event: any) => {
     event.preventDefault()
-    microcontroller.edit({
+    device.edit({
       description: descriptionValue
     }).then((data) => {
       reload()
@@ -49,14 +49,14 @@ const MicrocontrollerForm = ({ microcontroller, reload }: MicrocontrollerProps) 
   }
 
   const handleReset = () => {
-    setDescription(microcontroller.description)
+    setDescription(device.description)
   }
 
   return (
     <>
-      <form onSubmit={handleMcSave}>
-        <p className={classes.title}><strong>ID:</strong> {microcontroller.id}</p>
-        <p className={classes.title}><strong>URL:</strong> {microcontroller.host}:{microcontroller.port}</p>
+      <form onSubmit={handleDeviceSave}>
+        <p className={classes.title}><strong>ID:</strong> {device.id}</p>
+        <p className={classes.title}><strong>URL:</strong> {device.host}:{device.port}</p>
 
         <TextField type="text" fullWidth
           className={classes.title}
@@ -76,4 +76,4 @@ const MicrocontrollerForm = ({ microcontroller, reload }: MicrocontrollerProps) 
 
 }
 
-export default MicrocontrollerForm
+export default DeviceForm

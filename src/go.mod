@@ -1,4 +1,4 @@
-module firecontroller
+module devicecommander
 
 go 1.15
 
