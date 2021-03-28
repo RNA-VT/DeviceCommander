@@ -7,6 +7,7 @@ import (
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+	"github.com/spf13/viper"
 )
 
 //APIService -
@@ -29,9 +30,14 @@ func ConfigureRoutes(listenURL string, e *echo.Echo, API APIService) {
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"},
 	}))
+
+	frontendRoot := "../frontend/build/"
+	if viper.GetString("ENV") == "production" {
+		frontendRoot = "/src/build/"
+	}
 	// Routes
-	e.Static("/static", "../frontend/build/static")
-	e.File("/*", "../frontend/build/index.html")
+	e.Static("/static", frontendRoot+"static")
+	e.File("/*", frontendRoot+"index.html")
 	e.GET("/v1", API.defaultGet)
 
 	API.addRegistrationRoutes(e)
