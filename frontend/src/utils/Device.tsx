@@ -19,7 +19,7 @@ class Device {
 
     if (data.Solenoids) {
       const sf = new SolenoidFactory()
-      this.solenoids = sf.makeSolenoidsFromDevice(data)
+      this.solenoids = sf.makeSolenoidsFromDev(data)
     } else {
       this.solenoids = []
     }
@@ -31,7 +31,8 @@ class Device {
 
   async edit(newData: any) {
     const api = new ApiWrapper(this.myNetworkAddress())
-    return api.editDevice(this.id, newData)
+    // return api.editDevice(this.id, newData)
+    return
   }
 }
 
