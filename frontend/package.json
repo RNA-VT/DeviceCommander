@@ -17,22 +17,15 @@
     "@typescript-eslint/eslint-plugin": "^2.15.0",
     "@typescript-eslint/parser": "^2.15.0",
     "deep-object-diff": "^1.1.0",
-    "eslint": "^6.8.0",
-    "eslint-config-standard": "^14.1.0",
-    "eslint-config-standard-react": "^9.2.0",
-    "eslint-plugin-import": "^2.20.0",
-    "eslint-plugin-node": "^11.0.0",
-    "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-react": "^7.17.0",
-    "eslint-plugin-standard": "^4.0.1",
     "polished": "^3.4.2",
     "prop-types": "^15.7.2",
     "react": "^16.13.0",
+    "react-app": "^1.1.2",
     "react-dom": "^16.13.0",
     "react-draggable": "^4.2.0",
     "react-icons": "^3.9.0",
     "react-router-dom": "^5.1.2",
-    "react-scripts": "^4.0.1",
+    "react-scripts": "^4.0.3",
     "styled-components": "^5.0.0",
     "typescript": "^3.8.3",
     "unstated": "^2.1.1",
@@ -58,5 +51,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "eslint-config-react": "^1.1.7",
+    "eslint-config-react-app": "^6.0.0"
   }
 }
