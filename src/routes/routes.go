@@ -30,9 +30,7 @@ func ConfigureRoutes(listenURL string, e *echo.Echo, API APIService) {
 		AllowOrigins: []string{"*"},
 	}))
 	// Routes
-	e.Static("/static", "../frontend/build/static")
-	e.File("/*", "../frontend/build/index.html")
-	e.GET("/v1", API.defaultGet)
+	addBaseRoutes(e, API)
 
 	API.addRegistrationRoutes(e)
 	API.addInfoRoutes(e)
@@ -46,6 +44,13 @@ func ConfigureRoutes(listenURL string, e *echo.Echo, API APIService) {
 
 	// Start server
 	e.Logger.Fatal(e.Start(listenURL))
+}
+
+func addBaseRoutes(e *echo.Echo, API APIService) {
+	e.Static("static", "../frontend/build/static")
+	e.File("*", "../frontend/build/index.html")
+	api := e.Group("/v1")
+	api.GET("/", API.defaultGet)
 }
 
 func (a APIService) defaultGet(c echo.Context) error {
