@@ -47,6 +47,7 @@ workflows:
           name: publish-devicecommander
           image: rnavt/devicecommander
           context: docker_hub
+          use-docker-credentials-store: true
           docker-context: .
           tag: ${CIRCLE_SHA1:0:7},$CIRCLE_BRANCH
           # filters:
