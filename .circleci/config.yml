@@ -3,6 +3,8 @@ parameters:
   device-commander-version:
     type: string
     default: "0.0.1"
+orbs:
+  docker: circleci/docker@1.7.0
 executors:
   docker-publisher:
     docker:
@@ -41,6 +43,13 @@ workflows:
   devicecommander-build:
     jobs:
       - lint
-      - publish-devicecommander:
+      - docker/publish:
           name: publish-devicecommander
+          image: rnavt/devicecommander
           context: docker_hub
+          docker-context: .
+          tag: ${CIRCLE_SHA1:0:7},$CIRCLE_BRANCH
+          filters:
+              branches:
+                only:
+                  - master
