@@ -49,7 +49,7 @@ workflows:
           context: docker_hub
           docker-context: .
           tag: ${CIRCLE_SHA1:0:7},$CIRCLE_BRANCH
-          filters:
-              branches:
-                only:
-                  - master
+          # filters:
+          #     branches:
+          #       only:
+          #         - master
