@@ -1,6 +1,10 @@
 package device
 
-import "strconv"
+import (
+	"encoding/json"
+	"io"
+	"strconv"
+)
 
 //Device represents a compliant physical component & its web address.
 type Device struct {
@@ -24,7 +28,22 @@ func NewDevice(host string, port int) (Device, error) {
 		Port:     port,
 		failures: 0,
 	}
-	//TODO: Load Device Data from db
+
+	return dev, nil
+}
+
+func NewDeviceFromRequestBody(body io.ReadCloser) (Device, error) {
+	deviceLogger := getDeviceLogger()
+
+	defer body.Close()
+	decoder := json.NewDecoder(body)
+	var dev Device
+	err := decoder.Decode(&dev)
+	if err != nil {
+		deviceLogger.Error("Failed to decode device config from request body", err)
+		return dev, err
+	}
+
 	return dev, nil
 }
 
@@ -53,7 +72,7 @@ func (d *Device) ProcessHealthCheckResult(result bool) {
 }
 
 //Failed - If true, device should be deregistered
-func (d Device) Failed() bool {
+func (d Device) Unresponsive() bool {
 	failThreshold := 3
 	return d.failures >= failThreshold
 }

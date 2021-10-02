@@ -1,65 +1,55 @@
 package cluster
 
 import (
-	device "devicecommander/device"
-	"encoding/json"
-	"io"
-	"log"
 	"net/http"
 	"strconv"
 
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+
+	device "devicecommander/device"
 )
+
+func getRegistrationLogger() *log.Entry {
+	return log.WithFields(log.Fields{"module": "registration"})
+}
 
 //DeviceDiscovery -
 func DeviceDiscovery(c *Cluster) {
+	registrationLogger := getRegistrationLogger()
+
 	for i := 1; i < 255; i++ {
 		host := viper.Get("IP_ADDRESS_ROOT").(string) + strconv.Itoa(i)
-		unregistered := !c.isRegistered(host)
+		dev, err := c.GetDeviceByHost(host)
 
-		if unregistered {
+		if err == nil {
 			//TODO: Hit ports other than 80
 			//TODO: Scan https for /registration
 			url := "http://" + host + "/registration"
-			log.Println("[Registration] Attempting to Register: " + url)
+			registrationLogger.Info("Attempting to Register: " + url)
 			resp, err := http.Get(url)
 			if err != nil {
-				log.Println("[Registration] [Error] Attempt to register " + host + " resulted in an error:")
-				log.Println(err)
+				registrationLogger.Error("Attempt to register "+host+" resulted in an error: ", err)
 			} else {
 				switch resp.StatusCode {
 				case 200:
-					log.Println("[Registration] [Success] Registration Request Accepted: " + host)
-					log.Println("[Registration] [Success] Adding New Device...")
-					dev := DeviceFromRegistrationRequestBody(resp.Body)
+					registrationSuccessLogger := registrationLogger.WithFields(log.Fields{
+						"event": "success",
+					})
+					dev, err = device.NewDeviceFromRequestBody(resp.Body)
+					if err != nil {
+						return
+					}
+
+					registrationSuccessLogger.Info("Registration Request Accepted: " + host)
+					registrationSuccessLogger.Info("Adding new Device: " + dev.ID)
 					c.AddDevice(dev)
 				case 404:
-					log.Println("[Registration] [Warning] Host Not Found: " + host)
+					registrationLogger.Debug("Host Not Found: " + host)
 				default:
-					log.Println("[Registration] [Warning] Attempt to register " + host + " resulted in an unexpected response:" + strconv.Itoa(resp.StatusCode))
+					registrationLogger.Debug("Attempt to register " + host + " resulted in an unexpected response:" + strconv.Itoa(resp.StatusCode))
 				}
 			}
 		}
 	}
-}
-
-//DeviceFromRegistrationRequestBody - helper to get new device details from a registration request msg body
-func DeviceFromRegistrationRequestBody(body io.ReadCloser) device.Device {
-	defer body.Close()
-	decoder := json.NewDecoder(body)
-	var dev device.Device
-	err := decoder.Decode(&dev)
-	if err != nil {
-		log.Println("[Registration] [Error] Failed to decode device config from body", err)
-	}
-	return dev
-}
-
-func (c Cluster) isRegistered(host string) bool {
-	for _, dev := range c.Devices {
-		if host == dev.Host {
-			return true
-		}
-	}
-	return false
 }

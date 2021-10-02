@@ -2,11 +2,11 @@ package routes
 
 import (
 	"devicecommander/cluster"
-	"log"
 	"net/http"
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
@@ -14,8 +14,6 @@ import (
 type APIService struct {
 	Cluster *cluster.Cluster
 }
-
-const apiVersion = "1"
 
 // ConfigureRoutes will use Echo to start listening on the appropriate paths
 func ConfigureRoutes(listenURL string, e *echo.Echo, API APIService) {
@@ -44,7 +42,9 @@ func ConfigureRoutes(listenURL string, e *echo.Echo, API APIService) {
 	API.addInfoRoutes(e)
 	API.addManageRoutes(e)
 
-	log.Println("Configure routes listening on " + listenURL)
+	log.WithFields(log.Fields{
+		"module": "routes",
+	}).Info("Configure routes listening on " + listenURL)
 
 	log.Println("*****************************************************")
 	log.Println("~Rejoice~ The Device Commander Lives Again! ~Rejoice~")

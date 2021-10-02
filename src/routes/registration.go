@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"devicecommander/cluster"
+	"devicecommander/device"
 	"log"
 	"net/http"
 
@@ -18,7 +18,11 @@ func (a *APIService) addRegistrationRoutes(e *echo.Echo) {
 func (a *APIService) joinNetwork(c echo.Context) error {
 	log.Println("Device asked to join cluster")
 
-	dev := cluster.DeviceFromRegistrationRequestBody(c.Request().Body)
+	dev, err := device.NewDeviceFromRequestBody(c.Request().Body)
+	if err != nil {
+		return err
+	}
+
 	a.Cluster.AddDevice(dev)
 
 	return c.JSON(http.StatusOK, "Registered.")

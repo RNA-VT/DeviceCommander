@@ -5,9 +5,9 @@ import (
 	"devicecommander/app"
 	"devicecommander/cluster"
 	"devicecommander/routes"
-	"fmt"
 
 	"github.com/labstack/echo"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
@@ -36,14 +36,19 @@ func main() {
 }
 
 func configureEnvironment() {
-	viper.SetConfigName("config")
-	viper.SetConfigType("yaml")
-	viper.AddConfigPath(".")
+	// viper.SetConfigName("config")
+	// viper.SetConfigType("yaml")
+	// viper.AddConfigPath(".")
 
-	err := viper.ReadInConfig()
-	if err != nil {
-		panic(fmt.Errorf("fatal error config file: %s ", err))
-	}
+	// err := viper.ReadInConfig()
+	// if err != nil {
+	// 	panic(fmt.Errorf("fatal error config file: %s ", err))
+	// }
+
+	log.SetLevel(log.DebugLevel)
+	log.SetFormatter(&log.TextFormatter{
+		FullTimestamp: true,
+	})
 
 	viper.AutomaticEnv()
 

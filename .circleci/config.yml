@@ -6,8 +6,17 @@ parameters:
 executors:
   docker-publisher:
     docker:
-      - image: circleci/buildpack-deps:latest
+      - image: circleci/buildpack-deps:latest-alpine
 jobs:
+  lint:
+    docker:
+      - image: golangci/golangci-lint:v1.37-alpine
+    steps:
+      - checkout
+      - run:
+          working_directory: ./src
+          command: |
+            golangci-lint run
   publish-devicecommander:
     description: Publish the DeviceCommander docker image to Docker Hub.
     environment:
@@ -31,6 +40,7 @@ workflows:
   version: 2
   devicecommander-build:
     jobs:
+      - lint
       - publish-devicecommander:
           name: publish-devicecommander
           context: docker_hub

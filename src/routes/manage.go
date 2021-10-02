@@ -30,6 +30,9 @@ func (a APIService) editComponent(c echo.Context) error {
 
 	message := map[string]interface{}{}
 	err = json.Unmarshal([]byte(wholeBody), &message)
+	if err != nil {
+		return err
+	}
 
 	// component, err := a.Cluster.GetComponent(c.Param("id"))
 
@@ -66,6 +69,9 @@ func (a APIService) editDevice(c echo.Context) error {
 
 	message := map[string]interface{}{}
 	err = json.Unmarshal([]byte(wholeBody), &message)
+	if err != nil {
+		return err
+	}
 
 	for key, value := range message {
 		fmt.Println(key, value)

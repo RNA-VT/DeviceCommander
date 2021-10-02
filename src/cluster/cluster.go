@@ -3,9 +3,9 @@ package cluster
 import (
 	device "devicecommander/device"
 	"errors"
-	"log"
 	"time"
 
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
@@ -13,6 +13,24 @@ import (
 type Cluster struct {
 	Name    string
 	Devices []device.Device
+}
+
+// PrintClusterInfo will cleanly print out info about the cluster
+func (c Cluster) PrintClusterInfo() {
+	for i := 0; i < len(c.Devices); i++ {
+		log.Println("----Device---")
+		log.Println(c.Devices[i])
+	}
+	log.Println()
+}
+
+func (c Cluster) GetDeviceByHost(host string) (device.Device, error) {
+	for _, dev := range c.Devices {
+		if dev.Host == host {
+			return dev, nil
+		}
+	}
+	return device.Device{}, errors.New("Failed to find device in existing list.")
 }
 
 //GetDevices returns a map of all registered
@@ -25,19 +43,18 @@ func (c Cluster) GetDevices() map[string]device.Device {
 }
 
 //AddDevice attempts to add a device to the cluster and returns the response data.
-func (c *Cluster) AddDevice(newDevice device.Device) error {
-	if viper.GetString("ENV") == "production" {
-		for _, dev := range c.Devices {
-			if dev.URL() == newDevice.URL() {
-				return errors.New("This host & port combination are already registered to this cluster")
-			}
+func (c *Cluster) AddDevice(newDevice device.Device) {
+	clusterLogger := getClusterLogger()
+	for _, dev := range c.Devices {
+		if dev.URL() == newDevice.URL() {
+			clusterLogger.Debug("This host & port combination are already registered to this cluster")
+			break
 		}
 	}
 
 	c.Devices = append(c.Devices, newDevice)
 
-	PrintClusterInfo(*c)
-	return nil
+	c.PrintClusterInfo()
 }
 
 //RemoveDevice -
@@ -57,29 +74,24 @@ func (c *Cluster) RemoveDevice(deviceID string) {
 func (c *Cluster) Start() {
 	discoveryPeriod := viper.GetInt("DISCOVERY_PERIOD")
 	healthCheckPeriod := viper.GetInt("HEALTH_CHECK_PERIOD")
+	clusterLogger := getClusterLogger()
 
 	// Device Discovery
 	go func() {
 		ticker := time.NewTicker(time.Duration(discoveryPeriod) * time.Second)
-		for {
-			select {
-			case t := <-ticker.C:
-				log.Println("Begin Device Discovery... ", t)
-				DeviceDiscovery(c)
-			}
+		for range ticker.C {
+			clusterLogger.Info("Begin Device Discovery... ")
+			DeviceDiscovery(c)
 		}
 	}()
 
 	// Health Check
 	go func() {
 		ticker := time.NewTicker(time.Duration(healthCheckPeriod) * time.Second)
-		for {
-			select {
-			case t := <-ticker.C:
-				log.Println("Begin Health Checks... ", t)
-				for _, device := range c.Devices {
-					c.DeviceHealthCheck(&device)
-				}
+		for range ticker.C {
+			clusterLogger.Info("Begin Health Checks... ")
+			for _, device := range c.Devices {
+				device.CheckHealth()
 			}
 		}
 	}()
