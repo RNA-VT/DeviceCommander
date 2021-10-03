@@ -1,8 +1,9 @@
 package cluster
 
 import (
-	"github.com/rna-vt/devicecommander/scanner"
 	log "github.com/sirupsen/logrus"
+
+	"github.com/rna-vt/devicecommander/scanner"
 )
 
 func getRegistrationLogger() *log.Entry {
