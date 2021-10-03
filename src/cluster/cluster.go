@@ -30,7 +30,7 @@ func (c Cluster) GetDeviceByHost(host string) (device.Device, error) {
 			return dev, nil
 		}
 	}
-	return device.Device{}, errors.New("Failed to find device in existing list.")
+	return device.Device{}, errors.New("failed to find device in existing list.")
 }
 
 //GetDevices returns a map of all registered
