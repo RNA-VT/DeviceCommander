@@ -1,23 +1,23 @@
 package routes
 
 import (
-	"devicecommander/cluster"
 	"net/http"
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+
+	"github.com/rna-vt/devicecommander/cluster"
 )
 
-//APIService -
+// APIService -
 type APIService struct {
 	Cluster *cluster.Cluster
 }
 
 // ConfigureRoutes will use Echo to start listening on the appropriate paths
 func ConfigureRoutes(listenURL string, e *echo.Echo, API APIService) {
-
 	// Middleware
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())

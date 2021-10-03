@@ -17,6 +17,7 @@ func (a *APIService) addInfoRoutes(e *echo.Echo) {
 func (a APIService) health(c echo.Context) error {
 	return c.JSON(http.StatusOK, "I'm Alive")
 }
+
 func (a APIService) getClusterInfo(c echo.Context) error {
 	return c.JSON(http.StatusOK, a.Cluster)
 }

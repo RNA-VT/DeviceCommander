@@ -1,11 +1,12 @@
 package routes
 
 import (
-	"devicecommander/device"
 	"log"
 	"net/http"
 
 	"github.com/labstack/echo"
+
+	"github.com/rna-vt/devicecommander/device"
 )
 
 func (a *APIService) addRegistrationRoutes(e *echo.Echo) {

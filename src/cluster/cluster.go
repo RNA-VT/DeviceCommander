@@ -1,15 +1,17 @@
 package cluster
 
 import (
-	device "devicecommander/device"
 	"errors"
+	"fmt"
 	"time"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+
+	device "github.com/rna-vt/devicecommander/device"
 )
 
-//Cluster - This object defines an array of Devices
+// Cluster - This object defines an array of Devices
 type Cluster struct {
 	Name    string
 	Devices []device.Device
@@ -19,7 +21,7 @@ type Cluster struct {
 func (c Cluster) PrintClusterInfo() {
 	for i := 0; i < len(c.Devices); i++ {
 		log.Println("----Device---")
-		log.Println(c.Devices[i])
+		log.Println(fmt.Sprintf("%+v", c.Devices[i]))
 	}
 	log.Println()
 }
@@ -30,10 +32,10 @@ func (c Cluster) GetDeviceByHost(host string) (device.Device, error) {
 			return dev, nil
 		}
 	}
-	return device.Device{}, errors.New("failed to find device in existing list.")
+	return device.Device{}, errors.New("failed to find device in existing list")
 }
 
-//GetDevices returns a map of all registered
+// GetDevices returns a map of all registered
 func (c Cluster) GetDevices() map[string]device.Device {
 	devices := make(map[string]device.Device)
 	for i := 0; i < len(c.Devices); i++ {
@@ -42,14 +44,26 @@ func (c Cluster) GetDevices() map[string]device.Device {
 	return devices
 }
 
-//AddDevice attempts to add a device to the cluster and returns the response data.
+func (c *Cluster) AddDevices(newDevices []device.Device) {
+	for _, dev := range newDevices {
+		c.AddDevice(dev)
+	}
+}
+
+// AddDevice attempts to add a device to the cluster and returns the response data.
 func (c *Cluster) AddDevice(newDevice device.Device) {
 	clusterLogger := getClusterLogger()
+	isNew := true
 	for _, dev := range c.Devices {
 		if dev.URL() == newDevice.URL() {
 			clusterLogger.Debug("This host & port combination are already registered to this cluster")
+			isNew = false
 			break
 		}
+	}
+
+	if isNew {
+		clusterLogger.Info(fmt.Sprintf("Added new cluster: %+v", newDevice))
 	}
 
 	c.Devices = append(c.Devices, newDevice)
@@ -57,7 +71,7 @@ func (c *Cluster) AddDevice(newDevice device.Device) {
 	c.PrintClusterInfo()
 }
 
-//RemoveDevice -
+// RemoveDevice -
 func (c *Cluster) RemoveDevice(deviceID string) {
 	for index, device := range c.Devices {
 		if device.ID == deviceID {
@@ -70,7 +84,7 @@ func (c *Cluster) RemoveDevice(deviceID string) {
 	}
 }
 
-//Start begins the registration and health check goroutines
+// Start begins the registration and health check goroutines
 func (c *Cluster) Start() {
 	discoveryPeriod := viper.GetInt("DISCOVERY_PERIOD")
 	healthCheckPeriod := viper.GetInt("HEALTH_CHECK_PERIOD")

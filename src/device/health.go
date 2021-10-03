@@ -37,7 +37,11 @@ func (d Device) CheckHealth() {
 func (d Device) evaluateHealthCheckResponse(resp *http.Response) bool {
 	deviceLogger := getDeviceLogger()
 	defer resp.Body.Close()
-	body, _ := ioutil.ReadAll(resp.Body)
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		deviceLogger.Error("reading the healtheck failed")
+		return false
+	}
 	healthy := false
 	switch resp.StatusCode {
 	case 200:

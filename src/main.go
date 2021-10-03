@@ -2,13 +2,13 @@ package main
 
 /* Al useful imports */
 import (
-	"devicecommander/app"
-	"devicecommander/cluster"
-	"devicecommander/routes"
-
 	"github.com/labstack/echo"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+
+	"github.com/rna-vt/devicecommander/app"
+	"github.com/rna-vt/devicecommander/cluster"
+	"github.com/rna-vt/devicecommander/routes"
 )
 
 /* The entry point for our System */
@@ -25,7 +25,8 @@ func main() {
 		Cluster: cluster.Cluster{
 			Name: viper.GetString("CLUSTER_NAME"),
 		},
-		Echo: echo.New(),
+		Echo:     echo.New(),
+		Hostname: fullHostname,
 	}
 	var API routes.APIService
 
@@ -58,5 +59,5 @@ func configureEnvironment() {
 	viper.SetDefault("CLUSTER_NAME", "Flaming Hot Fleet Directory")
 	viper.SetDefault("IP_ADDRESS_ROOT", "192.16.1.")
 	viper.SetDefault("DISCOVERY_PERIOD", 30)
-	viper.SetDefault("HEALTH_CHECK_PERIOD", 5)
+	viper.SetDefault("HEALTH_CHECK_PERIOD", 60)
 }

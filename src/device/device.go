@@ -6,22 +6,22 @@ import (
 	"strconv"
 )
 
-//Device represents a compliant physical component & its web address.
+// Device represents a compliant physical component & its web address.
 type Device struct {
-	//ID is the serial nummber of the connecting device
+	// ID is the serial nummber of the connecting device
 	ID string `json:"id"`
-	//Name - Optional Device Nickname
+	// Name - Optional Device Nickname
 	Name string `json:"name"`
-	//Description - Optional text describing this device
+	// Description - Optional text describing this device
 	Description string `json:"description"`
-	//Host - Device Api Host
+	// Host - Device Api Host
 	Host string `json:"host"`
-	//Port - Device Api Port. Set to 443 for https
+	// Port - Device Api Port. Set to 443 for https
 	Port     int `json:"port"`
 	failures int
 }
 
-//NewDevice -
+// NewDevice -
 func NewDevice(host string, port int) (Device, error) {
 	dev := Device{
 		Host:     host,
@@ -47,7 +47,7 @@ func NewDeviceFromRequestBody(body io.ReadCloser) (Device, error) {
 	return dev, nil
 }
 
-//URL returns a network address including the ip address and port that this device is listening on
+// URL returns a network address including the ip address and port that this device is listening on
 func (d Device) URL() string {
 	return d.protocol() + "://" + d.Host + ":" + strconv.Itoa(d.Port)
 }
@@ -62,16 +62,16 @@ func (d Device) protocol() string {
 	return protocol
 }
 
-//ProcessHealthCheckResult - updates health check failure count & returns
+// ProcessHealthCheckResult - updates health check failure count & returns
 func (d *Device) ProcessHealthCheckResult(result bool) {
-	if result { //Healthy
+	if result { // Healthy
 		d.failures = 0
 	} else {
 		d.failures++
 	}
 }
 
-//Failed - If true, device should be deregistered
+// Failed - If true, device should be deregistered
 func (d Device) Unresponsive() bool {
 	failThreshold := 3
 	return d.failures >= failThreshold
