@@ -3,6 +3,7 @@ package scanner
 import (
 	"errors"
 	"fmt"
+	"net"
 	"net/http"
 	"strconv"
 	"time"
@@ -21,18 +22,58 @@ type DeviceResponse struct {
 	Device  device.Device
 }
 
-func ScanNetwork(addressRoot string) ([]device.Device, error) {
+type IPScanResults struct {
+	IPv4Addresses []net.IP
+	IPv6Addresses []net.IP
+}
+
+func GetLocalAddresses() (IPScanResults, error) {
+	logger := getScannerLogger()
+	results := IPScanResults{
+		IPv4Addresses: []net.IP{},
+		IPv6Addresses: []net.IP{},
+	}
+	ifaces, err := net.Interfaces()
+	if err != nil {
+		logger.Error(fmt.Errorf("localAddresses: %+v", err.Error()))
+		return results, err
+	}
+	for _, i := range ifaces {
+		addrs, err := i.Addrs()
+		if err != nil {
+			logger.Error(fmt.Errorf("localAddresses: %+v", err.Error()))
+			continue
+		}
+		for _, a := range addrs {
+			switch v := a.(type) {
+			case *net.IPAddr:
+				logger.Trace(fmt.Sprintf("%v : %s (%s)\n", i.Name, v, v.IP.DefaultMask()))
+
+			case *net.IPNet:
+				logger.Trace(fmt.Sprintf("%s : %v [%v/%v]\n", i.Name, v, v.IP, v.Mask))
+				if v.IP.To4() != nil {
+					results.IPv4Addresses = append(results.IPv4Addresses, v.IP)
+				} else {
+					results.IPv6Addresses = append(results.IPv6Addresses, v.IP)
+				}
+			}
+		}
+	}
+	return results, nil
+}
+
+func ScanIPs(ipSet []net.IP) ([]device.Device, error) {
 	logger := getScannerLogger()
 	deviceList := []device.Device{}
-	ipRange := 255
+
+	logger.Info("Scan IPs: ", ipSet)
 
 	ch := make(chan DeviceResponse)
-	for i := 1; i < ipRange; i++ {
-		host := addressRoot + strconv.Itoa(i)
-		go ProbeHostConcurrent(host, ch)
+	for _, ip := range ipSet {
+		go ProbeHostConcurrent(ip.String(), ch)
 	}
 
-	for i := 1; i < ipRange; i++ {
+	for i := 1; i < len(ipSet); i++ {
 		tmpResponse := <-ch
 		if tmpResponse.Success {
 			deviceList = append(deviceList, tmpResponse.Device)

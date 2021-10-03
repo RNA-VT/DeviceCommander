@@ -1,10 +1,8 @@
 package cluster
 
 import (
-	log "github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
-
 	"github.com/rna-vt/devicecommander/scanner"
+	log "github.com/sirupsen/logrus"
 )
 
 func getRegistrationLogger() *log.Entry {
@@ -16,7 +14,13 @@ func DeviceDiscovery(c *Cluster) {
 	logger := getRegistrationLogger()
 	logger.Info("Device discovery")
 
-	deviceList, err := scanner.ScanNetwork(viper.Get("IP_ADDRESS_ROOT").(string))
+	ipResults, err := scanner.GetLocalAddresses()
+	if err != nil {
+		logger.Error(err)
+		return
+	}
+
+	deviceList, err := scanner.ScanIPs(ipResults.IPv4Addresses)
 	if err != nil {
 		logger.Error(err)
 		return
