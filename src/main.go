@@ -8,6 +8,7 @@ import (
 
 	"github.com/rna-vt/devicecommander/app"
 	"github.com/rna-vt/devicecommander/cluster"
+	"github.com/rna-vt/devicecommander/postgres"
 	"github.com/rna-vt/devicecommander/routes"
 )
 
@@ -21,19 +22,33 @@ func main() {
 
 	fullHostname := host + ":" + port
 
+	dbConfig := postgres.DbConfig{
+		Name:     "postgres",
+		Host:     "0.0.0.0",
+		Port:     "5432",
+		UserName: "postgres",
+		Password: "changeme",
+	}
+	deviceService, err := postgres.NewDeviceService(dbConfig)
+	if err != nil {
+		log.Error(err)
+		return
+	}
+
 	app := app.Application{
 		Cluster: cluster.Cluster{
 			Name: viper.GetString("CLUSTER_NAME"),
 		},
-		Echo:     echo.New(),
-		Hostname: fullHostname,
+		Echo:          echo.New(),
+		Hostname:      fullHostname,
+		DeviceService: deviceService,
 	}
 	var API routes.APIService
 
 	API.Cluster = &app.Cluster
 
 	app.Cluster.Start()
-	routes.ConfigureRoutes(fullHostname, app.Echo, API)
+	routes.ConfigureRoutes(fullHostname, app.Echo, API, &app.DeviceService)
 }
 
 func configureEnvironment() {

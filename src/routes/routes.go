@@ -9,15 +9,17 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/rna-vt/devicecommander/cluster"
+	"github.com/rna-vt/devicecommander/postgres"
 )
 
 // APIService -
 type APIService struct {
-	Cluster *cluster.Cluster
+	Cluster       *cluster.Cluster
+	DeviceService *postgres.DeviceService
 }
 
 // ConfigureRoutes will use Echo to start listening on the appropriate paths
-func ConfigureRoutes(listenURL string, e *echo.Echo, API APIService) {
+func ConfigureRoutes(listenURL string, e *echo.Echo, API APIService, deviceService *postgres.DeviceService) {
 	// Middleware
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
@@ -41,10 +43,11 @@ func ConfigureRoutes(listenURL string, e *echo.Echo, API APIService) {
 	API.addRegistrationRoutes(e)
 	API.addInfoRoutes(e)
 	API.addManageRoutes(e)
+	API.addGraphQLRoutes(e, deviceService)
 
 	log.WithFields(log.Fields{
 		"module": "routes",
-	}).Info("Configure routes listening on " + listenURL)
+	}).Info("Configured routes listening on " + listenURL)
 
 	log.Println("*****************************************************")
 	log.Println("~Rejoice~ The Device Commander Lives Again! ~Rejoice~")

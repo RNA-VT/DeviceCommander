@@ -2,8 +2,8 @@ package device
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
-	"strconv"
 )
 
 // Device represents a compliant physical component & its web address.
@@ -49,7 +49,7 @@ func NewDeviceFromRequestBody(body io.ReadCloser) (Device, error) {
 
 // URL returns a network address including the ip address and port that this device is listening on
 func (d Device) URL() string {
-	return d.protocol() + "://" + d.Host + ":" + strconv.Itoa(d.Port)
+	return fmt.Sprintf("%s://%s:%d", d.protocol(), d.Host, d.Port)
 }
 
 func (d Device) protocol() string {
