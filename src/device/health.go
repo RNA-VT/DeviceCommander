@@ -8,12 +8,12 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func (d Device) CheckHealth() {
+func (d *DeviceObj) CheckHealth() {
 	deviceLogger := getDeviceLogger()
 
 	url := d.URL() + "/health"
 
-	deviceLogger.Info("Checking Device:", d.ID, url)
+	deviceLogger.Info("Checking Device:", d.device.ID, url)
 
 	resp, err := http.Get(url)
 	if err != nil {
@@ -34,7 +34,7 @@ func (d Device) CheckHealth() {
 	// }
 }
 
-func (d Device) evaluateHealthCheckResponse(resp *http.Response) bool {
+func (d DeviceObj) evaluateHealthCheckResponse(resp *http.Response) bool {
 	deviceLogger := getDeviceLogger()
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
@@ -45,12 +45,12 @@ func (d Device) evaluateHealthCheckResponse(resp *http.Response) bool {
 	healthy := false
 	switch resp.StatusCode {
 	case 200:
-		deviceLogger.WithFields(log.Fields{"event": "isHealthy"}).Info(d.ID)
+		deviceLogger.WithFields(log.Fields{"event": "isHealthy"}).Info(d.device.ID)
 		healthy = true
 	case 404:
-		deviceLogger.Error("Registered Device Not Found: " + d.ID)
+		deviceLogger.Error("Registered Device Not Found: " + d.device.ID.String())
 	default:
-		deviceLogger.Error("Unexpected Result: " + d.ID)
+		deviceLogger.Error("Unexpected Result: " + d.device.ID.String())
 		deviceLogger.Error("Status Code: " + strconv.Itoa(resp.StatusCode))
 		deviceLogger.Error("Response: " + string(body))
 	}

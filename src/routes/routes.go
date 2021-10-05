@@ -42,7 +42,6 @@ func ConfigureRoutes(listenURL string, e *echo.Echo, API APIService, deviceServi
 
 	API.addRegistrationRoutes(e)
 	API.addInfoRoutes(e)
-	API.addManageRoutes(e)
 	API.addGraphQLRoutes(e, deviceService)
 
 	log.WithFields(log.Fields{

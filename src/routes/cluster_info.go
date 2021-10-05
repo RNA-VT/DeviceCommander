@@ -3,7 +3,10 @@ package routes
 import (
 	"net/http"
 
+	"github.com/google/uuid"
 	"github.com/labstack/echo"
+
+	"github.com/rna-vt/devicecommander/graph/model"
 )
 
 func (a *APIService) addInfoRoutes(e *echo.Echo) {
@@ -19,18 +22,34 @@ func (a APIService) health(c echo.Context) error {
 }
 
 func (a APIService) getClusterInfo(c echo.Context) error {
-	return c.JSON(http.StatusOK, a.Cluster)
+	logger := getRouteLogger()
+	devices, err := a.DeviceService.GetAll()
+	if err != nil {
+		logger.Error(err)
+		return err
+	}
+
+	return c.JSON(http.StatusOK, &devices[0])
 }
 
 func (a APIService) getDevices(c echo.Context) error {
-	return c.JSON(http.StatusOK, a.Cluster.Devices)
+	devices, err := a.DeviceService.GetAll()
+	if err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, devices)
 }
 
 func (a APIService) getDevice(c echo.Context) error {
-	devices := a.Cluster.GetDevices()
-	dev, ok := devices[c.Param("id")]
-	if !ok {
-		return c.JSON(http.StatusNotFound, "ID Not Found")
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		return err
 	}
-	return c.JSON(http.StatusOK, dev)
+
+	device, err := a.DeviceService.Get(model.Device{ID: id})
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusOK, device)
 }

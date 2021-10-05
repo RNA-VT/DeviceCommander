@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
+
 	// _ "github.com/jackc/pgx/v4/stdlib"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -41,6 +42,7 @@ func NewDeviceService(config DbConfig) (DeviceService, error) {
 }
 
 func (s *DeviceService) Create(newDeviceArgs model.NewDevice) (*model.Device, error) {
+	logger := getPostgresLogger()
 	newDevice := model.Device{
 		ID:   uuid.New(),
 		Host: newDeviceArgs.Host,
@@ -60,10 +62,12 @@ func (s *DeviceService) Create(newDeviceArgs model.NewDevice) (*model.Device, er
 		return &newDevice, result.Error
 	}
 
+	logger.Debug("Created device " + newDevice.ID.String())
 	return &newDevice, nil
 }
 
 func (s *DeviceService) Update(input model.UpdateDevice) error {
+	logger := getPostgresLogger()
 	id, err := uuid.Parse(input.ID)
 	if err != nil {
 		return err
@@ -74,10 +78,12 @@ func (s *DeviceService) Update(input model.UpdateDevice) error {
 		return result.Error
 	}
 
+	logger.Debug("Updated device " + device.ID.String())
 	return nil
 }
 
 func (s *DeviceService) Delete(uuid string) (*model.Device, error) {
+	logger := getPostgresLogger()
 	var toBeDeleted model.Device
 	result := s.dBConnection.First(&toBeDeleted, "ID = ?", uuid)
 	if result.Error != nil {
@@ -87,6 +93,7 @@ func (s *DeviceService) Delete(uuid string) (*model.Device, error) {
 	// TODO: Implement soft deletes
 	s.dBConnection.Delete(model.Device{}, uuid)
 
+	logger.Debug("Deleted device " + uuid)
 	return &toBeDeleted, nil
 }
 

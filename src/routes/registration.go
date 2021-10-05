@@ -24,7 +24,10 @@ func (a *APIService) joinNetwork(c echo.Context) error {
 		return err
 	}
 
-	a.Cluster.AddDevice(dev)
+	newDevice, err := a.DeviceService.Create(dev)
+	if err != nil {
+		return err
+	}
 
-	return c.JSON(http.StatusOK, "Registered.")
+	return c.JSON(http.StatusOK, newDevice)
 }

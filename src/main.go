@@ -37,7 +37,8 @@ func main() {
 
 	app := app.Application{
 		Cluster: cluster.Cluster{
-			Name: viper.GetString("CLUSTER_NAME"),
+			Name:          viper.GetString("CLUSTER_NAME"),
+			DeviceService: &deviceService,
 		},
 		Echo:          echo.New(),
 		Hostname:      fullHostname,

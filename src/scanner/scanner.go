@@ -11,6 +11,7 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/rna-vt/devicecommander/device"
+	"github.com/rna-vt/devicecommander/graph/model"
 )
 
 func getScannerLogger() *log.Entry {
@@ -19,7 +20,7 @@ func getScannerLogger() *log.Entry {
 
 type DeviceResponse struct {
 	Success bool
-	Device  device.Device
+	Device  model.NewDevice
 }
 
 type IPScanResults struct {
@@ -62,9 +63,9 @@ func GetLocalAddresses() (IPScanResults, error) {
 	return results, nil
 }
 
-func ScanIPs(ipSet []net.IP) ([]device.Device, error) {
+func ScanIPs(ipSet []net.IP) ([]model.NewDevice, error) {
 	logger := getScannerLogger()
-	deviceList := []device.Device{}
+	deviceList := []model.NewDevice{}
 
 	logger.Info("Scan IPs: ", ipSet)
 
@@ -98,7 +99,7 @@ func ProbeHostConcurrent(host string, ch chan<- DeviceResponse) {
 	}
 }
 
-func ProbeHost(host string) (device.Device, error) {
+func ProbeHost(host string) (model.NewDevice, error) {
 	logger := getScannerLogger()
 	url := "http://" + host + "/registration"
 	logger.Trace("Probing ", host)
@@ -108,7 +109,7 @@ func ProbeHost(host string) (device.Device, error) {
 	}
 	resp, err := client.Get(url)
 	if err != nil {
-		return device.Device{}, err
+		return model.NewDevice{}, err
 	}
 
 	switch resp.StatusCode {
@@ -126,9 +127,9 @@ func ProbeHost(host string) (device.Device, error) {
 		return dev, nil
 	case 404:
 		logger.Debug("Host Not Found: " + host)
-		return device.Device{}, errors.New("host not found " + host)
+		return model.NewDevice{}, errors.New("host not found " + host)
 	default:
 		logger.Debug("Attempt to register " + host + " resulted in an unexpected response:" + strconv.Itoa(resp.StatusCode))
-		return device.Device{}, fmt.Errorf("attempt to register %s resulted in an unexpected response: %d", host, resp.StatusCode)
+		return model.NewDevice{}, fmt.Errorf("attempt to register %s resulted in an unexpected response: %d", host, resp.StatusCode)
 	}
 }
