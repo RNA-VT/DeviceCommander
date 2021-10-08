@@ -29,7 +29,7 @@ func (a APIService) getClusterInfo(c echo.Context) error {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, &devices[0])
+	return c.JSON(http.StatusOK, &devices)
 }
 
 func (a APIService) getDevices(c echo.Context) error {

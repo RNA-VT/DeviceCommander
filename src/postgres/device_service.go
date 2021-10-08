@@ -5,7 +5,6 @@ import (
 
 	"github.com/google/uuid"
 
-	// _ "github.com/jackc/pgx/v4/stdlib"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
@@ -49,6 +48,10 @@ func (s *DeviceService) Create(newDeviceArgs model.NewDevice) (*model.Device, er
 		Port: newDeviceArgs.Port,
 	}
 
+	if newDeviceArgs.Mac != nil {
+		newDevice.MAC = *newDeviceArgs.Mac
+	}
+
 	if newDeviceArgs.Name != nil {
 		newDevice.Name = *newDeviceArgs.Name
 	}
@@ -82,36 +85,36 @@ func (s *DeviceService) Update(input model.UpdateDevice) error {
 	return nil
 }
 
-func (s *DeviceService) Delete(uuid string) (*model.Device, error) {
+func (s *DeviceService) Delete(id string) (*model.Device, error) {
 	logger := getPostgresLogger()
 	var toBeDeleted model.Device
-	result := s.dBConnection.First(&toBeDeleted, "ID = ?", uuid)
+	result := s.dBConnection.First(&toBeDeleted, "ID = ?", id)
 	if result.Error != nil {
 		return &toBeDeleted, result.Error
 	}
 
-	// TODO: Implement soft deletes
-	s.dBConnection.Delete(model.Device{}, uuid)
+	logger.Debug(toBeDeleted)
 
-	logger.Debug("Deleted device " + uuid)
+	uid, err := uuid.Parse(id)
+	if err != nil {
+		return &toBeDeleted, err
+	}
+	toBeDeleted.ID = uid
+
+	// TODO: Implement soft deletes
+	s.dBConnection.Delete(model.Device{}, toBeDeleted)
+
+	logger.Debug("Deleted device " + id)
 	return &toBeDeleted, nil
 }
 
 func (s *DeviceService) Get(devQuery model.Device) ([]*model.Device, error) {
-	logger := getPostgresLogger()
 	devices := []*model.Device{}
-	logger.Info(1)
-	logger.Info(devQuery)
-	logger.Info(2)
-	logger.Info(s)
-	logger.Info(3)
 	result := s.dBConnection.Where(devQuery).Find(&devices)
-	logger.Info(4)
 	if result.Error != nil {
 		return devices, result.Error
 	}
 
-	fmt.Println(devices)
 	return devices, nil
 }
 
@@ -122,7 +125,6 @@ func (s *DeviceService) GetAll() ([]*model.Device, error) {
 		return devices, result.Error
 	}
 
-	fmt.Println(devices)
 	return devices, nil
 }
 

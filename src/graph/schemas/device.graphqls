@@ -1,5 +1,6 @@
 type Device {
   ID: String!
+  MAC: String
   Name: String
   Description: String
   Host: String
@@ -7,6 +8,7 @@ type Device {
 }
 
 input NewDevice {
+  MAC: String
   Name: String
   Description: String
   Host: String!
@@ -15,6 +17,7 @@ input NewDevice {
 
 input UpdateDevice {
   ID: String!
+  MAC: String
   Name: String
   Description: String
   Host: String

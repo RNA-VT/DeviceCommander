@@ -3,6 +3,7 @@
 package model
 
 type NewDevice struct {
+	Mac         *string `json:"MAC"`
 	Name        *string `json:"Name"`
 	Description *string `json:"Description"`
 	Host        string  `json:"Host"`
@@ -11,6 +12,7 @@ type NewDevice struct {
 
 type UpdateDevice struct {
 	ID          string  `json:"ID"`
+	Mac         *string `json:"MAC"`
 	Name        *string `json:"Name"`
 	Description *string `json:"Description"`
 	Host        *string `json:"Host"`

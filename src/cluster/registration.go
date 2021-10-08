@@ -1,9 +1,8 @@
 package cluster
 
 import (
-	log "github.com/sirupsen/logrus"
-
 	"github.com/rna-vt/devicecommander/scanner"
+	log "github.com/sirupsen/logrus"
 )
 
 func getRegistrationLogger() *log.Entry {
@@ -15,25 +14,32 @@ func DeviceDiscovery(c *Cluster) {
 	logger := getRegistrationLogger()
 	logger.Info("Device discovery")
 
-	ipResults, err := scanner.GetLocalAddresses()
-	if err != nil {
-		logger.Error(err)
-		return
+	arpScanner := scanner.ArpScanner{
+		LoopDelay:     60,
+		DeviceService: &c.DeviceService,
 	}
 
-	deviceList, err := scanner.ScanIPs(ipResults.IPv4Addresses)
-	if err != nil {
-		logger.Error(err)
-		return
-	}
+	arpScanner.Start()
 
-	if len(deviceList) > 0 {
-		// TODO: Bulk insert
-		for _, d := range deviceList {
-			_, err := c.DeviceService.Create(d)
-			if err != nil {
-				logger.Error(err)
-			}
-		}
-	}
+	// ipResults, err := scanner.GetLocalAddresses()
+	// if err != nil {
+	// 	logger.Error(err)
+	// 	return
+	// }
+
+	// deviceList, err := scanner.ScanIPs(ipResults.IPv4Addresses)
+	// if err != nil {
+	// 	logger.Error(err)
+	// 	return
+	// }
+
+	// if len(deviceList) > 0 {
+	// 	// TODO: Bulk insert
+	// 	for _, d := range deviceList {
+	// 		_, err := c.DeviceService.Create(d)
+	// 		if err != nil {
+	// 			logger.Error(err)
+	// 		}
+	// 	}
+	// }
 }

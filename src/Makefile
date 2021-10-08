@@ -8,4 +8,4 @@ gqlgen:
 	~/go/bin/gqlgen generate --verbose
 
 run:
-	go run main.go
+	sudo go run main.go

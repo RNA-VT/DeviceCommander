@@ -4,9 +4,9 @@ go 1.15
 
 require (
 	github.com/99designs/gqlgen v0.14.0
+	github.com/google/gopacket v1.1.19
 	github.com/google/uuid v1.3.0
 	github.com/hashicorp/golang-lru v0.5.1 // indirect
-	github.com/jackc/pgx/v4 v4.13.0
 	github.com/labstack/echo v3.3.10+incompatible
 	github.com/labstack/gommon v0.3.0 // indirect
 	github.com/lib/pq v1.10.3 // indirect

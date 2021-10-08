@@ -16,6 +16,11 @@ github.com/agnivade/levenshtein
 github.com/dgrijalva/jwt-go
 # github.com/fsnotify/fsnotify v1.4.7
 github.com/fsnotify/fsnotify
+# github.com/google/gopacket v1.1.19
+## explicit
+github.com/google/gopacket
+github.com/google/gopacket/layers
+github.com/google/gopacket/pcap
 # github.com/google/uuid v1.3.0
 ## explicit
 github.com/google/uuid
@@ -36,6 +41,8 @@ github.com/hashicorp/hcl/hcl/token
 github.com/hashicorp/hcl/json/parser
 github.com/hashicorp/hcl/json/scanner
 github.com/hashicorp/hcl/json/token
+# github.com/irai/arp v1.4.0
+## explicit
 # github.com/jackc/chunkreader/v2 v2.0.1
 github.com/jackc/chunkreader/v2
 # github.com/jackc/pgconn v1.10.0
@@ -53,7 +60,6 @@ github.com/jackc/pgservicefile
 # github.com/jackc/pgtype v1.8.1
 github.com/jackc/pgtype
 # github.com/jackc/pgx/v4 v4.13.0
-## explicit
 github.com/jackc/pgx/v4
 github.com/jackc/pgx/v4/internal/sanitize
 github.com/jackc/pgx/v4/stdlib

@@ -14,10 +14,6 @@ import (
 	"github.com/rna-vt/devicecommander/graph/model"
 )
 
-func getScannerLogger() *log.Entry {
-	return log.WithFields(log.Fields{"module": "scanner"})
-}
-
 type DeviceResponse struct {
 	Success bool
 	Device  model.NewDevice
