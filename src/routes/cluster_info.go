@@ -40,16 +40,17 @@ func (a APIService) getDevices(c echo.Context) error {
 	return c.JSON(http.StatusOK, devices)
 }
 
-func (a APIService) getDevice(c echo.Context) error {
+func (a *APIService) getDevice(c echo.Context) error {
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		return err
 	}
 
-	device, err := a.DeviceService.Get(model.Device{ID: id})
+	tmpDev := model.Device{ID: id}
+	device, err := a.DeviceService.Get(tmpDev)
 	if err != nil {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, device)
+	return c.JSON(http.StatusOK, &device)
 }

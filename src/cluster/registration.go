@@ -30,7 +30,10 @@ func DeviceDiscovery(c *Cluster) {
 	if len(deviceList) > 0 {
 		// TODO: Bulk insert
 		for _, d := range deviceList {
-			c.DeviceService.Create(d)
+			_, err := c.DeviceService.Create(d)
+			if err != nil {
+				logger.Error(err)
+			}
 		}
 	}
 }

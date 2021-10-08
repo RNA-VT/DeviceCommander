@@ -27,5 +27,7 @@ func (a *Application) Start() {
 		DeviceService: &a.DeviceService,
 	}
 
-	routes.ConfigureRoutes(a.Hostname, a.Echo, api, &a.DeviceService)
+	a.Cluster.Start()
+
+	routes.ConfigureRoutes(a.Hostname, a.Echo, &api, &a.DeviceService)
 }

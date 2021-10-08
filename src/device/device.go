@@ -8,32 +8,17 @@ import (
 	"github.com/rna-vt/devicecommander/graph/model"
 )
 
-// // Device represents a compliant physical component & its web address.
-// type Device struct {
-// 	// ID is the serial nummber of the connecting device
-// 	ID string `json:"id"`
-// 	// Name - Optional Device Nickname
-// 	Name string `json:"name"`
-// 	// Description - Optional text describing this device
-// 	Description string `json:"description"`
-// 	// Host - Device Api Host
-// 	Host string `json:"host"`
-// 	// Port - Device Api Port. Set to 443 for https
-// 	Port     int `json:"port"`
-// 	failures int
-// }
-
 type DeviceObj struct {
 	device *model.Device
 }
 
 // NewDevice -
-func NewDeviceObj(d *model.Device) (DeviceObj, error) {
+func NewDeviceObj(d *model.Device) (*DeviceObj, error) {
 	dev := DeviceObj{
 		device: d,
 	}
 
-	return dev, nil
+	return &dev, nil
 }
 
 // NewDevice -

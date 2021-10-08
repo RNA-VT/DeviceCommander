@@ -38,7 +38,7 @@ func main() {
 	app := app.Application{
 		Cluster: cluster.Cluster{
 			Name:          viper.GetString("CLUSTER_NAME"),
-			DeviceService: &deviceService,
+			DeviceService: deviceService,
 		},
 		Echo:          echo.New(),
 		Hostname:      fullHostname,
@@ -47,9 +47,7 @@ func main() {
 	var API routes.APIService
 
 	API.Cluster = &app.Cluster
-
-	app.Cluster.Start()
-	routes.ConfigureRoutes(fullHostname, app.Echo, API, &app.DeviceService)
+	app.Start()
 }
 
 func configureEnvironment() {

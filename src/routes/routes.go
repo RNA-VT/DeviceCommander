@@ -19,7 +19,7 @@ type APIService struct {
 }
 
 // ConfigureRoutes will use Echo to start listening on the appropriate paths
-func ConfigureRoutes(listenURL string, e *echo.Echo, API APIService, deviceService *postgres.DeviceService) {
+func ConfigureRoutes(listenURL string, e *echo.Echo, api *APIService, deviceService *postgres.DeviceService) {
 	// Middleware
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
@@ -38,11 +38,11 @@ func ConfigureRoutes(listenURL string, e *echo.Echo, API APIService, deviceServi
 	// Routes
 	e.Static("/static", frontendRoot+"static")
 	e.File("/*", frontendRoot+"index.html")
-	e.GET("/v1", API.defaultGet)
+	e.GET("/v1", api.defaultGet)
 
-	API.addRegistrationRoutes(e)
-	API.addInfoRoutes(e)
-	API.addGraphQLRoutes(e, deviceService)
+	api.addRegistrationRoutes(e)
+	api.addInfoRoutes(e)
+	api.addGraphQLRoutes(e, deviceService)
 
 	log.WithFields(log.Fields{
 		"module": "routes",

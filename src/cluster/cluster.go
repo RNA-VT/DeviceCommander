@@ -14,8 +14,7 @@ import (
 // Cluster - This object defines an array of Devices
 type Cluster struct {
 	Name          string
-	DeviceService *postgres.DeviceService
-	// Devices       []device.Device
+	DeviceService postgres.DeviceService
 }
 
 // PrintClusterInfo will cleanly print out info about the cluster
@@ -64,11 +63,9 @@ func (c *Cluster) Start() {
 				tmp, err := device.NewDeviceObj(d)
 				if err != nil {
 					logger.Error(err)
-					return
 				} else {
 					tmp.CheckHealth()
 				}
-
 			}
 		}
 	}()

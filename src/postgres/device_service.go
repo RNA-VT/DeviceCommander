@@ -98,8 +98,15 @@ func (s *DeviceService) Delete(uuid string) (*model.Device, error) {
 }
 
 func (s *DeviceService) Get(devQuery model.Device) ([]*model.Device, error) {
+	logger := getPostgresLogger()
 	devices := []*model.Device{}
+	logger.Info(1)
+	logger.Info(devQuery)
+	logger.Info(2)
+	logger.Info(s)
+	logger.Info(3)
 	result := s.dBConnection.Where(devQuery).Find(&devices)
+	logger.Info(4)
 	if result.Error != nil {
 		return devices, result.Error
 	}
