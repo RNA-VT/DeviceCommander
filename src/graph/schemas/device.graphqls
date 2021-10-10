@@ -5,6 +5,7 @@ type Device {
   Description: String
   Host: String
   Port: Int
+  Active: Boolean
 }
 
 input NewDevice {
@@ -13,6 +14,7 @@ input NewDevice {
   Description: String
   Host: String!
   Port: Int!
+  Active: Boolean
 }
 
 input UpdateDevice {
@@ -22,6 +24,7 @@ input UpdateDevice {
   Description: String
   Host: String
   Port: Int
+  Active: Boolean
 }
 
 extend type Query {

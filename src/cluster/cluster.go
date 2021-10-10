@@ -9,7 +9,6 @@ import (
 
 	"github.com/rna-vt/devicecommander/device"
 	"github.com/rna-vt/devicecommander/postgres"
-	"github.com/rna-vt/devicecommander/scanner"
 )
 
 // Cluster - This object defines an array of Devices
@@ -36,24 +35,17 @@ func (c Cluster) PrintClusterInfo() {
 // Start begins the registration and health check goroutines
 func (c *Cluster) Start() {
 	logger := getClusterLogger()
-	// discoveryPeriod := viper.GetInt("DISCOVERY_PERIOD")
+	discoveryPeriod := viper.GetInt("DISCOVERY_PERIOD")
 	healthCheckPeriod := viper.GetInt("HEALTH_CHECK_PERIOD")
 	clusterLogger := getClusterLogger()
 
-	// Device Discovery
-	arpScanner := scanner.ArpScanner{
-		LoopDelay:     10,
-		DeviceService: &c.DeviceService,
-	}
-
-	go arpScanner.Start()
-	// go func() {
-	// 	ticker := time.NewTicker(time.Duration(discoveryPeriod) * time.Second)
-	// 	for range ticker.C {
-	// 		clusterLogger.Info("Begin Device Discovery... ")
-	// 		DeviceDiscovery(c)
-	// 	}
-	// }()
+	go func() {
+		ticker := time.NewTicker(time.Duration(discoveryPeriod) * time.Second)
+		for range ticker.C {
+			clusterLogger.Info("Begin Device Discovery... ")
+			DeviceDiscovery(c)
+		}
+	}()
 
 	// Health Check
 	go func() {

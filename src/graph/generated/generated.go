@@ -45,6 +45,7 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Device struct {
+		Active      func(childComplexity int) int
 		Description func(childComplexity int) int
 		Host        func(childComplexity int) int
 		ID          func(childComplexity int) int
@@ -90,6 +91,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e}
 	_ = ec
 	switch typeName + "." + field {
+
+	case "Device.Active":
+		if e.complexity.Device.Active == nil {
+			break
+		}
+
+		return e.complexity.Device.Active(childComplexity), true
 
 	case "Device.Description":
 		if e.complexity.Device.Description == nil {
@@ -247,6 +255,7 @@ var sources = []*ast.Source{
   Description: String
   Host: String
   Port: Int
+  Active: Boolean
 }
 
 input NewDevice {
@@ -255,6 +264,7 @@ input NewDevice {
   Description: String
   Host: String!
   Port: Int!
+  Active: Boolean
 }
 
 input UpdateDevice {
@@ -264,6 +274,7 @@ input UpdateDevice {
   Description: String
   Host: String
   Port: Int
+  Active: Boolean
 }
 
 extend type Query {
@@ -573,6 +584,38 @@ func (ec *executionContext) _Device_Port(ctx context.Context, field graphql.Coll
 	res := resTmp.(int)
 	fc.Result = res
 	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Device_Active(ctx context.Context, field graphql.CollectedField, obj *model.Device) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Device",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Active, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalOBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_createDevice(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1978,6 +2021,14 @@ func (ec *executionContext) unmarshalInputNewDevice(ctx context.Context, obj int
 			if err != nil {
 				return it, err
 			}
+		case "Active":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Active"))
+			it.Active, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -2041,6 +2092,14 @@ func (ec *executionContext) unmarshalInputUpdateDevice(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
+		case "Active":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Active"))
+			it.Active, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -2090,6 +2149,8 @@ func (ec *executionContext) _Device(ctx context.Context, sel ast.SelectionSet, o
 			out.Values[i] = ec._Device_Host(ctx, field, obj)
 		case "Port":
 			out.Values[i] = ec._Device_Port(ctx, field, obj)
+		case "Active":
+			out.Values[i] = ec._Device_Active(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

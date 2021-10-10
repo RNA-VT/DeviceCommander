@@ -8,6 +8,7 @@ type NewDevice struct {
 	Description *string `json:"Description"`
 	Host        string  `json:"Host"`
 	Port        int     `json:"Port"`
+	Active      *bool   `json:"Active"`
 }
 
 type UpdateDevice struct {
@@ -17,4 +18,5 @@ type UpdateDevice struct {
 	Description *string `json:"Description"`
 	Host        *string `json:"Host"`
 	Port        *int    `json:"Port"`
+	Active      *bool   `json:"Active"`
 }

@@ -14,11 +14,11 @@ func (d *DeviceObj) CheckHealth() {
 
 	url := d.URL() + "/health"
 
-	logger.Info("Checking Device:", d.device.ID, url)
+	logger.Info(fmt.Sprintf("Checking Device: [%s] at %s", d.device.ID, url))
 
 	resp, err := http.Get(url)
 	if err != nil {
-		logger.Warn(fmt.Sprintf("[%s] %s", url, err.Error()))
+		logger.Warn(fmt.Sprintf("Error checking [%s] %s", url, err.Error()))
 		return
 	}
 
