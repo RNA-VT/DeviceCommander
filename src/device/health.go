@@ -9,6 +9,8 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// CheckHealth probes the health endpoint of the device in question. The health
+// endpoint is currently at Device.URL()/health
 func (d *DeviceObj) CheckHealth() {
 	logger := getDeviceLogger()
 
@@ -34,6 +36,10 @@ func (d *DeviceObj) CheckHealth() {
 	// }
 }
 
+// evaluateHealthCheckResponse inspects the repsponse from a device and extracts
+// a few details. Firstly it will create useful logs for better understanding
+// the response from the device health check. Secondly, it will return a true/false
+// determining the health of the device.
 func (d *DeviceObj) evaluateHealthCheckResponse(resp *http.Response) bool {
 	logger := getDeviceLogger()
 	defer resp.Body.Close()

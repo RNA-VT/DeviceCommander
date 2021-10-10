@@ -8,11 +8,13 @@ import (
 	"github.com/rna-vt/devicecommander/graph/model"
 )
 
+// DeviceObj is a wrapper for the Device struct. It aims to provide a helpful
+// layer of abstraction away from the gqlgen/postgres models.
 type DeviceObj struct {
 	device *model.Device
 }
 
-// NewDevice -
+// NewDeviceObj creates a new instance of a DeviceObj
 func NewDeviceObj(d *model.Device) (*DeviceObj, error) {
 	dev := DeviceObj{
 		device: d,
@@ -32,6 +34,7 @@ func NewDevice(host string, port int) (model.Device, error) {
 	return dev, nil
 }
 
+// NewDeviceFromRequestBody creates a new instance of a NewDevice
 func NewDeviceFromRequestBody(body io.ReadCloser) (model.NewDevice, error) {
 	deviceLogger := getDeviceLogger()
 
@@ -52,6 +55,7 @@ func (d DeviceObj) URL() string {
 	return fmt.Sprintf("%s://%s:%d", d.protocol(), d.device.Host, d.device.Port)
 }
 
+// protocol determines the http/https protocol by Port allocation
 func (d DeviceObj) protocol() string {
 	var protocol string
 	if d.device.Port == 443 {

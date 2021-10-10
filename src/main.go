@@ -22,12 +22,12 @@ func main() {
 
 	fullHostname := host + ":" + port
 
-	dbConfig := postgres.DbConfig{
-		Name:     "postgres",
-		Host:     "0.0.0.0",
-		Port:     "5432",
-		UserName: "postgres",
-		Password: "changeme",
+	dbConfig := postgres.DBConfig{
+		Name:     viper.GetString("POSTGRES_NAME"),
+		Host:     viper.GetString("POSTGRES_HOST"),
+		Port:     viper.GetString("POSTGRES_PORT"),
+		UserName: viper.GetString("POSTGRES_USER"),
+		Password: viper.GetString("POSTGRES_PASSWORD"),
 	}
 	deviceService, err := postgres.NewDeviceService(dbConfig)
 	if err != nil {
@@ -74,4 +74,10 @@ func configureEnvironment() {
 	viper.SetDefault("IP_ADDRESS_ROOT", "192.16.1.")
 	viper.SetDefault("DISCOVERY_PERIOD", 30)
 	viper.SetDefault("HEALTH_CHECK_PERIOD", 60)
+
+	viper.SetDefault("POSTGRES_NAME", "postgres")
+	viper.SetDefault("POSTGRES_HOST", "0.0.0.0")
+	viper.SetDefault("POSTGRES_PORT", 5432)
+	viper.SetDefault("POSTGRES_USER", "postgres")
+	viper.SetDefault("POSTGRES_PASSWORD", "changeme")
 }

@@ -4,7 +4,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type DbConfig struct {
+type DBConfig struct {
 	Name     string
 	Host     string
 	Port     string

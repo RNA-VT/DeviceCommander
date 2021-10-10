@@ -11,7 +11,9 @@ import (
 	"github.com/rna-vt/devicecommander/postgres"
 )
 
-// Cluster - This object defines an array of Devices
+// Cluster is responsible for maintaing the cluster like state of DeviceCommander.
+// It does things like probe the current active set for health and collection
+// of new devices.
 type Cluster struct {
 	Name          string
 	DeviceService postgres.DeviceService
@@ -32,13 +34,15 @@ func (c Cluster) PrintClusterInfo() {
 	log.Println()
 }
 
-// Start begins the registration and health check goroutines
+// Start begins the collection of new devices (registration) and device health
+// check goroutines.
 func (c *Cluster) Start() {
 	logger := getClusterLogger()
 	discoveryPeriod := viper.GetInt("DISCOVERY_PERIOD")
 	healthCheckPeriod := viper.GetInt("HEALTH_CHECK_PERIOD")
 	clusterLogger := getClusterLogger()
 
+	// Discover and collection of new devices.
 	go func() {
 		ticker := time.NewTicker(time.Duration(discoveryPeriod) * time.Second)
 		for range ticker.C {

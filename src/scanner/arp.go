@@ -32,6 +32,10 @@ type ArpScanner struct {
 	Stop          chan struct{}
 }
 
+// Start is the entrypoint for the ArpScanner. It will run two concurrent
+// routines for reading and writing of arp messages. The scanner can be stopped
+// by closing the Stop chan.
+// NewDevices will be returned via the NewDeviceChan.
 func (a *ArpScanner) Start() {
 	logger := getScannerLogger()
 	// Get a list of all interfaces.
@@ -58,7 +62,6 @@ func (a *ArpScanner) Start() {
 }
 
 // scan scans an individual interface's local network for machines using ARP requests/replies.
-//
 // scan loops forever, sending packets out regularly.  It returns an error if
 // it's ever unable to write a packet.
 func (a *ArpScanner) scan(iface *net.Interface) error {
@@ -97,7 +100,7 @@ func (a *ArpScanner) scan(iface *net.Interface) error {
 	}
 	defer handle.Close()
 
-	go a.readARP(handle, iface, a.NewDeviceChan)
+	go a.readARP(handle, iface)
 	// defer close(a.Stop)
 	for {
 		// Write our scan packets out to the handle.
@@ -113,9 +116,8 @@ func (a *ArpScanner) scan(iface *net.Interface) error {
 }
 
 // readARP watches a handle for incoming ARP responses we might care about, and prints them.
-//
 // readARP loops until 'stop' is closed.
-func (a *ArpScanner) readARP(handle *pcap.Handle, iface *net.Interface, newDevices chan model.NewDevice) {
+func (a *ArpScanner) readARP(handle *pcap.Handle, iface *net.Interface) {
 	logger := getScannerLogger()
 	src := gopacket.NewPacketSource(handle, layers.LayerTypeEthernet)
 	in := src.Packets()
@@ -151,7 +153,7 @@ func (a *ArpScanner) readARP(handle *pcap.Handle, iface *net.Interface, newDevic
 			}
 
 			// passs new device across channel
-			newDevices <- newDevice
+			a.NewDeviceChan <- newDevice
 		}
 	}
 }

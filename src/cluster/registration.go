@@ -12,7 +12,8 @@ func getRegistrationLogger() *log.Entry {
 	return log.WithFields(log.Fields{"module": "registration"})
 }
 
-// DeviceDiscovery -
+// DeviceDiscovery will start an ArpScanner and use its results to create new
+// Devices in the database if they do not already exist.
 func DeviceDiscovery(c *Cluster) {
 	logger := getRegistrationLogger()
 

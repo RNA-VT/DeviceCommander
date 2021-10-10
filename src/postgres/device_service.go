@@ -11,6 +11,7 @@ import (
 	"github.com/rna-vt/devicecommander/graph/model"
 )
 
+// BaseService prototypes the required interfaces for a CRUD postgres service.
 type BaseService interface {
 	Initialise() error
 	Create(model.NewDevice) (*model.Device, error)
@@ -21,13 +22,15 @@ type BaseService interface {
 	GetAll(host string, port int) ([]*model.Device, error)
 }
 
+// DeviceService implements the BaseService for CRUD actions involving the Devices.
 type DeviceService struct {
-	DbConfig     DbConfig
+	DbConfig     DBConfig
 	dBConnection *gorm.DB
 	Initialized  bool
 }
 
-func NewDeviceService(config DbConfig) (DeviceService, error) {
+// NewDeviceService creates a new instance of a DeviceService with a DBConfig.
+func NewDeviceService(config DBConfig) (DeviceService, error) {
 	service := DeviceService{
 		DbConfig:    config,
 		Initialized: false,
