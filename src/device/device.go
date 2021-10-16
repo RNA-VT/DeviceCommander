@@ -23,7 +23,7 @@ func NewDeviceObj(d *model.Device) (*DeviceObj, error) {
 	return &dev, nil
 }
 
-// NewDevice -
+// NewDevice creates a barebones new instance of a Device with a host and port.
 func NewDevice(host string, port int) (model.Device, error) {
 	dev := model.Device{
 		Host:     host,

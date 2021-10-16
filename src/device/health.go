@@ -11,7 +11,7 @@ import (
 
 // CheckHealth probes the health endpoint of the device in question. The health
 // endpoint is currently at Device.URL()/health
-func (d *DeviceObj) CheckHealth() {
+func (d *DeviceObj) CheckHealth() (*DeviceObj, error) {
 	logger := getDeviceLogger()
 
 	url := d.URL() + "/health"
@@ -21,12 +21,14 @@ func (d *DeviceObj) CheckHealth() {
 	resp, err := http.Get(url)
 	if err != nil {
 		logger.Warn(fmt.Sprintf("Error checking [%s] %s", url, err.Error()))
-		return
+		return &DeviceObj{}, err
 	}
 
 	d.evaluateHealthCheckResponse(resp)
 	result := d.evaluateHealthCheckResponse(resp)
 	d.ProcessHealthCheckResult(result)
+
+	return d, nil
 
 	// TODO: need to cleanup unresponsive nodes somewhere
 	// if d.Unresponsive() {

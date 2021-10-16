@@ -23,6 +23,7 @@ import (
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
 	"github.com/google/gopacket/pcap"
+
 	"github.com/rna-vt/devicecommander/graph/model"
 )
 
@@ -68,18 +69,18 @@ func (a *ArpScanner) scan(iface *net.Interface) error {
 	// We just look for IPv4 addresses, so try to find if the interface has one.
 	logger := getScannerLogger()
 	var addr *net.IPNet
-	if addrs, err := iface.Addrs(); err != nil {
+	addrs, err := iface.Addrs()
+	if err != nil {
 		return err
-	} else {
-		for _, ad := range addrs {
-			if ipnet, ok := ad.(*net.IPNet); ok {
-				if ip4 := ipnet.IP.To4(); ip4 != nil {
-					addr = &net.IPNet{
-						IP:   ip4,
-						Mask: ipnet.Mask[len(ipnet.Mask)-4:],
-					}
-					break
+	}
+	for _, ad := range addrs {
+		if ipnet, ok := ad.(*net.IPNet); ok {
+			if ip4 := ipnet.IP.To4(); ip4 != nil {
+				addr = &net.IPNet{
+					IP:   ip4,
+					Mask: ipnet.Mask[len(ipnet.Mask)-4:],
 				}
+				break
 			}
 		}
 	}
@@ -186,7 +187,10 @@ func (a *ArpScanner) writeARP(handle *pcap.Handle, iface *net.Interface, addr *n
 	// Send one packet for every address.
 	for _, ip := range a.ips(addr) {
 		arp.DstProtAddress = []byte(ip)
-		gopacket.SerializeLayers(buf, opts, &eth, &arp)
+		if err := gopacket.SerializeLayers(buf, opts, &eth, &arp); err != nil {
+			return err
+		}
+
 		if err := handle.WritePacketData(buf.Bytes()); err != nil {
 			return err
 		}

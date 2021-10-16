@@ -3,9 +3,10 @@ package cluster
 import (
 	"fmt"
 
+	log "github.com/sirupsen/logrus"
+
 	"github.com/rna-vt/devicecommander/graph/model"
 	"github.com/rna-vt/devicecommander/scanner"
-	log "github.com/sirupsen/logrus"
 )
 
 func getRegistrationLogger() *log.Entry {
