@@ -15,15 +15,15 @@
 
 version: '3.5'
 services:
-  # device-commander:
-  #   container_name: device_commander
-  #   image: rnavt/devicecommander:latest
-  #   ports:
-  #     - "8001:8001"
-  #   networks:
-  #     - postgres
-  #   restart: unless-stopped
-
+  device-commander:
+    container_name: device_commander
+    image: rnavt/devicecommander:latest
+    command: ["device-commander"]
+    ports:
+      - "8001:8001"
+    networks:
+      - postgres
+    restart: unless-stopped
   postgres:
     container_name: postgres_container
     image: postgres:13
