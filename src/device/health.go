@@ -34,6 +34,7 @@ func (d DeviceObj) CheckHealth() (DeviceObj, error) {
 	// 	healthDeregistrationLogger.Info("Failure Threshold Reached... Removing Device: " + d.ID)
 	// 	c.RemoveDevice(d.ID)
 	// }
+	return d, nil
 }
 
 // evaluateHealthCheckResponse inspects the repsponse from a device and extracts
