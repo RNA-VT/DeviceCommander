@@ -63,12 +63,12 @@ func (c *Cluster) Start() {
 			}
 
 			for _, d := range devices {
-				tmp, err := device.NewDeviceObj(d)
+				device, err := device.NewDeviceObj(d)
 				if err != nil {
 					logger.Error(err)
-				} else {
-					tmp.CheckHealth()
+					continue
 				}
+				device.CheckHealth()
 			}
 		}
 	}()
