@@ -28,8 +28,6 @@ func (d DeviceObj) CheckHealth() (DeviceObj, error) {
 	result := d.EvaluateHealthCheckResponse(resp)
 	d.device.Failures = d.ProcessHealthCheckResult(result)
 
-	return d, nil
-
 	// TODO: need to cleanup unresponsive nodes somewhere
 	// if d.Unresponsive() {
 	// 	healthDeregistrationLogger := healthLogger.WithFields(log.Fields{"event": "deregistration"})

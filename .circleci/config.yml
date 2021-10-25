@@ -18,6 +18,7 @@ jobs:
       - run:
           working_directory: ./src
           command: |
+            apk add libpcap-dev
             golangci-lint run
 workflows:
   version: 2
