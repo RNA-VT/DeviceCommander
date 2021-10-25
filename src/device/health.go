@@ -11,7 +11,7 @@ import (
 
 // CheckHealth probes the health endpoint of the device in question. The health
 // endpoint is currently at Device.URL()/health
-func (d *DeviceObj) CheckHealth() (*DeviceObj, error) {
+func (d DeviceObj) CheckHealth() (DeviceObj, error) {
 	logger := getDeviceLogger()
 
 	url := d.URL() + "/health"
@@ -21,12 +21,12 @@ func (d *DeviceObj) CheckHealth() (*DeviceObj, error) {
 	resp, err := http.Get(url)
 	if err != nil {
 		logger.Warn(fmt.Sprintf("Error checking [%s] %s", url, err.Error()))
-		return &DeviceObj{}, err
+		return DeviceObj{}, err
 	}
 
-	d.evaluateHealthCheckResponse(resp)
-	result := d.evaluateHealthCheckResponse(resp)
-	d.ProcessHealthCheckResult(result)
+	d.EvaluateHealthCheckResponse(resp)
+	result := d.EvaluateHealthCheckResponse(resp)
+	d.device.Failures = d.ProcessHealthCheckResult(result)
 
 	return d, nil
 
@@ -42,7 +42,7 @@ func (d *DeviceObj) CheckHealth() (*DeviceObj, error) {
 // a few details. Firstly it will create useful logs for better understanding
 // the response from the device health check. Secondly, it will return a true/false
 // determining the health of the device.
-func (d *DeviceObj) evaluateHealthCheckResponse(resp *http.Response) bool {
+func (d DeviceObj) EvaluateHealthCheckResponse(resp *http.Response) bool {
 	logger := getDeviceLogger()
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)

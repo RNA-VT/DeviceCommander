@@ -56,7 +56,7 @@ type ComplexityRoot struct {
 
 	Mutation struct {
 		CreateDevice func(childComplexity int, input model.NewDevice) int
-		DeleteDevice func(childComplexity int, uuid string) int
+		DeleteDevice func(childComplexity int, id string) int
 		UpdateDevice func(childComplexity int, input model.UpdateDevice) int
 	}
 
@@ -71,7 +71,7 @@ type DeviceResolver interface {
 type MutationResolver interface {
 	CreateDevice(ctx context.Context, input model.NewDevice) (*model.Device, error)
 	UpdateDevice(ctx context.Context, input model.UpdateDevice) (string, error)
-	DeleteDevice(ctx context.Context, uuid string) (*model.Device, error)
+	DeleteDevice(ctx context.Context, id string) (*model.Device, error)
 }
 type QueryResolver interface {
 	Devices(ctx context.Context) ([]*model.Device, error)
@@ -163,7 +163,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.DeleteDevice(childComplexity, args["uuid"].(string)), true
+		return e.complexity.Mutation.DeleteDevice(childComplexity, args["id"].(string)), true
 
 	case "Mutation.updateDevice":
 		if e.complexity.Mutation.UpdateDevice == nil {
@@ -284,7 +284,7 @@ extend type Query {
 extend type Mutation {
   createDevice(input: NewDevice!): Device!
   updateDevice(input: UpdateDevice!): String!
-  deleteDevice(uuid: String!): Device!
+  deleteDevice(id: String!): Device!
 }`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
@@ -312,14 +312,14 @@ func (ec *executionContext) field_Mutation_deleteDevice_args(ctx context.Context
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
-	if tmp, ok := rawArgs["uuid"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("uuid"))
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
 		arg0, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["uuid"] = arg0
+	args["id"] = arg0
 	return args, nil
 }
 
@@ -727,7 +727,7 @@ func (ec *executionContext) _Mutation_deleteDevice(ctx context.Context, field gr
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteDevice(rctx, args["uuid"].(string))
+		return ec.resolvers.Mutation().DeleteDevice(rctx, args["id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)

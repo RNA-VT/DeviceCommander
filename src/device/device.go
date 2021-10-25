@@ -4,9 +4,20 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net/http"
 
 	"github.com/rna-vt/devicecommander/graph/model"
 )
+
+type DeviceInterface interface {
+	NewDeviceFromRequestBody(body io.ReadCloser) (model.NewDevice, error)
+	URL() string
+	protocol() string
+	ProcessHealthCheckResult(result bool)
+	Unresponsive() bool
+	CheckHealth() (*DeviceObj, error)
+	EvaluateHealthCheckResponse(resp *http.Response) bool
+}
 
 // DeviceObj is a wrapper for the Device struct. It aims to provide a helpful
 // layer of abstraction away from the gqlgen/postgres models.
@@ -66,13 +77,12 @@ func (d DeviceObj) protocol() string {
 	return protocol
 }
 
-// ProcessHealthCheckResult - updates health check failure count & returns
-func (d *DeviceObj) ProcessHealthCheckResult(result bool) {
+// ProcessHealthCheckResult - updates health check failure count & returns the failure count
+func (d DeviceObj) ProcessHealthCheckResult(result bool) int {
 	if result { // Healthy
-		d.device.Failures = 0
-	} else {
-		d.device.Failures++
+		return 0
 	}
+	return d.device.Failures + 1
 }
 
 // Failed - If true, device should be deregistered

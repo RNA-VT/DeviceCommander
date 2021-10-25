@@ -11,20 +11,20 @@ import (
 )
 
 // BaseService prototypes the required interfaces for a CRUD postgres service.
-type BaseService interface {
-	Initialise() error
+type DeviceCRUDService interface {
+	Initialise() (*gorm.DB, error)
 	Create(model.NewDevice) (*model.Device, error)
 	Update(model.UpdateDevice) error
-	Delete(model.Device) (*model.Device, error)
+	Delete(string) (*model.Device, error)
 
-	Get(model.Device) (*model.Device, error)
-	GetAll(host string, port int) ([]*model.Device, error)
+	Get(model.Device) ([]*model.Device, error)
+	GetAll() ([]*model.Device, error)
 }
 
 // DeviceService implements the BaseService for CRUD actions involving the Devices.
 type DeviceService struct {
 	DbConfig     DBConfig
-	dBConnection *gorm.DB
+	DBConnection *gorm.DB
 	Initialized  bool
 }
 
@@ -34,15 +34,16 @@ func NewDeviceService(config DBConfig) (DeviceService, error) {
 		DbConfig:    config,
 		Initialized: false,
 	}
-	err := service.Initialise()
+	db, err := service.Initialise()
 	if err != nil {
 		return service, err
 	}
+	service.DBConnection = db
 	service.Initialized = true
 	return service, nil
 }
 
-func (s *DeviceService) Create(newDeviceArgs model.NewDevice) (*model.Device, error) {
+func (s DeviceService) Create(newDeviceArgs model.NewDevice) (*model.Device, error) {
 	logger := getPostgresLogger()
 	newDevice := model.Device{
 		ID:   uuid.New(),
@@ -62,7 +63,7 @@ func (s *DeviceService) Create(newDeviceArgs model.NewDevice) (*model.Device, er
 		newDevice.Description = *newDeviceArgs.Description
 	}
 
-	result := s.dBConnection.Create(&newDevice)
+	result := s.DBConnection.Create(&newDevice)
 	if result.Error != nil {
 		return &newDevice, result.Error
 	}
@@ -71,14 +72,14 @@ func (s *DeviceService) Create(newDeviceArgs model.NewDevice) (*model.Device, er
 	return &newDevice, nil
 }
 
-func (s *DeviceService) Update(input model.UpdateDevice) error {
+func (s DeviceService) Update(input model.UpdateDevice) error {
 	logger := getPostgresLogger()
 	id, err := uuid.Parse(input.ID)
 	if err != nil {
 		return err
 	}
 	device := model.Device{ID: id}
-	result := s.dBConnection.Model(device).Updates(input)
+	result := s.DBConnection.Model(device).Updates(input)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -87,10 +88,10 @@ func (s *DeviceService) Update(input model.UpdateDevice) error {
 	return nil
 }
 
-func (s *DeviceService) Delete(id string) (*model.Device, error) {
+func (s DeviceService) Delete(id string) (*model.Device, error) {
 	logger := getPostgresLogger()
 	var toBeDeleted model.Device
-	result := s.dBConnection.First(&toBeDeleted, "ID = ?", id)
+	result := s.DBConnection.First(&toBeDeleted, "ID = ?", id)
 	if result.Error != nil {
 		return &toBeDeleted, result.Error
 	}
@@ -104,15 +105,15 @@ func (s *DeviceService) Delete(id string) (*model.Device, error) {
 	toBeDeleted.ID = uid
 
 	// TODO: Implement soft deletes
-	s.dBConnection.Delete(model.Device{}, toBeDeleted)
+	s.DBConnection.Delete(model.Device{}, toBeDeleted)
 
 	logger.Debug("Deleted device " + id)
 	return &toBeDeleted, nil
 }
 
-func (s *DeviceService) Get(devQuery model.Device) ([]*model.Device, error) {
+func (s DeviceService) Get(devQuery model.Device) ([]*model.Device, error) {
 	devices := []*model.Device{}
-	result := s.dBConnection.Where(devQuery).Find(&devices)
+	result := s.DBConnection.Where(devQuery).Find(&devices)
 	if result.Error != nil {
 		return devices, result.Error
 	}
@@ -120,9 +121,9 @@ func (s *DeviceService) Get(devQuery model.Device) ([]*model.Device, error) {
 	return devices, nil
 }
 
-func (s *DeviceService) GetAll() ([]*model.Device, error) {
+func (s DeviceService) GetAll() ([]*model.Device, error) {
 	devices := []*model.Device{}
-	result := s.dBConnection.Find(&devices)
+	result := s.DBConnection.Find(&devices)
 	if result.Error != nil {
 		return devices, result.Error
 	}
@@ -130,19 +131,17 @@ func (s *DeviceService) GetAll() ([]*model.Device, error) {
 	return devices, nil
 }
 
-func (s *DeviceService) Initialise() error {
+func (s DeviceService) Initialise() (*gorm.DB, error) {
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Shanghai", s.DbConfig.Host, s.DbConfig.UserName, s.DbConfig.Password, s.DbConfig.Name, s.DbConfig.Port)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		return err
+		return &gorm.DB{}, err
 	}
-
-	s.dBConnection = db
 
 	err = db.AutoMigrate(&model.Device{})
 	if err != nil {
-		return err
+		return &gorm.DB{}, err
 	}
 
-	return nil
+	return db, nil
 }

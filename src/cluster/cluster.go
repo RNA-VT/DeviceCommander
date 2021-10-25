@@ -16,7 +16,7 @@ import (
 // of new devices.
 type Cluster struct {
 	Name          string
-	DeviceService postgres.DeviceService
+	DeviceService postgres.DeviceCRUDService
 }
 
 // PrintClusterInfo will cleanly print out info about the cluster

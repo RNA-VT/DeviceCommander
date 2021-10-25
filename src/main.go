@@ -2,6 +2,8 @@ package main
 
 /* Al useful imports */
 import (
+	"fmt"
+
 	"github.com/labstack/echo"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -16,11 +18,6 @@ import (
 func main() {
 	/* Load Config from Env Vars */
 	configureEnvironment()
-
-	host := viper.GetString("HOST")
-	port := viper.GetString("PORT")
-
-	fullHostname := host + ":" + port
 
 	dbConfig := postgres.DBConfig{
 		Name:     viper.GetString("POSTGRES_NAME"),
@@ -41,7 +38,7 @@ func main() {
 			DeviceService: deviceService,
 		},
 		Echo:          echo.New(),
-		Hostname:      fullHostname,
+		Hostname:      fmt.Sprintf("%s:%s", viper.GetString("HOST"), viper.GetString("PORT")),
 		DeviceService: deviceService,
 	}
 	var API routes.APIService
