@@ -3,34 +3,35 @@ parameters:
   device-commander-version:
     type: string
     default: "0.0.1"
+orbs:
+  docker: circleci/docker@1.7.0
 executors:
   docker-publisher:
     docker:
-      - image: circleci/buildpack-deps:latest
+      - image: circleci/buildpack-deps:latest-alpine
 jobs:
-  publish-devicecommander:
-    description: Publish the DeviceCommander docker image to Docker Hub.
-    environment:
-        VERSION: << pipeline.parameters.device-commander-version >>
-    executor: docker-publisher
+  lint:
+    docker:
+      - image: golangci/golangci-lint:v1.37-alpine
     steps:
       - checkout
-      - setup_remote_docker:
-          version: 19.03.13
       - run:
-          name: Publish the DeviceCommander docker image to Docker Hub.
-          working_directory: .
+          working_directory: ./src
           command: |
-            echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-            SHORT_SHA=${CIRCLE_SHA1:0:7}
-            docker build . -t rnavt/devicecommander:$VERSION-$SHORT_SHA -t rnavt/devicecommander:$CIRCLE_BRANCH -t rnavt/devicecommander:latest
-            docker push rnavt/devicecommander:$VERSION-$SHORT_SHA
-            docker push rnavt/devicecommander:$CIRCLE_BRANCH
-            docker push rnavt/devicecommander:latest
+            apk add libpcap-dev
+            golangci-lint run
 workflows:
   version: 2
   devicecommander-build:
     jobs:
-      - publish-devicecommander:
-          name: publish-devicecommander
+      - lint
+      - docker/publish:
+          name: build-and-publish
+          image: rnavt/devicecommander
           context: docker_hub
+          docker-context: .
+          tag: ${CIRCLE_SHA1:0:7},$CIRCLE_BRANCH
+          filters:
+              branches:
+                only:
+                  - master
