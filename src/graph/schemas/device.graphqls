@@ -34,5 +34,5 @@ extend type Query {
 extend type Mutation {
   createDevice(input: NewDevice!): Device!
   updateDevice(input: UpdateDevice!): String!
-  deleteDevice(uuid: String!): Device!
+  deleteDevice(id: String!): Device!
 }

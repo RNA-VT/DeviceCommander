@@ -15,11 +15,11 @@ import (
 // APIService -
 type APIService struct {
 	Cluster       *cluster.Cluster
-	DeviceService *postgres.DeviceService
+	DeviceService postgres.DeviceCRUDService
 }
 
 // ConfigureRoutes will use Echo to start listening on the appropriate paths
-func ConfigureRoutes(listenURL string, e *echo.Echo, api *APIService, deviceService *postgres.DeviceService) {
+func ConfigureRoutes(listenURL string, e *echo.Echo, api *APIService, deviceService postgres.DeviceCRUDService) {
 	// Middleware
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())

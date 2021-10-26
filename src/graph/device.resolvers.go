@@ -31,8 +31,8 @@ func (r *mutationResolver) UpdateDevice(ctx context.Context, input model.UpdateD
 	return input.ID, nil
 }
 
-func (r *mutationResolver) DeleteDevice(ctx context.Context, uuid string) (*model.Device, error) {
-	newDevice, err := r.DeviceService.Delete(uuid)
+func (r *mutationResolver) DeleteDevice(ctx context.Context, id string) (*model.Device, error) {
+	newDevice, err := r.DeviceService.Delete(id)
 	if err != nil {
 		return newDevice, err
 	}
@@ -57,8 +57,6 @@ func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResol
 // Query returns generated.QueryResolver implementation.
 func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
-type (
-	deviceResolver   struct{ *Resolver }
-	mutationResolver struct{ *Resolver }
-	queryResolver    struct{ *Resolver }
-)
+type deviceResolver struct{ *Resolver }
+type mutationResolver struct{ *Resolver }
+type queryResolver struct{ *Resolver }
