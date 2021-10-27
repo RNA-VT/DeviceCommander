@@ -12,7 +12,6 @@ github.com/99designs/gqlgen/graphql/introspection
 github.com/99designs/gqlgen/graphql/playground
 # github.com/DATA-DOG/go-sqlmock v1.5.0
 ## explicit
-github.com/DATA-DOG/go-sqlmock
 # github.com/agnivade/levenshtein v1.1.1
 ## explicit
 github.com/agnivade/levenshtein
@@ -116,9 +115,12 @@ github.com/spf13/pflag
 # github.com/spf13/viper v1.6.1
 ## explicit
 github.com/spf13/viper
+# github.com/stretchr/objx v0.2.0
+github.com/stretchr/objx
 # github.com/stretchr/testify v1.7.0
 ## explicit
 github.com/stretchr/testify/assert
+github.com/stretchr/testify/mock
 github.com/stretchr/testify/require
 github.com/stretchr/testify/suite
 # github.com/subosito/gotenv v1.2.0

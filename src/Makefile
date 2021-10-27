@@ -7,5 +7,11 @@ lint-fix:
 gqlgen:
 	~/go/bin/gqlgen generate --verbose
 
+mockery:
+	mockery --dir ./postgres --all --keeptree
+
+test:
+	go test ./test -count=1 -v
+
 run:
 	sudo go run main.go
