@@ -1,5 +1,7 @@
 FROM golang:1.17-alpine as go-builder
 
+RUN apk add libpcap-dev build-base
+
 RUN mkdir -p /go/src/DeviceCommander/
 
 ADD /src /go/src/DeviceCommander/
