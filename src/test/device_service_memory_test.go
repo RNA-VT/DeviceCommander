@@ -93,7 +93,8 @@ func (s *InMemoryDeviceServiceSuite) TestUpdate() {
 
 func (s *InMemoryDeviceServiceSuite) AfterTest(_, _ string) {
 	for _, d := range s.testDevices {
-		s.service.Delete(d.ID.String())
+		_, err := s.service.Delete(d.ID.String())
+		assert.Nil(s.T(), err)
 	}
 
 	s.testDevices = []model.Device{}
