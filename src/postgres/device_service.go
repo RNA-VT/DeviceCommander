@@ -12,7 +12,6 @@ import (
 
 // BaseService prototypes the required interfaces for a CRUD postgres service.
 type DeviceCRUDService interface {
-	Initialise() (*gorm.DB, error)
 	Create(model.NewDevice) (*model.Device, error)
 	Update(model.UpdateDevice) error
 	Delete(string) (*model.Device, error)
@@ -34,13 +33,29 @@ func NewDeviceService(config DBConfig) (DeviceService, error) {
 		DbConfig:    config,
 		Initialized: false,
 	}
-	db, err := service.Initialise()
+	service, err := service.Initialise()
 	if err != nil {
 		return service, err
 	}
-	service.DBConnection = db
 	service.Initialized = true
 	return service, nil
+}
+
+func (s DeviceService) Initialise() (DeviceService, error) {
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Shanghai", s.DbConfig.Host, s.DbConfig.UserName, s.DbConfig.Password, s.DbConfig.Name, s.DbConfig.Port)
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		return s, err
+	}
+
+	s.DBConnection = db
+
+	err = db.AutoMigrate(&model.Device{})
+	if err != nil {
+		return s, err
+	}
+
+	return s, nil
 }
 
 func (s DeviceService) Create(newDeviceArgs model.NewDevice) (*model.Device, error) {
@@ -129,19 +144,4 @@ func (s DeviceService) GetAll() ([]*model.Device, error) {
 	}
 
 	return devices, nil
-}
-
-func (s DeviceService) Initialise() (*gorm.DB, error) {
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Shanghai", s.DbConfig.Host, s.DbConfig.UserName, s.DbConfig.Password, s.DbConfig.Name, s.DbConfig.Port)
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	if err != nil {
-		return &gorm.DB{}, err
-	}
-
-	err = db.AutoMigrate(&model.Device{})
-	if err != nil {
-		return &gorm.DB{}, err
-	}
-
-	return db, nil
 }
