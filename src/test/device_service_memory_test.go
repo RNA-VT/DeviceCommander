@@ -3,12 +3,13 @@ package test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
+
 	"github.com/rna-vt/devicecommander/graph/model"
 	"github.com/rna-vt/devicecommander/memory"
 	p "github.com/rna-vt/devicecommander/postgres"
 	"github.com/rna-vt/devicecommander/utilities"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/suite"
 )
 
 type InMemoryDeviceServiceSuite struct {

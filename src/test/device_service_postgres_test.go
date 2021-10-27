@@ -4,12 +4,13 @@ import (
 	"log"
 	"testing"
 
-	"github.com/rna-vt/devicecommander/graph/model"
-	p "github.com/rna-vt/devicecommander/postgres"
-	"github.com/rna-vt/devicecommander/utilities"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
+
+	"github.com/rna-vt/devicecommander/graph/model"
+	p "github.com/rna-vt/devicecommander/postgres"
+	"github.com/rna-vt/devicecommander/utilities"
 )
 
 type PostgresDeviceServiceSuite struct {

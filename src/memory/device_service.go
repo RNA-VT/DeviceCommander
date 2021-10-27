@@ -2,6 +2,7 @@ package memory
 
 import (
 	"github.com/google/uuid"
+
 	"github.com/rna-vt/devicecommander/graph/model"
 )
 

@@ -4,10 +4,11 @@ import (
 	"context"
 	"testing"
 
+	"github.com/stretchr/testify/suite"
+
 	"github.com/rna-vt/devicecommander/graph"
 	"github.com/rna-vt/devicecommander/graph/model"
 	"github.com/rna-vt/devicecommander/mocks"
-	"github.com/stretchr/testify/suite"
 )
 
 type DeviceGraphQLSuite struct {
@@ -30,7 +31,7 @@ func (s *DeviceGraphQLSuite) TestCreateDevice() {
 
 	newDevice := model.NewDevice{
 		Host: "0.0.0.0",
-		Port: 0000,
+		Port: 0o000,
 	}
 
 	s.mockDeviceService.On("Create", newDevice).Return(&model.Device{}, nil)
