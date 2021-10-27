@@ -10,8 +10,8 @@ gqlgen:
 mockery:
 	mockery --dir ./postgres --all --keeptree
 
-test:
-	go test ./test -count=1 -v
+run-test:
+	grc go test -v ./test -count=1
 
 run:
 	sudo go run main.go

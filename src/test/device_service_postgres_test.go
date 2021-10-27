@@ -1,8 +1,6 @@
 package test
 
 import (
-	"crypto/rand"
-	"fmt"
 	"log"
 	"testing"
 
@@ -14,37 +12,13 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-type DeviceSuite struct {
+type PostgresDeviceServiceSuite struct {
 	suite.Suite
 	testDevices []model.Device
 	service     p.DeviceCRUDService
 }
 
-func generateRandomMacAddress() string {
-	buf := make([]byte, 6)
-	_, err := rand.Read(buf)
-	if err != nil {
-		fmt.Println("error:", err)
-		return ""
-	}
-	// Set the local bit
-	buf[0] |= 2
-	return fmt.Sprintf("%02x:%02x:%02x:%02x:%02x:%02x", buf[0], buf[1], buf[2], buf[3], buf[4], buf[5])
-}
-
-func generateRandomNewDevices(count int) []model.NewDevice {
-	collection := []model.NewDevice{}
-	for i := 0; i < count; i++ {
-		tmpMac := generateRandomMacAddress()
-		tmpDev := model.NewDevice{
-			Mac: &tmpMac,
-		}
-		collection = append(collection, tmpDev)
-	}
-	return collection
-}
-
-func (s *DeviceSuite) SetupSuite() {
+func (s *PostgresDeviceServiceSuite) SetupSuite() {
 	utilities.ConfigureEnvironment()
 
 	dbConfig := p.DBConfig{
@@ -62,8 +36,8 @@ func (s *DeviceSuite) SetupSuite() {
 	s.service = deviceService
 }
 
-func (s *DeviceSuite) TestGet() {
-	newDevs := generateRandomNewDevices(1)
+func (s *PostgresDeviceServiceSuite) TestGet() {
+	newDevs := GenerateRandomNewDevices(1)
 	newDev := newDevs[0]
 
 	dev, err := s.service.Create(newDev)
@@ -82,8 +56,8 @@ func (s *DeviceSuite) TestGet() {
 	assert.Equal(s.T(), results[0], dev, "the return from create should be equal to the return from get")
 }
 
-func (s *DeviceSuite) TestDelete() {
-	newDevs := generateRandomNewDevices(1)
+func (s *PostgresDeviceServiceSuite) TestDelete() {
+	newDevs := GenerateRandomNewDevices(1)
 	newDev := newDevs[0]
 
 	dev, err := s.service.Create(newDev)
@@ -102,8 +76,8 @@ func (s *DeviceSuite) TestDelete() {
 	assert.Equal(s.T(), len(getResults), 0, "there should be 0 devices with the ID of the deleted device")
 }
 
-func (s *DeviceSuite) TestUpdate() {
-	newDevs := generateRandomNewDevices(1)
+func (s *PostgresDeviceServiceSuite) TestUpdate() {
+	newDevs := GenerateRandomNewDevices(1)
 	newDev := newDevs[0]
 
 	dev, err := s.service.Create(newDev)
@@ -112,7 +86,7 @@ func (s *DeviceSuite) TestUpdate() {
 	// add device to test list for deletion after
 	s.testDevices = append(s.testDevices, *dev)
 
-	tmpMAC := generateRandomMacAddress()
+	tmpMAC := GenerateRandomMacAddress()
 
 	err = s.service.Update(model.UpdateDevice{
 		ID:  dev.ID.String(),
@@ -130,7 +104,7 @@ func (s *DeviceSuite) TestUpdate() {
 	assert.Equal(s.T(), getResults[0].MAC, tmpMAC, "the updated device should have the new MAC address")
 }
 
-func (s *DeviceSuite) AfterTest(_, _ string) {
+func (s *PostgresDeviceServiceSuite) AfterTest(_, _ string) {
 	for _, d := range s.testDevices {
 		s.service.Delete(d.ID.String())
 	}
@@ -142,6 +116,6 @@ func (s *DeviceSuite) AfterTest(_, _ string) {
 
 // In order for 'go test' to run this suite, we need to create
 // a normal test function and pass our suite to suite.Run
-func TestDeviceTestSuite(t *testing.T) {
-	suite.Run(t, new(DeviceSuite))
+func TestPostgresDeviceServiceSuite(t *testing.T) {
+	suite.Run(t, new(PostgresDeviceServiceSuite))
 }
