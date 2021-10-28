@@ -19,7 +19,9 @@ jobs:
         go-version: 1.17
 
     - name: Build
-      run: go build -v ./src/...
+      working-directory: ./src
+      run: go build -v ./...
 
     - name: Test
-      run: go test -v ./src/...
+      working-directory: ./src
+      run: go test -v ./test
