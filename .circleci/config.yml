@@ -5,35 +5,11 @@ parameters:
     default: "0.0.1"
 orbs:
   docker: circleci/docker@1.7.0
-  go: circleci/go@1.7.0
 executors:
   docker-publisher:
     docker:
       - image: circleci/buildpack-deps:latest-alpine
 jobs:
-  build-go:
-    executor:
-      name: go/default
-      tag: '1.17'
-    steps:
-      - checkout
-      - go/load-cache
-      - go/mod-download
-      - go/save-cache
-      - go/test:
-          covermode: atomic
-          failfast: true
-          race: true
-  test:
-    docker:
-      - image: golangci/golangci-lint:v1.37-alpine
-    steps:
-      - checkout
-      - run:
-          working_directory: ./src
-          command: |
-            apk add libpcap-dev
-            golangci-lint run
   lint:
     docker:
       - image: golangci/golangci-lint:v1.37-alpine
@@ -49,7 +25,6 @@ workflows:
   devicecommander-build:
     jobs:
       - lint
-      - build-go
       - docker/publish:
           name: build-and-publish
           image: rnavt/devicecommander
