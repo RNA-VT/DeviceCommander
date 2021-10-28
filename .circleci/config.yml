@@ -34,6 +34,7 @@ workflows:
   version: 2
   devicecommander-build:
     jobs:
+      - test
       - lint
       - docker/publish:
           name: build-and-publish
