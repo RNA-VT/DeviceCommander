@@ -12,7 +12,6 @@ executors:
       - image: circleci/buildpack-deps:latest-alpine
 jobs:
   build-go:
-    working_dir: ./src
     executor:
       name: go/default
       tag: '1.17'
@@ -22,6 +21,7 @@ jobs:
       - go/mod-download
       - go/save-cache
       - go/test:
+          working_dir: ./src
           covermode: atomic
           failfast: true
           race: true
