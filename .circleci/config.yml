@@ -12,6 +12,7 @@ executors:
       - image: circleci/buildpack-deps:latest-alpine
 jobs:
   build-go:
+    working_directory: ./src
     executor:
       name: go/default
       tag: '1.17'
@@ -49,8 +50,7 @@ workflows:
   devicecommander-build:
     jobs:
       - lint
-      - build-go:
-        working_directory: ./src
+      - build-go
       - docker/publish:
           name: build-and-publish
           image: rnavt/devicecommander
