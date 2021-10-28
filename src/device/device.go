@@ -1,13 +1,10 @@
 package device
 
 import (
-	"crypto/sha1"
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
-	"reflect"
 
 	"github.com/rna-vt/devicecommander/graph/model"
 )
@@ -92,24 +89,4 @@ func (d Wrapper) ProcessHealthCheckResult(result bool) int {
 func (d Wrapper) Unresponsive() bool {
 	failThreshold := 3
 	return d.Device.Failures >= failThreshold
-}
-
-func (d Wrapper) GetValueHash(keys []string) string {
-	r := reflect.ValueOf(d.Device)
-	s := "hash:"
-	for _, key := range keys {
-		tmp := reflect.Indirect(r).FieldByName(key)
-		log.Println(tmp.String())
-		// if !tmp.IsNil() {
-		// 	s = s + tmp.String()
-		// }
-	}
-
-	log.Println(s)
-
-	h := sha1.New()
-	h.Write([]byte(s))
-	bs := h.Sum(nil)
-
-	return string(bs)
 }
