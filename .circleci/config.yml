@@ -5,7 +5,7 @@ parameters:
     default: "0.0.1"
 orbs:
   docker: circleci/docker@1.7.0
-  go: circleci/go@x.y
+  go: circleci/go@1.7.0
 executors:
   docker-publisher:
     docker:
