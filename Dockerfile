@@ -1,4 +1,6 @@
-FROM golang:1.13.5 as go-builder
+FROM golang:1.17-alpine as go-builder
+
+RUN apk add libpcap-dev build-base
 
 RUN mkdir -p /go/src/DeviceCommander/
 
@@ -12,21 +14,21 @@ RUN ls
 
 RUN chmod +x device-commander
 
-FROM node:15.11 as node-builder
+# FROM node:15.11 as node-builder
 
-ADD /frontend /src
+# ADD /frontend /src
 
-WORKDIR /src
+# WORKDIR /src
 
-RUN npm install
+# RUN npm install
 
-RUN npm run build
+# RUN npm run build
 
 # Build final image
 FROM debian:10.4-slim
 
 COPY --from=go-builder /go/src/DeviceCommander/device-commander /usr/local/bin/device-commander
-COPY --from=node-builder /src/build /src/build
+# COPY --from=node-builder /src/build /src/build
 
 RUN touch /config.yaml
 

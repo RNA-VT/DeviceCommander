@@ -1,25 +1,25 @@
 package routes
 
 import (
-	"devicecommander/cluster"
-	"log"
 	"net/http"
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+
+	"github.com/rna-vt/devicecommander/cluster"
+	"github.com/rna-vt/devicecommander/postgres"
 )
 
-//APIService -
+// APIService -
 type APIService struct {
-	Cluster *cluster.Cluster
+	Cluster       *cluster.Cluster
+	DeviceService postgres.DeviceCRUDService
 }
 
-const apiVersion = "1"
-
 // ConfigureRoutes will use Echo to start listening on the appropriate paths
-func ConfigureRoutes(listenURL string, e *echo.Echo, API APIService) {
-
+func ConfigureRoutes(listenURL string, e *echo.Echo, api *APIService, deviceService postgres.DeviceCRUDService) {
 	// Middleware
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
@@ -38,13 +38,15 @@ func ConfigureRoutes(listenURL string, e *echo.Echo, API APIService) {
 	// Routes
 	e.Static("/static", frontendRoot+"static")
 	e.File("/*", frontendRoot+"index.html")
-	e.GET("/v1", API.defaultGet)
+	e.GET("/v1", api.defaultGet)
 
-	API.addRegistrationRoutes(e)
-	API.addInfoRoutes(e)
-	API.addManageRoutes(e)
+	api.addRegistrationRoutes(e)
+	api.addInfoRoutes(e)
+	api.addGraphQLRoutes(e, deviceService)
 
-	log.Println("Configure routes listening on " + listenURL)
+	log.WithFields(log.Fields{
+		"module": "routes",
+	}).Info("Configured routes listening on " + listenURL)
 
 	log.Println("*****************************************************")
 	log.Println("~Rejoice~ The Device Commander Lives Again! ~Rejoice~")

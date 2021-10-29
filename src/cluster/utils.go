@@ -1,14 +1,9 @@
 package cluster
 
 import (
-	"log"
+	log "github.com/sirupsen/logrus"
 )
 
-// PrintClusterInfo will cleanly print out info about the cluster
-func PrintClusterInfo(c Cluster) {
-	for i := 0; i < len(c.Devices); i++ {
-		log.Println("----Device---")
-		log.Println(c.Devices[i])
-	}
-	log.Println()
+func getClusterLogger() *log.Entry {
+	return log.WithFields(log.Fields{"module": "cluster"})
 }

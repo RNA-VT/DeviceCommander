@@ -1,65 +1,53 @@
 package cluster
 
 import (
-	device "devicecommander/device"
-	"encoding/json"
-	"io"
-	"log"
-	"net/http"
-	"strconv"
+	"fmt"
 
-	"github.com/spf13/viper"
+	log "github.com/sirupsen/logrus"
+
+	"github.com/rna-vt/devicecommander/graph/model"
+	"github.com/rna-vt/devicecommander/scanner"
 )
 
-//DeviceDiscovery -
-func DeviceDiscovery(c *Cluster) {
-	for i := 1; i < 255; i++ {
-		host := viper.Get("IP_ADDRESS_ROOT").(string) + strconv.Itoa(i)
-		unregistered := !c.isRegistered(host)
+func getRegistrationLogger() *log.Entry {
+	return log.WithFields(log.Fields{"module": "registration"})
+}
 
-		if unregistered {
-			//TODO: Hit ports other than 80
-			//TODO: Scan https for /registration
-			url := "http://" + host + "/registration"
-			log.Println("[Registration] Attempting to Register: " + url)
-			resp, err := http.Get(url)
-			if err != nil {
-				log.Println("[Registration] [Error] Attempt to register " + host + " resulted in an error:")
-				log.Println(err)
-			} else {
-				switch resp.StatusCode {
-				case 200:
-					log.Println("[Registration] [Success] Registration Request Accepted: " + host)
-					log.Println("[Registration] [Success] Adding New Device...")
-					dev := DeviceFromRegistrationRequestBody(resp.Body)
-					c.AddDevice(dev)
-				case 404:
-					log.Println("[Registration] [Warning] Host Not Found: " + host)
-				default:
-					log.Println("[Registration] [Warning] Attempt to register " + host + " resulted in an unexpected response:" + strconv.Itoa(resp.StatusCode))
+// DeviceDiscovery will start an ArpScanner and use its results to create new
+// Devices in the database if they do not already exist.
+func DeviceDiscovery(c *Cluster) {
+	logger := getRegistrationLogger()
+
+	newDevices := make(chan model.NewDevice, 10)
+	defer close(newDevices)
+	stop := make(chan struct{})
+	defer close(stop)
+	arpScanner := scanner.ArpScanner{
+		LoopDelay:     60,
+		NewDeviceChan: newDevices,
+		Stop:          stop,
+	}
+
+	go arpScanner.Start()
+
+	searchLimit := 10
+	for i := 0; i < searchLimit; i++ {
+		tmpNewDevice := <-newDevices
+		devSearch := model.Device{
+			MAC: *tmpNewDevice.Mac,
+		}
+		results, err := c.DeviceService.Get(devSearch)
+		if err != nil {
+			logger.Error(err)
+		} else {
+			if len(results) == 0 {
+				completeDevice, err := c.DeviceService.Create(tmpNewDevice)
+				if err != nil {
+					logger.Error(err)
+				} else {
+					logger.Debug(fmt.Sprintf("registered mac address [%s] with id [%s]", completeDevice.MAC, completeDevice.ID))
 				}
 			}
 		}
 	}
-}
-
-//DeviceFromRegistrationRequestBody - helper to get new device details from a registration request msg body
-func DeviceFromRegistrationRequestBody(body io.ReadCloser) device.Device {
-	defer body.Close()
-	decoder := json.NewDecoder(body)
-	var dev device.Device
-	err := decoder.Decode(&dev)
-	if err != nil {
-		log.Println("[Registration] [Error] Failed to decode device config from body", err)
-	}
-	return dev
-}
-
-func (c Cluster) isRegistered(host string) bool {
-	for _, dev := range c.Devices {
-		if host == dev.Host {
-			return true
-		}
-	}
-	return false
 }

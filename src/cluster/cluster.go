@@ -1,84 +1,76 @@
 package cluster
 
 import (
-	device "devicecommander/device"
-	"errors"
-	"log"
+	"fmt"
 	"time"
 
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+
+	"github.com/rna-vt/devicecommander/device"
+	"github.com/rna-vt/devicecommander/postgres"
 )
 
-//Cluster - This object defines an array of Devices
+// Cluster is responsible for maintaing the cluster like state of DeviceCommander.
+// It does things like probe the current active set for health and collection
+// of new devices.
 type Cluster struct {
-	Name    string
-	Devices []device.Device
+	Name          string
+	DeviceService postgres.DeviceCRUDService
 }
 
-//GetDevices returns a map of all registered
-func (c Cluster) GetDevices() map[string]device.Device {
-	devices := make(map[string]device.Device)
-	for i := 0; i < len(c.Devices); i++ {
-		devices[c.Devices[i].ID] = c.Devices[i]
+// PrintClusterInfo will cleanly print out info about the cluster
+func (c Cluster) PrintClusterInfo() {
+	logger := getClusterLogger()
+	devices, err := c.DeviceService.GetAll()
+	if err != nil {
+		logger.Error(err)
+		return
 	}
-	return devices
-}
-
-//AddDevice attempts to add a device to the cluster and returns the response data.
-func (c *Cluster) AddDevice(newDevice device.Device) error {
-	if viper.GetString("ENV") == "production" {
-		for _, dev := range c.Devices {
-			if dev.URL() == newDevice.URL() {
-				return errors.New("This host & port combination are already registered to this cluster")
-			}
-		}
+	for i := 0; i < len(devices); i++ {
+		log.Println("----Device---")
+		log.Println(fmt.Sprintf("%+v", devices[i]))
 	}
-
-	c.Devices = append(c.Devices, newDevice)
-
-	PrintClusterInfo(*c)
-	return nil
+	log.Println()
 }
 
-//RemoveDevice -
-func (c *Cluster) RemoveDevice(deviceID string) {
-	for index, device := range c.Devices {
-		if device.ID == deviceID {
-			s := c.Devices
-			count := len(c.Devices)
-			s[count-1], s[index] = s[index], s[count-1]
-			c.Devices = s[:len(s)-1]
-			return
-		}
-	}
-}
-
-//Start begins the registration and health check goroutines
+// Start begins the collection of new devices (registration) and device health
+// check goroutines.
 func (c *Cluster) Start() {
+	logger := getClusterLogger()
 	discoveryPeriod := viper.GetInt("DISCOVERY_PERIOD")
 	healthCheckPeriod := viper.GetInt("HEALTH_CHECK_PERIOD")
+	clusterLogger := getClusterLogger()
 
-	// Device Discovery
+	// Discover and collection of new devices.
 	go func() {
 		ticker := time.NewTicker(time.Duration(discoveryPeriod) * time.Second)
-		for {
-			select {
-			case t := <-ticker.C:
-				log.Println("Begin Device Discovery... ", t)
-				DeviceDiscovery(c)
-			}
+		for range ticker.C {
+			clusterLogger.Info("Begin Device Discovery... ")
+			DeviceDiscovery(c)
 		}
 	}()
 
 	// Health Check
 	go func() {
 		ticker := time.NewTicker(time.Duration(healthCheckPeriod) * time.Second)
-		for {
-			select {
-			case t := <-ticker.C:
-				log.Println("Begin Health Checks... ", t)
-				for _, device := range c.Devices {
-					c.DeviceHealthCheck(&device)
+		for range ticker.C {
+			clusterLogger.Info("Begin Health Checks... ")
+			devices, err := c.DeviceService.GetAll()
+			if err != nil {
+				logger.Error(err)
+				return
+			}
+
+			for _, d := range devices {
+				device, err := device.NewDeviceWrapper(d)
+				if err != nil {
+					logger.Error(err)
+					continue
+				}
+				_, err = device.CheckHealth()
+				if err != nil {
+					logger.Error(err)
 				}
 			}
 		}

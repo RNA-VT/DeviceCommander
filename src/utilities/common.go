@@ -2,12 +2,12 @@ package utilities
 
 import "encoding/json"
 
-//LabelString -
+// LabelString -
 func LabelString(key string, value string) string {
 	return "\n\t[" + key + "]:     " + value
 }
 
-//JSON Marshals an object into a byte array
+// JSON Marshals an object into a byte array
 func JSON(obj interface{}) (out []byte, err error) {
 	out, err = json.Marshal(obj)
 	if err != nil {
@@ -16,7 +16,7 @@ func JSON(obj interface{}) (out []byte, err error) {
 	return
 }
 
-//StringJSON returns a stringified of a json string representing obj
+// StringJSON returns a stringified of a json string representing obj
 func StringJSON(obj interface{}) (out string, err error) {
 	bytes, err := JSON(obj)
 	if err != nil {
@@ -24,4 +24,14 @@ func StringJSON(obj interface{}) (out string, err error) {
 		return
 	}
 	return string(bytes), err
+}
+
+func MergeMaps(maps ...map[string]interface{}) map[string]interface{} {
+	result := make(map[string]interface{})
+	for _, m := range maps {
+		for k, v := range m {
+			result[k] = v
+		}
+	}
+	return result
 }

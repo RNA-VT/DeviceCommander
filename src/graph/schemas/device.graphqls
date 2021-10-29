@@ -1,0 +1,38 @@
+type Device {
+  ID: String!
+  MAC: String
+  Name: String
+  Description: String
+  Host: String
+  Port: Int
+  Active: Boolean
+}
+
+input NewDevice {
+  MAC: String
+  Name: String
+  Description: String
+  Host: String!
+  Port: Int!
+  Active: Boolean
+}
+
+input UpdateDevice {
+  ID: String!
+  MAC: String
+  Name: String
+  Description: String
+  Host: String
+  Port: Int
+  Active: Boolean
+}
+
+extend type Query {
+  devices: [Device!]!
+}
+
+extend type Mutation {
+  createDevice(input: NewDevice!): Device!
+  updateDevice(input: UpdateDevice!): String!
+  deleteDevice(id: String!): Device!
+}

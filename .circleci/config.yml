@@ -3,34 +3,100 @@ parameters:
   device-commander-version:
     type: string
     default: "0.0.1"
+orbs:
+  docker: circleci/docker@1.7.0
 executors:
   docker-publisher:
     docker:
-      - image: circleci/buildpack-deps:latest
+      - image: circleci/buildpack-deps:latest-alpine
 jobs:
-  publish-devicecommander:
-    description: Publish the DeviceCommander docker image to Docker Hub.
-    environment:
-        VERSION: << pipeline.parameters.device-commander-version >>
-    executor: docker-publisher
+  test:
+    docker: # run the steps with Docker
+      # CircleCI Go images available at: https://hub.docker.com/r/circleci/golang/
+      - image: circleci/golang:1.16
+        auth:
+          username: mydockerhub-user
+          password: $DOCKERHUB_PASSWORD  # context / project UI env-var reference
+      # CircleCI PostgreSQL images available at: https://hub.docker.com/r/circleci/postgres/
+      - image: circleci/postgres:9.6-alpine
+        auth:
+          username: mydockerhub-user
+          password: $DOCKERHUB_PASSWORD  # context / project UI env-var reference
+        environment: # environment variables for primary container
+          POSTGRES_USER: postgres
+          POSTGRES_DB: postgres
+          POSTGRES_PASSWORD: changeme
+
+    parallelism: 1
+
+    environment: # environment variables for the build itself
+      TEST_RESULTS: /tmp/test-results # path to where test results will be saved
+
+    steps: # steps that comprise the `build` job
+      - checkout # check out source code to working directory
+      - run: mkdir -p $TEST_RESULTS # create the test results directory
+
+      - restore_cache: # restores saved cache if no changes are detected since last run
+          keys:
+            - go-mod-v4-{{ checksum "go.sum" }}
+
+      #  Wait for Postgres to be ready before proceeding
+      - run:
+          name: Waiting for Postgres to be ready
+          command: dockerize -wait tcp://localhost:5432 -timeout 1m
+
+      - run:
+          name: Run unit tests
+          working_directory: ./src
+          environment: # environment variables for the database url and path to migration files
+            # CONTACTS_DB_URL: "postgres://circleci-demo-go@localhost:5432/circle_test?sslmode=disable"
+            # CONTACTS_DB_MIGRATIONS: /home/circleci/project/db/migrations
+            POSTGRES_HOST: localhost
+
+          # store the results of our tests in the $TEST_RESULTS directory
+          command: |
+            ls
+            sudo apt-get install libpcap-dev
+            PACKAGE_NAMES=$(go list ./... | circleci tests split --split-by=timings --timings-type=classname)
+            gotestsum --junitfile ${TEST_RESULTS}/gotestsum-report.xml -- $PACKAGE_NAMES
+
+      # - run: make # pull and build dependencies for the project
+
+      - save_cache:
+          key: go-mod-v4-{{ checksum "go.sum" }}
+          paths:
+            - "/go/pkg/mod"
+
+      - store_artifacts: # upload test summary for display in Artifacts
+          path: /tmp/test-results
+          destination: raw-test-output
+
+      - store_test_results: # upload test results for display in Test Summary
+          path: /tmp/test-results
+
+  lint:
+    docker:
+      - image: golangci/golangci-lint:v1.37-alpine
     steps:
       - checkout
-      - setup_remote_docker:
-          version: 19.03.13
       - run:
-          name: Publish the DeviceCommander docker image to Docker Hub.
-          working_directory: .
+          working_directory: ./src
           command: |
-            echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-            SHORT_SHA=${CIRCLE_SHA1:0:7}
-            docker build . -t rnavt/devicecommander:$VERSION-$SHORT_SHA -t rnavt/devicecommander:$CIRCLE_BRANCH -t rnavt/devicecommander:latest
-            docker push rnavt/devicecommander:$VERSION-$SHORT_SHA
-            docker push rnavt/devicecommander:$CIRCLE_BRANCH
-            docker push rnavt/devicecommander:latest
+            apk add libpcap-dev
+            golangci-lint run
 workflows:
   version: 2
   devicecommander-build:
     jobs:
-      - publish-devicecommander:
-          name: publish-devicecommander
+      - lint
+      - test
+      - docker/publish:
+          name: build-and-publish
+          image: rnavt/devicecommander
           context: docker_hub
+          docker-context: .
+          tag: ${CIRCLE_SHA1:0:7},$CIRCLE_BRANCH
+          filters:
+              branches:
+                only:
+                  - master
