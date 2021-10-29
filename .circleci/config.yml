@@ -55,7 +55,6 @@ jobs:
 
           # store the results of our tests in the $TEST_RESULTS directory
           command: |
-            ls
             sudo apt-get install libpcap-dev
             PACKAGE_NAMES=$(go list ./... | circleci tests split --split-by=timings --timings-type=classname)
             gotestsum --junitfile ${TEST_RESULTS}/gotestsum-report.xml -- $PACKAGE_NAMES
