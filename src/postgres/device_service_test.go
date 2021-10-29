@@ -52,7 +52,7 @@ func (s *PostgresDeviceServiceSuite) TestGet() {
 	})
 	assert.Nil(s.T(), err)
 
-	assert.Equal(s.T(), len(results), 1, "there should only be a single return when searching by id")
+	assert.Equal(s.T(), len(results), 0, "there should only be a single return when searching by id")
 
 	assert.Equal(s.T(), results[0], dev, "the return from create should be equal to the return from get")
 }

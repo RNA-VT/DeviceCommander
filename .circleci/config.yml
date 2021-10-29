@@ -27,7 +27,7 @@ jobs:
           POSTGRES_DB: postgres
           POSTGRES_PASSWORD: changeme
 
-    parallelism: 2
+    parallelism: 1
 
     environment: # environment variables for the build itself
       TEST_RESULTS: /tmp/test-results # path to where test results will be saved
