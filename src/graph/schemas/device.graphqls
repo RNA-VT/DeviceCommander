@@ -6,6 +6,7 @@ type Device {
   Host: String
   Port: Int
   Active: Boolean
+  Endpoints: [Endpoint]!
 }
 
 input NewDevice {

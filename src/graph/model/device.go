@@ -11,12 +11,13 @@ import (
 // Host - Device Api Host
 // Port - Device Api Port. Set to 443 for https
 type Device struct {
-	ID          uuid.UUID `json:"ID"`
-	MAC         string    `json:"MAC" gorm:"unique"`
-	Name        string    `json:"Name"`
-	Description string    `json:"Description"`
-	Host        string    `json:"Host"`
-	Port        int       `json:"Port"`
-	Failures    int       `json:"Failures"`
-	Active      bool      `json:"Active"`
+	ID          uuid.UUID   `json:"ID"`
+	MAC         string      `json:"MAC" gorm:"unique"`
+	Name        string      `json:"Name"`
+	Description string      `json:"Description"`
+	Host        string      `json:"Host"`
+	Port        int         `json:"Port"`
+	Failures    int         `json:"Failures"`
+	Active      bool        `json:"Active"`
+	Endpoints   *[]Endpoint `json:"Endpoints"`
 }

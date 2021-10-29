@@ -11,6 +11,22 @@ type NewDevice struct {
 	Active      *bool   `json:"Active"`
 }
 
+type NewEndpoint struct {
+	DeviceID    string       `json:"DeviceID"`
+	Name        *string      `json:"Name"`
+	Type        string       `json:"Type"`
+	Description *string      `json:"Description"`
+	Path        *string      `json:"Path"`
+	Parameters  []*Parameter `json:"Parameters"`
+}
+
+type Parameter struct {
+	Key         string  `json:"Key"`
+	EndpointID  string  `json:"EndpointID"`
+	Description *string `json:"Description"`
+	Type        string  `json:"Type"`
+}
+
 type UpdateDevice struct {
 	ID          string  `json:"ID"`
 	Mac         *string `json:"MAC"`
@@ -19,4 +35,14 @@ type UpdateDevice struct {
 	Host        *string `json:"Host"`
 	Port        *int    `json:"Port"`
 	Active      *bool   `json:"Active"`
+}
+
+type UpdateEndpoint struct {
+	ID          string       `json:"ID"`
+	DeviceID    *string      `json:"DeviceID"`
+	Name        *string      `json:"Name"`
+	Type        *string      `json:"Type"`
+	Description *string      `json:"Description"`
+	Path        *string      `json:"Path"`
+	Parameters  []*Parameter `json:"Parameters"`
 }

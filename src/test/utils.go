@@ -30,3 +30,45 @@ func GenerateRandomNewDevices(count int) []model.NewDevice {
 	}
 	return collection
 }
+
+func GenerateRandomNewEndpoints(deviceID string, count int) []model.NewEndpoint {
+	collection := []model.NewEndpoint{}
+	for i := 0; i < count; i++ {
+		tmpEndpointName := "dmx-config"
+		tmpEndpoint := model.NewEndpoint{
+			DeviceID: deviceID,
+			Name:     &tmpEndpointName,
+			Type:     "SET",
+			Parameters: []*model.Parameter{
+				{
+					Key:  "universe",
+					Type: "int",
+				},
+				{
+					Key:  "start-address",
+					Type: "int",
+				},
+			},
+		}
+
+		tmpEndpointName2 := "state"
+		tmpEndpoint2 := model.NewEndpoint{
+			DeviceID: deviceID,
+			Name:     &tmpEndpointName2,
+			Type:     "GET",
+			Parameters: []*model.Parameter{
+				{
+					Key:  "universe",
+					Type: "int",
+				},
+				{
+					Key:  "start-address",
+					Type: "int",
+				},
+			},
+		}
+		collection = append(collection, tmpEndpoint)
+		collection = append(collection, tmpEndpoint2)
+	}
+	return collection
+}

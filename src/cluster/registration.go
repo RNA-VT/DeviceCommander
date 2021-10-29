@@ -30,6 +30,7 @@ func DeviceDiscovery(c *Cluster) {
 
 	go arpScanner.Start()
 
+	// Listen for 10 new devices
 	searchLimit := 10
 	for i := 0; i < searchLimit; i++ {
 		tmpNewDevice := <-newDevices
