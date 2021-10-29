@@ -46,12 +46,14 @@ jobs:
 
       - run:
           name: Run unit tests
+          working_directory: ./src
           environment: # environment variables for the database url and path to migration files
             CONTACTS_DB_URL: "postgres://circleci-demo-go@localhost:5432/circle_test?sslmode=disable"
             CONTACTS_DB_MIGRATIONS: /home/circleci/project/db/migrations
 
           # store the results of our tests in the $TEST_RESULTS directory
           command: |
+            ls
             PACKAGE_NAMES=$(go list ./... | circleci tests split --split-by=timings --timings-type=classname)
             gotestsum --junitfile ${TEST_RESULTS}/gotestsum-report.xml -- $PACKAGE_NAMES
 
