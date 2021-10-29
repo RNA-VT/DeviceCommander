@@ -1,4 +1,4 @@
-package test
+package postgres
 
 import (
 	"log"
@@ -9,27 +9,27 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	"github.com/rna-vt/devicecommander/graph/model"
-	p "github.com/rna-vt/devicecommander/postgres"
+	"github.com/rna-vt/devicecommander/test"
 	"github.com/rna-vt/devicecommander/utilities"
 )
 
 type PostgresDeviceServiceSuite struct {
 	suite.Suite
 	testDevices []model.Device
-	service     p.DeviceCRUDService
+	service     DeviceCRUDService
 }
 
 func (s *PostgresDeviceServiceSuite) SetupSuite() {
 	utilities.ConfigureEnvironment()
 
-	dbConfig := p.DBConfig{
+	dbConfig := DBConfig{
 		Name:     viper.GetString("POSTGRES_NAME"),
 		Host:     viper.GetString("POSTGRES_HOST"),
 		Port:     viper.GetString("POSTGRES_PORT"),
 		UserName: viper.GetString("POSTGRES_USER"),
 		Password: viper.GetString("POSTGRES_PASSWORD"),
 	}
-	deviceService, err := p.NewDeviceService(dbConfig)
+	deviceService, err := NewDeviceService(dbConfig)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -38,7 +38,7 @@ func (s *PostgresDeviceServiceSuite) SetupSuite() {
 }
 
 func (s *PostgresDeviceServiceSuite) TestGet() {
-	newDevs := GenerateRandomNewDevices(1)
+	newDevs := test.GenerateRandomNewDevices(1)
 	newDev := newDevs[0]
 
 	dev, err := s.service.Create(newDev)
@@ -58,7 +58,7 @@ func (s *PostgresDeviceServiceSuite) TestGet() {
 }
 
 func (s *PostgresDeviceServiceSuite) TestDelete() {
-	newDevs := GenerateRandomNewDevices(1)
+	newDevs := test.GenerateRandomNewDevices(1)
 	newDev := newDevs[0]
 
 	dev, err := s.service.Create(newDev)
@@ -78,7 +78,7 @@ func (s *PostgresDeviceServiceSuite) TestDelete() {
 }
 
 func (s *PostgresDeviceServiceSuite) TestUpdate() {
-	newDevs := GenerateRandomNewDevices(1)
+	newDevs := test.GenerateRandomNewDevices(1)
 	newDev := newDevs[0]
 
 	dev, err := s.service.Create(newDev)
@@ -87,7 +87,7 @@ func (s *PostgresDeviceServiceSuite) TestUpdate() {
 	// add device to test list for deletion after
 	s.testDevices = append(s.testDevices, *dev)
 
-	tmpMAC := GenerateRandomMacAddress()
+	tmpMAC := test.GenerateRandomMacAddress()
 
 	err = s.service.Update(model.UpdateDevice{
 		ID:  dev.ID.String(),

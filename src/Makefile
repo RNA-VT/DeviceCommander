@@ -11,7 +11,7 @@ mockery:
 	mockery --dir ./postgres --all --keeptree
 
 run-test:
-	grc go test -v ./test -count=1
+	grc go test ./.. -count=1
 
 run:
 	sudo go run main.go

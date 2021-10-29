@@ -1,4 +1,4 @@
-package test
+package graph
 
 import (
 	"context"
@@ -7,21 +7,20 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/rna-vt/devicecommander/graph"
 	"github.com/rna-vt/devicecommander/graph/model"
 	"github.com/rna-vt/devicecommander/mocks"
 )
 
 type DeviceGraphQLSuite struct {
 	suite.Suite
-	resolver          graph.Resolver
+	resolver          Resolver
 	mockDeviceService mocks.DeviceCRUDService
 	ctx               context.Context
 }
 
 func (s *DeviceGraphQLSuite) SetupSuite() {
 	s.mockDeviceService = mocks.DeviceCRUDService{}
-	s.resolver = graph.Resolver{
+	s.resolver = Resolver{
 		DeviceService: &s.mockDeviceService,
 	}
 	s.ctx = context.Background()
