@@ -88,8 +88,8 @@ workflows:
   version: 2
   devicecommander-build:
     jobs:
-      - build
       - lint
+      - test
       - docker/publish:
           name: build-and-publish
           image: rnavt/devicecommander
