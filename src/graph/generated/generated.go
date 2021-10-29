@@ -84,12 +84,14 @@ type ComplexityRoot struct {
 	Parameter struct {
 		Description func(childComplexity int) int
 		EndpointID  func(childComplexity int) int
+		ID          func(childComplexity int) int
 		Key         func(childComplexity int) int
 		Type        func(childComplexity int) int
 	}
 
 	Query struct {
-		Devices func(childComplexity int) int
+		Devices   func(childComplexity int) int
+		Endpoints func(childComplexity int) int
 	}
 
 	UpdateEndpoint struct {
@@ -97,7 +99,6 @@ type ComplexityRoot struct {
 		DeviceID    func(childComplexity int) int
 		ID          func(childComplexity int) int
 		Name        func(childComplexity int) int
-		Parameters  func(childComplexity int) int
 		Path        func(childComplexity int) int
 		Type        func(childComplexity int) int
 	}
@@ -117,6 +118,7 @@ type MutationResolver interface {
 }
 type QueryResolver interface {
 	Devices(ctx context.Context) ([]*model.Device, error)
+	Endpoints(ctx context.Context) ([]*model.Endpoint, error)
 }
 
 type executableSchema struct {
@@ -331,6 +333,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Parameter.EndpointID(childComplexity), true
 
+	case "Parameter.ID":
+		if e.complexity.Parameter.ID == nil {
+			break
+		}
+
+		return e.complexity.Parameter.ID(childComplexity), true
+
 	case "Parameter.Key":
 		if e.complexity.Parameter.Key == nil {
 			break
@@ -351,6 +360,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Devices(childComplexity), true
+
+	case "Query.endpoints":
+		if e.complexity.Query.Endpoints == nil {
+			break
+		}
+
+		return e.complexity.Query.Endpoints(childComplexity), true
 
 	case "UpdateEndpoint.Description":
 		if e.complexity.UpdateEndpoint.Description == nil {
@@ -379,13 +395,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.UpdateEndpoint.Name(childComplexity), true
-
-	case "UpdateEndpoint.Parameters":
-		if e.complexity.UpdateEndpoint.Parameters == nil {
-			break
-		}
-
-		return e.complexity.UpdateEndpoint.Parameters(childComplexity), true
 
 	case "UpdateEndpoint.Path":
 		if e.complexity.UpdateEndpoint.Path == nil {
@@ -531,14 +540,18 @@ type UpdateEndpoint {
     Type: String
     Description: String
     Path: String
-    Parameters: [Parameter]
 }
 
 type Parameter {
+    ID: String!
     Key: String!
     EndpointID: String!
     Description: String
     Type: String!
+}
+
+extend type Query {
+  endpoints: [Endpoint!]!
 }
 `, BuiltIn: false},
 }
@@ -1471,6 +1484,41 @@ func (ec *executionContext) _NewEndpoint_Parameters(ctx context.Context, field g
 	return ec.marshalNParameter2ᚕᚖgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋgraphᚋmodelᚐParameter(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Parameter_ID(ctx context.Context, field graphql.CollectedField, obj *model.Parameter) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Parameter",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Parameter_Key(ctx context.Context, field graphql.CollectedField, obj *model.Parameter) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -1641,6 +1689,41 @@ func (ec *executionContext) _Query_devices(ctx context.Context, field graphql.Co
 	res := resTmp.([]*model.Device)
 	fc.Result = res
 	return ec.marshalNDevice2ᚕᚖgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋgraphᚋmodelᚐDeviceᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_endpoints(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Endpoints(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Endpoint)
+	fc.Result = res
+	return ec.marshalNEndpoint2ᚕᚖgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋgraphᚋmodelᚐEndpointᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1907,38 +1990,6 @@ func (ec *executionContext) _UpdateEndpoint_Path(ctx context.Context, field grap
 	res := resTmp.(*string)
 	fc.Result = res
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _UpdateEndpoint_Parameters(ctx context.Context, field graphql.CollectedField, obj *model.UpdateEndpoint) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "UpdateEndpoint",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Parameters, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.Parameter)
-	fc.Result = res
-	return ec.marshalOParameter2ᚕᚖgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋgraphᚋmodelᚐParameter(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) ___Directive_name(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
@@ -3419,6 +3470,11 @@ func (ec *executionContext) _Parameter(ctx context.Context, sel ast.SelectionSet
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Parameter")
+		case "ID":
+			out.Values[i] = ec._Parameter_ID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "Key":
 			out.Values[i] = ec._Parameter_Key(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -3476,6 +3532,20 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}
 				return res
 			})
+		case "endpoints":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_endpoints(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "__type":
 			out.Values[i] = ec._Query___type(ctx, field)
 		case "__schema":
@@ -3517,8 +3587,6 @@ func (ec *executionContext) _UpdateEndpoint(ctx context.Context, sel ast.Selecti
 			out.Values[i] = ec._UpdateEndpoint_Description(ctx, field, obj)
 		case "Path":
 			out.Values[i] = ec._UpdateEndpoint_Path(ctx, field, obj)
-		case "Parameters":
-			out.Values[i] = ec._UpdateEndpoint_Parameters(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3889,6 +3957,60 @@ func (ec *executionContext) marshalNEndpoint2ᚕgithubᚗcomᚋrnaᚑvtᚋdevice
 	wg.Wait()
 
 	return ret
+}
+
+func (ec *executionContext) marshalNEndpoint2ᚕᚖgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋgraphᚋmodelᚐEndpointᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Endpoint) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNEndpoint2ᚖgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋgraphᚋmodelᚐEndpoint(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNEndpoint2ᚖgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋgraphᚋmodelᚐEndpoint(ctx context.Context, sel ast.SelectionSet, v *model.Endpoint) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._Endpoint(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNEndpoint2ᚖᚕgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋgraphᚋmodelᚐEndpoint(ctx context.Context, sel ast.SelectionSet, v *[]model.Endpoint) graphql.Marshaler {
@@ -4280,47 +4402,6 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 		return graphql.Null
 	}
 	return graphql.MarshalInt(*v)
-}
-
-func (ec *executionContext) marshalOParameter2ᚕᚖgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋgraphᚋmodelᚐParameter(ctx context.Context, sel ast.SelectionSet, v []*model.Parameter) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalOParameter2ᚖgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋgraphᚋmodelᚐParameter(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	return ret
 }
 
 func (ec *executionContext) marshalOParameter2ᚖgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋgraphᚋmodelᚐParameter(ctx context.Context, sel ast.SelectionSet, v *model.Parameter) graphql.Marshaler {

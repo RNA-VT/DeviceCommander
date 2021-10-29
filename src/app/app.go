@@ -10,10 +10,11 @@ import (
 
 // The Application encapsulates the required state for the running software
 type Application struct {
-	Cluster       cluster.Cluster
-	Echo          *echo.Echo
-	Hostname      string
-	DeviceService postgres.DeviceCRUDService
+	Cluster         cluster.Cluster
+	Echo            *echo.Echo
+	Hostname        string
+	DeviceService   postgres.DeviceCRUDService
+	EndpointService postgres.EndpointCRUDService
 }
 
 // SystemInfo returns a stringified version of this api
@@ -23,11 +24,12 @@ func (a *Application) SystemInfo() string {
 
 func (a *Application) Start() {
 	api := routes.APIService{
-		Cluster:       &a.Cluster,
-		DeviceService: a.DeviceService,
+		Cluster:         &a.Cluster,
+		DeviceService:   a.DeviceService,
+		EndpointService: a.EndpointService,
 	}
 
 	a.Cluster.Start()
 
-	routes.ConfigureRoutes(a.Hostname, a.Echo, &api, a.DeviceService)
+	routes.ConfigureRoutes(a.Hostname, a.Echo, &api)
 }

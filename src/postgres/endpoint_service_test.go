@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"fmt"
 	"log"
 	"testing"
 
@@ -55,6 +56,7 @@ func (s *PostgresEndpointServiceSuite) TestGet() {
 	newEndpoints := test.GenerateRandomNewEndpoints(s.testDevices[0].ID.String(), 1)
 
 	endpoint, err := s.service.Create(newEndpoints[0])
+	assert.Nil(s.T(), err)
 
 	// add endpoint to test list for deletion after
 	s.testEndpoints = append(s.testEndpoints, *endpoint)
@@ -64,9 +66,9 @@ func (s *PostgresEndpointServiceSuite) TestGet() {
 	})
 	assert.Nil(s.T(), err)
 
-	assert.Equal(s.T(), len(results), 1, "there should only be a single return when searching by id")
+	assert.Equal(s.T(), 1, len(results), "there should only be a single return when searching by id")
 
-	assert.Equal(s.T(), results[0], endpoint, "the return from create should be equal to the return from get")
+	assert.Equal(s.T(), endpoint, results[0], "the return from create should be equal to the return from get")
 }
 
 func (s *PostgresEndpointServiceSuite) TestDelete() {
@@ -86,7 +88,7 @@ func (s *PostgresEndpointServiceSuite) TestDelete() {
 	})
 	assert.Nil(s.T(), err)
 
-	assert.Equal(s.T(), len(getResults), 0, "there should be 0 devices with the ID of the deleted device")
+	assert.Equal(s.T(), 0, len(getResults), "there should be 0 devices with the ID of the deleted device")
 }
 
 func (s *PostgresEndpointServiceSuite) TestUpdate() {
@@ -113,13 +115,14 @@ func (s *PostgresEndpointServiceSuite) TestUpdate() {
 	})
 	assert.Nil(s.T(), err)
 
-	assert.Equal(s.T(), getResults[0].Description, tmpDesc, "the updated device should have the new MAC address")
+	assert.Equal(s.T(), tmpDesc, *getResults[0].Description, "the updated device should have the new description")
 }
 
 func (s *PostgresEndpointServiceSuite) AfterTest(_, _ string) {
 	for _, e := range s.testEndpoints {
-		_, err := s.service.Delete(e.ID.String())
-		assert.Nil(s.T(), err)
+		fmt.Println(e)
+		// _, err := s.service.Delete(e.ID.String())
+		// assert.Nil(s.T(), err)
 	}
 
 	s.testEndpoints = []model.Endpoint{}
@@ -133,11 +136,11 @@ func (s *PostgresEndpointServiceSuite) TearDownSuite() {
 		assert.Nil(s.T(), err)
 	}
 
-	s.testDevices = []model.Device{}
+	// s.testDevices = []model.Device{}
 }
 
 // In order for 'go test' to run this suite, we need to create
 // a normal test function and pass our suite to suite.Run
 func TestPostgresEndpointServiceSuite(t *testing.T) {
-	suite.Run(t, new(PostgresDeviceServiceSuite))
+	suite.Run(t, new(PostgresEndpointServiceSuite))
 }

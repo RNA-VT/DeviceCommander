@@ -11,5 +11,6 @@ import (
 // It serves as dependency injection for your app, add any dependencies you require here.
 
 type Resolver struct {
-	DeviceService postgres.DeviceCRUDService
+	DeviceService   postgres.DeviceCRUDService
+	EndpointService postgres.EndpointCRUDService
 }

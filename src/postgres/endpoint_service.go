@@ -79,13 +79,13 @@ func (s EndpointService) Update(input model.UpdateEndpoint) error {
 	if err != nil {
 		return err
 	}
-	device := model.Device{ID: id}
-	result := s.DBConnection.Model(device).Updates(input)
+	end := model.Endpoint{ID: id}
+	result := s.DBConnection.Model(end).Updates(input)
 	if result.Error != nil {
 		return result.Error
 	}
 
-	logger.Debug("Updated device " + device.ID.String())
+	logger.Debug("Updated endpoint " + end.ID.String())
 	return nil
 }
 
@@ -106,9 +106,9 @@ func (s EndpointService) Delete(id string) (*model.Endpoint, error) {
 	toBeDeleted.ID = uid
 
 	// TODO: Implement soft deletes
-	s.DBConnection.Delete(model.Device{}, toBeDeleted)
+	s.DBConnection.Delete(model.Endpoint{}, toBeDeleted)
 
-	logger.Debug("Deleted device " + id)
+	logger.Debug("Deleted endpoint " + id)
 	return &toBeDeleted, nil
 }
 

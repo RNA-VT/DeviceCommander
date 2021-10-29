@@ -21,6 +21,7 @@ type NewEndpoint struct {
 }
 
 type Parameter struct {
+	ID          string  `json:"ID"`
 	Key         string  `json:"Key"`
 	EndpointID  string  `json:"EndpointID"`
 	Description *string `json:"Description"`
@@ -38,11 +39,10 @@ type UpdateDevice struct {
 }
 
 type UpdateEndpoint struct {
-	ID          string       `json:"ID"`
-	DeviceID    *string      `json:"DeviceID"`
-	Name        *string      `json:"Name"`
-	Type        *string      `json:"Type"`
-	Description *string      `json:"Description"`
-	Path        *string      `json:"Path"`
-	Parameters  []*Parameter `json:"Parameters"`
+	ID          string  `json:"ID"`
+	DeviceID    *string `json:"DeviceID"`
+	Name        *string `json:"Name"`
+	Type        *string `json:"Type"`
+	Description *string `json:"Description"`
+	Path        *string `json:"Path"`
 }

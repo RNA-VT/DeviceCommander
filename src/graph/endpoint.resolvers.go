@@ -18,6 +18,14 @@ func (r *endpointResolver) DeviceID(ctx context.Context, obj *model.Endpoint) (s
 	return obj.DeviceID.String(), nil
 }
 
+func (r *queryResolver) Endpoints(ctx context.Context) ([]*model.Endpoint, error) {
+	endpoints, err := r.EndpointService.GetAll()
+	if err != nil {
+		return endpoints, err
+	}
+	return endpoints, nil
+}
+
 // Endpoint returns generated.EndpointResolver implementation.
 func (r *Resolver) Endpoint() generated.EndpointResolver { return &endpointResolver{r} }
 

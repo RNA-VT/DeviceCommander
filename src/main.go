@@ -33,14 +33,21 @@ func main() {
 		return
 	}
 
+	endpointService, err := postgres.NewEndpointService(dbConfig)
+	if err != nil {
+		log.Error(err)
+		return
+	}
+
 	app := app.Application{
 		Cluster: cluster.Cluster{
 			Name:          viper.GetString("CLUSTER_NAME"),
 			DeviceService: deviceService,
 		},
-		Echo:          echo.New(),
-		Hostname:      fmt.Sprintf("%s:%s", viper.GetString("HOST"), viper.GetString("PORT")),
-		DeviceService: deviceService,
+		Echo:            echo.New(),
+		Hostname:        fmt.Sprintf("%s:%s", viper.GetString("HOST"), viper.GetString("PORT")),
+		DeviceService:   deviceService,
+		EndpointService: endpointService,
 	}
 	var API routes.APIService
 

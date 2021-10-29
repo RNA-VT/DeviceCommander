@@ -24,12 +24,16 @@ type UpdateEndpoint {
     Type: String
     Description: String
     Path: String
-    Parameters: [Parameter]
 }
 
 type Parameter {
+    ID: String!
     Key: String!
     EndpointID: String!
     Description: String
     Type: String!
+}
+
+extend type Query {
+  endpoints: [Endpoint!]!
 }

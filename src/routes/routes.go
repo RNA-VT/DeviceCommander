@@ -14,12 +14,13 @@ import (
 
 // APIService -
 type APIService struct {
-	Cluster       *cluster.Cluster
-	DeviceService postgres.DeviceCRUDService
+	Cluster         *cluster.Cluster
+	DeviceService   postgres.DeviceCRUDService
+	EndpointService postgres.EndpointCRUDService
 }
 
 // ConfigureRoutes will use Echo to start listening on the appropriate paths
-func ConfigureRoutes(listenURL string, e *echo.Echo, api *APIService, deviceService postgres.DeviceCRUDService) {
+func ConfigureRoutes(listenURL string, e *echo.Echo, api *APIService) {
 	// Middleware
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
@@ -42,7 +43,7 @@ func ConfigureRoutes(listenURL string, e *echo.Echo, api *APIService, deviceServ
 
 	api.addRegistrationRoutes(e)
 	api.addInfoRoutes(e)
-	api.addGraphQLRoutes(e, deviceService)
+	api.addGraphQLRoutes(e, api.DeviceService, api.EndpointService)
 
 	log.WithFields(log.Fields{
 		"module": "routes",

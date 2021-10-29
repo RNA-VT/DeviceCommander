@@ -10,14 +10,15 @@ import (
 	"github.com/rna-vt/devicecommander/postgres"
 )
 
-func (a *APIService) addGraphQLRoutes(e *echo.Echo, deviceService postgres.DeviceCRUDService) {
+func (a *APIService) addGraphQLRoutes(e *echo.Echo, deviceService postgres.DeviceCRUDService, endpointService postgres.EndpointCRUDService) {
 	baseRoute := "/v1/graphql"
 	api := e.Group(baseRoute)
 
 	graphqlHandler := handler.NewDefaultServer(
 		generated.NewExecutableSchema(
 			generated.Config{Resolvers: &graph.Resolver{
-				DeviceService: deviceService,
+				DeviceService:   deviceService,
+				EndpointService: endpointService,
 			}},
 		),
 	)
