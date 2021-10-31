@@ -13,17 +13,16 @@ type NewDevice struct {
 
 type NewEndpoint struct {
 	DeviceID    string       `json:"DeviceID"`
-	Name        *string      `json:"Name"`
+	Method      *string      `json:"Method"`
 	Type        string       `json:"Type"`
 	Description *string      `json:"Description"`
-	Path        *string      `json:"Path"`
 	Parameters  []*Parameter `json:"Parameters"`
 }
 
 type Parameter struct {
 	ID          string  `json:"ID"`
-	Key         string  `json:"Key"`
 	EndpointID  string  `json:"EndpointID"`
+	Name        string  `json:"Name"`
 	Description *string `json:"Description"`
 	Type        string  `json:"Type"`
 }
@@ -39,10 +38,10 @@ type UpdateDevice struct {
 }
 
 type UpdateEndpoint struct {
-	ID          string  `json:"ID"`
-	DeviceID    *string `json:"DeviceID"`
-	Name        *string `json:"Name"`
-	Type        *string `json:"Type"`
-	Description *string `json:"Description"`
-	Path        *string `json:"Path"`
+	ID          string       `json:"ID"`
+	DeviceID    *string      `json:"DeviceID"`
+	Method      *string      `json:"Method"`
+	Type        *string      `json:"Type"`
+	Description *string      `json:"Description"`
+	Parameters  []*Parameter `json:"Parameters"`
 }

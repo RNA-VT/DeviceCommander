@@ -1,35 +1,33 @@
 type Endpoint {
     ID: String!
     DeviceID: String!
-    Name: String
+    Method: String
     Type: String!
     Description: String
-    Path: String
-    Parameters: [Parameter]!
+    Parameters: [Parameter]
 }
 
 type NewEndpoint {
     DeviceID: String!
-    Name: String
+    Method: String
     Type: String!
     Description: String
-    Path: String
-    Parameters: [Parameter]!
+    Parameters: [Parameter]
 }
 
 type UpdateEndpoint {
     ID: String!
     DeviceID: String
-    Name: String
+    Method: String
     Type: String
     Description: String
-    Path: String
+    Parameters: [Parameter]
 }
 
 type Parameter {
     ID: String!
-    Key: String!
     EndpointID: String!
+    Name: String!
     Description: String
     Type: String!
 }

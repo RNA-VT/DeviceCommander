@@ -25,7 +25,7 @@ func NewDeviceEndpoint() *DeviceEndpoint {
 }
 
 func (e DeviceEndpoint) Execute(map[string]interface{}) error {
-	log.Println(e.Name)
+	log.Println(e.Method)
 	log.Println(e.Device.URL())
 	return nil
 }

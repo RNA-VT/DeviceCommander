@@ -37,15 +37,15 @@ func GenerateRandomNewEndpoints(deviceID string, count int) []model.NewEndpoint 
 		tmpEndpointName := "dmx-config"
 		tmpEndpoint := model.NewEndpoint{
 			DeviceID: deviceID,
-			Name:     &tmpEndpointName,
+			Method:   &tmpEndpointName,
 			Type:     "SET",
 			Parameters: []*model.Parameter{
 				{
-					Key:  "universe",
+					Name: "universe",
 					Type: "int",
 				},
 				{
-					Key:  "start-address",
+					Name: "start-address",
 					Type: "int",
 				},
 			},
@@ -54,15 +54,15 @@ func GenerateRandomNewEndpoints(deviceID string, count int) []model.NewEndpoint 
 		tmpEndpointName2 := "state"
 		tmpEndpoint2 := model.NewEndpoint{
 			DeviceID: deviceID,
-			Name:     &tmpEndpointName2,
+			Method:   &tmpEndpointName2,
 			Type:     "GET",
 			Parameters: []*model.Parameter{
 				{
-					Key:  "universe",
+					Name: "universe",
 					Type: "int",
 				},
 				{
-					Key:  "start-address",
+					Name: "start-address",
 					Type: "int",
 				},
 			},
