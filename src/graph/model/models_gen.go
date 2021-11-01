@@ -26,14 +26,6 @@ type NewParameter struct {
 	Type        string  `json:"Type"`
 }
 
-type Parameter struct {
-	ID          string  `json:"ID"`
-	EndpointID  string  `json:"EndpointID"`
-	Name        string  `json:"Name"`
-	Description *string `json:"Description"`
-	Type        string  `json:"Type"`
-}
-
 type UpdateDevice struct {
 	ID          string  `json:"ID"`
 	Mac         *string `json:"MAC"`

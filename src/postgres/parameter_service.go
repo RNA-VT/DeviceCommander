@@ -3,6 +3,7 @@ package postgres
 import (
 	"fmt"
 
+	"github.com/google/uuid"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -68,32 +69,46 @@ func (s ParameterService) Create(newParameterArgs model.NewParameter) (*model.Pa
 		return newParameter, result.Error
 	}
 
-	logger.Debug("Created Parameter " + newParameter.ID)
+	logger.Debug("Created Parameter " + newParameter.ID.String())
 	return newParameter, nil
 }
 
 func (s ParameterService) Update(input model.UpdateParameter) error {
 	logger := getPostgresLogger()
 
-	end := model.Parameter{ID: input.ID}
+	parameterID, err := uuid.Parse(input.ID)
+	if err != nil {
+		return err
+	}
+
+	end := model.Parameter{ID: parameterID}
 
 	result := s.DBConnection.Session(&gorm.Session{FullSaveAssociations: true}).Model(end).Updates(input)
 	if result.Error != nil {
 		return result.Error
 	}
 
-	logger.Debug("Updated Parameter " + end.ID)
+	logger.Debug("Updated Parameter " + end.ID.String())
 	return nil
 }
 
 func (s ParameterService) Delete(id string) (*model.Parameter, error) {
 	logger := getPostgresLogger()
 	var toBeDeleted model.Parameter
-	toBeDeleted.ID = id
+
+	parameterID, err := uuid.Parse(id)
+	if err != nil {
+		return &toBeDeleted, err
+	}
+	toBeDeleted.ID = parameterID
 
 	results, err := s.Get(toBeDeleted)
 	if err != nil {
 		return &toBeDeleted, err
+	}
+
+	if len(results) == 0 {
+		return &toBeDeleted, fmt.Errorf("parameter %s has already been deleted", id)
 	}
 
 	toBeDeleted = *results[0]

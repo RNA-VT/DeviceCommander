@@ -40,9 +40,13 @@ func NewEndpointFromNewEndpoint(input model.NewEndpoint) *model.Endpoint {
 }
 
 func NewParameterFromNewParameter(input model.NewParameter) *model.Parameter {
+	endpointID, err := uuid.Parse(input.EndpointID)
+	if err != nil {
+		log.Error(err)
+	}
 	param := model.Parameter{
-		ID:         uuid.New().String(),
-		EndpointID: input.EndpointID,
+		ID:         uuid.New(),
+		EndpointID: endpointID,
 		Name:       input.Name,
 		Type:       input.Type,
 	}

@@ -112,7 +112,7 @@ func (s EndpointService) Delete(id string) (*model.Endpoint, error) {
 	}
 
 	if len(results) == 0 {
-		return &toBeDeleted, fmt.Errorf("%s has already been deleted", id)
+		return &toBeDeleted, fmt.Errorf("endpoint %s has already been deleted", id)
 	}
 
 	toBeDeleted = *results[0]

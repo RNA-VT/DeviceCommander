@@ -76,7 +76,7 @@ func (s *PostgresEndpointServiceSuite) TestGet() {
 	assert.Equal(s.T(), testEndpoint, *results[0], "the return from create should be equal to the return from get")
 
 	for _, p := range results[0].Parameters {
-		assert.Equal(s.T(), testEndpoint.ID.String(), p.EndpointID, "the new param should have the correct endpoint id")
+		assert.Equal(s.T(), testEndpoint.ID, p.EndpointID, "the new param should have the correct endpoint id")
 	}
 
 	assert.Equal(s.T(), len(testEndpoint.Parameters), len(results[0].Parameters), "the endpoint should have the same number of parameters as the new obj")

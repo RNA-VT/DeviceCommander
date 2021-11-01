@@ -16,6 +16,7 @@ import (
 type PostgresParameterServiceSuite struct {
 	suite.Suite
 	testDevices      []model.Device
+	testEndpoints    []model.Endpoint
 	testParameters   []model.Parameter
 	deviceService    DeviceService
 	endpointService  EndpointCRUDService
@@ -56,12 +57,18 @@ func (s *PostgresParameterServiceSuite) SetupSuite() {
 	dev, err := s.deviceService.Create(newDevs[0])
 	assert.Nil(s.T(), err)
 
+	testEndpoint := test.GenerateRandomNewEndpoints(dev.ID.String(), 1)
+
+	end, err := s.endpointService.Create(testEndpoint[0])
+	assert.Nil(s.T(), err)
+
 	s.testDevices = append(s.testDevices, *dev)
+	s.testEndpoints = append(s.testEndpoints, *end)
 }
 
 func (s *PostgresParameterServiceSuite) CreateTestParameter() model.Parameter {
-	currentTestDevice := s.testDevices[0]
-	testParameters := test.GenerateRandomNewParameterForEndpoint(currentTestDevice.ID.String(), 1)
+	currentTestEndpoint := s.testEndpoints[0]
+	testParameters := test.GenerateRandomNewParameterForEndpoint(currentTestEndpoint.ID.String(), 1)
 
 	param, err := s.parameterService.Create(testParameters[0])
 	assert.Nil(s.T(), err)
@@ -81,13 +88,13 @@ func (s *PostgresParameterServiceSuite) TestGet() {
 
 	assert.Equal(s.T(), 1, len(results), "there should only be a single return when searching by id")
 
-	assert.Equal(s.T(), testParameter, results[0], "the return from create should be equal to the return from get")
+	assert.Equal(s.T(), &testParameter, results[0], "the return from create should be equal to the return from get")
 }
 
 func (s *PostgresParameterServiceSuite) TestDelete() {
 	testParameter := s.CreateTestParameter()
 
-	deleteResult, err := s.parameterService.Delete(testParameter.ID)
+	deleteResult, err := s.parameterService.Delete(testParameter.ID.String())
 	assert.Nil(s.T(), err)
 
 	assert.Equal(s.T(), deleteResult.ID, testParameter.ID, "the return from a delete should contain the deleted object")
@@ -105,7 +112,7 @@ func (s *PostgresParameterServiceSuite) TestUpdate() {
 
 	tmpDesc := "Radom test update"
 	err := s.parameterService.Update(model.UpdateParameter{
-		ID:          testParameter.ID,
+		ID:          testParameter.ID.String(),
 		Description: &tmpDesc,
 	})
 	assert.Nil(s.T(), err)
@@ -123,7 +130,7 @@ func (s *PostgresParameterServiceSuite) TestParamUpdate() {
 
 	tmpDesc := "Radom test update 710"
 	paramUpdate := model.UpdateParameter{
-		ID:          testParameter.ID,
+		ID:          testParameter.ID.String(),
 		Description: &tmpDesc,
 	}
 
@@ -140,20 +147,18 @@ func (s *PostgresParameterServiceSuite) TestParamUpdate() {
 
 func (s *PostgresParameterServiceSuite) TearDownSuite() {
 	for _, p := range s.testParameters {
-		_, err := s.parameterService.Delete(p.ID)
-		assert.Nil(s.T(), err)
+		_, err := s.parameterService.Delete(p.ID.String())
+		log.Warn(err)
 	}
 
 	for _, d := range s.testDevices {
 		_, err := s.deviceService.Delete(d.ID.String())
 		assert.Nil(s.T(), err)
 	}
-
-	// s.testDevices = []model.Device{}
 }
 
 // In order for 'go test' to run this suite, we need to create
 // a normal test function and pass our suite to suite.Run
 func TestPostgresParameterServiceSuite(t *testing.T) {
-	suite.Run(t, new(PostgresEndpointServiceSuite))
+	suite.Run(t, new(PostgresParameterServiceSuite))
 }

@@ -11,3 +11,11 @@ type Endpoint struct {
 	Path        *string      `json:"Path"`
 	Parameters  []*Parameter `json:"Paramaters,omitempty"`
 }
+
+type Parameter struct {
+	ID          uuid.UUID `json:"ID"`
+	EndpointID  uuid.UUID `json:"EndpointID"`
+	Name        string    `json:"Name"`
+	Description *string   `json:"Description"`
+	Type        string    `json:"Type"`
+}
