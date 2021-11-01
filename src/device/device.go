@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/google/uuid"
+
 	"github.com/rna-vt/devicecommander/graph/model"
 )
 

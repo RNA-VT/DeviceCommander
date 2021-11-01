@@ -41,5 +41,7 @@ func (r *Resolver) Endpoint() generated.EndpointResolver { return &endpointResol
 // Parameter returns generated.ParameterResolver implementation.
 func (r *Resolver) Parameter() generated.ParameterResolver { return &parameterResolver{r} }
 
-type endpointResolver struct{ *Resolver }
-type parameterResolver struct{ *Resolver }
+type (
+	endpointResolver  struct{ *Resolver }
+	parameterResolver struct{ *Resolver }
+)

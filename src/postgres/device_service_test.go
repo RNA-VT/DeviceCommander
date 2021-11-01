@@ -44,7 +44,6 @@ func (s *PostgresDeviceServiceSuite) SetupSuite() {
 
 	// add device to test list for deletion after
 	s.testDevices = append(s.testDevices, *dev)
-
 }
 
 func (s *PostgresDeviceServiceSuite) TestGet() {
