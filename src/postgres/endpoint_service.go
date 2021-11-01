@@ -6,7 +6,9 @@ import (
 	"github.com/google/uuid"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 
+	"github.com/rna-vt/devicecommander/endpoint"
 	"github.com/rna-vt/devicecommander/graph/model"
 )
 
@@ -55,22 +57,25 @@ func (s EndpointService) Initialise() (EndpointService, error) {
 		return s, err
 	}
 
+	err = db.AutoMigrate(&model.Parameter{})
+	if err != nil {
+		return s, err
+	}
+
 	return s, nil
 }
 
 func (s EndpointService) Create(newDeviceArgs model.NewEndpoint) (*model.Endpoint, error) {
 	logger := getPostgresLogger()
-	newEndpoint := model.Endpoint{
-		ID: uuid.New(),
-	}
+	newEndpoint := endpoint.NewEndpointFromNewEndpoint(newDeviceArgs)
 
 	result := s.DBConnection.Create(&newEndpoint)
 	if result.Error != nil {
-		return &newEndpoint, result.Error
+		return newEndpoint, result.Error
 	}
 
 	logger.Debug("Created endpoint " + newEndpoint.ID.String())
-	return &newEndpoint, nil
+	return newEndpoint, nil
 }
 
 func (s EndpointService) Update(input model.UpdateEndpoint) error {
@@ -79,8 +84,10 @@ func (s EndpointService) Update(input model.UpdateEndpoint) error {
 	if err != nil {
 		return err
 	}
+
 	end := model.Endpoint{ID: id}
-	result := s.DBConnection.Model(end).Updates(input)
+
+	result := s.DBConnection.Session(&gorm.Session{FullSaveAssociations: true}).Model(end).Updates(input)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -92,18 +99,27 @@ func (s EndpointService) Update(input model.UpdateEndpoint) error {
 func (s EndpointService) Delete(id string) (*model.Endpoint, error) {
 	logger := getPostgresLogger()
 	var toBeDeleted model.Endpoint
-	result := s.DBConnection.First(&toBeDeleted, "ID = ?", id)
-	if result.Error != nil {
-		return &toBeDeleted, result.Error
-	}
-
-	logger.Debug(toBeDeleted)
-
-	uid, err := uuid.Parse(id)
+	endUUID, err := uuid.Parse(id)
 	if err != nil {
 		return &toBeDeleted, err
 	}
-	toBeDeleted.ID = uid
+	toBeDeleted.ID = endUUID
+
+	results, err := s.Get(toBeDeleted)
+	// result := s.DBConnection.First(&toBeDeleted, "ID = ?", id)
+	if err != nil {
+		return &toBeDeleted, err
+	}
+
+	if len(results) == 0 {
+		return &toBeDeleted, fmt.Errorf("%s has already been deleted", id)
+	}
+
+	toBeDeleted = *results[0]
+
+	for _, param := range toBeDeleted.Parameters {
+		s.DBConnection.Delete(model.Parameter{}, param)
+	}
 
 	// TODO: Implement soft deletes
 	s.DBConnection.Delete(model.Endpoint{}, toBeDeleted)
@@ -114,7 +130,7 @@ func (s EndpointService) Delete(id string) (*model.Endpoint, error) {
 
 func (s EndpointService) Get(query model.Endpoint) ([]*model.Endpoint, error) {
 	endpoints := []*model.Endpoint{}
-	result := s.DBConnection.Where(query).Find(&endpoints)
+	result := s.DBConnection.Preload(clause.Associations).Where(query).Find(&endpoints)
 	if result.Error != nil {
 		return endpoints, result.Error
 	}

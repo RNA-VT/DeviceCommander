@@ -34,41 +34,55 @@ func GenerateRandomNewDevices(count int) []model.NewDevice {
 func GenerateRandomNewEndpoints(deviceID string, count int) []model.NewEndpoint {
 	collection := []model.NewEndpoint{}
 	for i := 0; i < count; i++ {
-		tmpEndpointName := "dmx-config"
+		tmpParam := GenerateRandomNewParameter(2)
 		tmpEndpoint := model.NewEndpoint{
 			DeviceID: deviceID,
-			Method:   &tmpEndpointName,
+			Method:   "dmx-config",
 			Type:     "SET",
-			Parameters: []*model.Parameter{
-				{
-					Name: "universe",
-					Type: "int",
-				},
-				{
-					Name: "start-address",
-					Type: "int",
-				},
+			Parameters: []*model.NewParameter{
+				&tmpParam[0],
+				&tmpParam[1],
 			},
 		}
 
-		tmpEndpointName2 := "state"
 		tmpEndpoint2 := model.NewEndpoint{
 			DeviceID: deviceID,
-			Method:   &tmpEndpointName2,
+			Method:   "state",
 			Type:     "GET",
-			Parameters: []*model.Parameter{
-				{
-					Name: "universe",
-					Type: "int",
-				},
-				{
-					Name: "start-address",
-					Type: "int",
-				},
+			Parameters: []*model.NewParameter{
+				&tmpParam[0],
+				&tmpParam[1],
 			},
 		}
 		collection = append(collection, tmpEndpoint)
 		collection = append(collection, tmpEndpoint2)
+	}
+	return collection
+}
+
+func GenerateRandomNewParameter(count int) []model.NewParameter {
+	collection := []model.NewParameter{}
+	for i := 0; i < count; i++ {
+		tmpParam := model.NewParameter{
+			Name: "foobar",
+			Type: "SET",
+		}
+
+		collection = append(collection, tmpParam)
+	}
+	return collection
+}
+
+func GenerateRandomNewParameterForEndpoint(endpointID string, count int) []model.NewParameter {
+	collection := []model.NewParameter{}
+	for i := 0; i < count; i++ {
+		tmpParam := model.NewParameter{
+			EndpointID: endpointID,
+			Name:       "foobar",
+			Type:       "SET",
+		}
+
+		collection = append(collection, tmpParam)
 	}
 	return collection
 }

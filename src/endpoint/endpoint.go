@@ -1,31 +1,55 @@
 package endpoint
 
 import (
-	"log"
+	"github.com/google/uuid"
+	"github.com/labstack/gommon/log"
 
-	"github.com/rna-vt/devicecommander/device"
 	"github.com/rna-vt/devicecommander/graph/model"
 )
 
-type Endpoint interface {
-	Execute(map[string]interface{}) error
+func NewEndpointFromNewEndpoint(input model.NewEndpoint) *model.Endpoint {
+	deviceUUID, err := uuid.Parse(input.DeviceID)
+	if err != nil {
+		log.Error(err)
+	}
+
+	endID := uuid.New()
+	end := model.Endpoint{
+		ID:       endID,
+		DeviceID: deviceUUID,
+		Type:     input.Type,
+		Method:   input.Method,
+	}
+
+	if input.Description != nil {
+		end.Description = input.Description
+	}
+
+	if input.Parameters != nil {
+		end.Parameters = []*model.Parameter{}
+
+		for _, p := range input.Parameters {
+			tmpP := NewParameterFromNewParameter(*p)
+			end.Parameters = append(end.Parameters, tmpP)
+		}
+	} else {
+		end.Parameters = []*model.Parameter{}
+	}
+
+	return &end
 }
 
-type Parameter struct {
-	model.Parameter
-}
+func NewParameterFromNewParameter(input model.NewParameter) *model.Parameter {
+	param := model.Parameter{
+		ID:         uuid.New().String(),
+		EndpointID: input.EndpointID,
+		Name:       input.Name,
+		Type:       input.Type,
+	}
 
-type DeviceEndpoint struct {
-	model.Endpoint
-	Device device.Device
-}
+	if input.Description != nil {
+		param.Description = input.Description
+	}
 
-func NewDeviceEndpoint() *DeviceEndpoint {
-	return &DeviceEndpoint{}
-}
-
-func (e DeviceEndpoint) Execute(map[string]interface{}) error {
-	log.Println(e.Method)
-	log.Println(e.Device.URL())
-	return nil
+	return &param
 }

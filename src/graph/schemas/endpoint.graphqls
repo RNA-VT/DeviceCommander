@@ -1,18 +1,18 @@
 type Endpoint {
     ID: String!
     DeviceID: String!
-    Method: String
+    Method: String!
     Type: String!
     Description: String
-    Parameters: [Parameter]
+    Parameters: [Parameter]!
 }
 
 type NewEndpoint {
     DeviceID: String!
-    Method: String
+    Method: String!
     Type: String!
     Description: String
-    Parameters: [Parameter]
+    Parameters: [NewParameter]!
 }
 
 type UpdateEndpoint {
@@ -21,7 +21,6 @@ type UpdateEndpoint {
     Method: String
     Type: String
     Description: String
-    Parameters: [Parameter]
 }
 
 type Parameter {
@@ -30,6 +29,21 @@ type Parameter {
     Name: String!
     Description: String
     Type: String!
+}
+
+type NewParameter {
+    EndpointID: String!
+    Name: String!
+    Description: String
+    Type: String!
+}
+
+type UpdateParameter {
+    ID: String!
+    EndpointID: String
+    Name: String
+    Description: String
+    Type: String
 }
 
 extend type Query {
