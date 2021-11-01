@@ -151,6 +151,11 @@ func (s *PostgresParameterServiceSuite) TearDownSuite() {
 		log.Warn(err)
 	}
 
+	for _, e := range s.testEndpoints {
+		_, err := s.parameterService.Delete(e.ID.String())
+		log.Warn(err)
+	}
+
 	for _, d := range s.testDevices {
 		_, err := s.deviceService.Delete(d.ID.String())
 		assert.Nil(s.T(), err)

@@ -26,20 +26,20 @@ func NewEndpointFromNewEndpoint(input model.NewEndpoint) *model.Endpoint {
 	}
 
 	if input.Parameters != nil {
-		end.Parameters = []*model.Parameter{}
+		end.Parameters = []model.Parameter{}
 
 		for _, p := range input.Parameters {
 			tmpP := NewParameterFromNewParameter(*p)
 			end.Parameters = append(end.Parameters, tmpP)
 		}
 	} else {
-		end.Parameters = []*model.Parameter{}
+		end.Parameters = []model.Parameter{}
 	}
 
 	return &end
 }
 
-func NewParameterFromNewParameter(input model.NewParameter) *model.Parameter {
+func NewParameterFromNewParameter(input model.NewParameter) model.Parameter {
 	endpointID, err := uuid.Parse(input.EndpointID)
 	if err != nil {
 		log.Error(err)
@@ -55,5 +55,5 @@ func NewParameterFromNewParameter(input model.NewParameter) *model.Parameter {
 		param.Description = input.Description
 	}
 
-	return &param
+	return param
 }

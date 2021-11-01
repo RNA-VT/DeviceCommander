@@ -7,6 +7,7 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
+	"github.com/rna-vt/devicecommander/device"
 	"github.com/rna-vt/devicecommander/graph/model"
 )
 
@@ -50,7 +51,7 @@ func (s DeviceService) Initialise() (DeviceService, error) {
 
 	s.DBConnection = db
 
-	err = db.AutoMigrate(&model.Device{})
+	err = RunMigration(db)
 	if err != nil {
 		return s, err
 	}
@@ -60,24 +61,7 @@ func (s DeviceService) Initialise() (DeviceService, error) {
 
 func (s DeviceService) Create(newDeviceArgs model.NewDevice) (*model.Device, error) {
 	logger := getPostgresLogger()
-	newDevice := model.Device{
-		ID:   uuid.New(),
-		Host: newDeviceArgs.Host,
-		Port: newDeviceArgs.Port,
-	}
-
-	if newDeviceArgs.Mac != nil {
-		newDevice.MAC = *newDeviceArgs.Mac
-	}
-
-	if newDeviceArgs.Name != nil {
-		newDevice.Name = *newDeviceArgs.Name
-	}
-
-	if newDeviceArgs.Description != nil {
-		newDevice.Description = *newDeviceArgs.Description
-	}
-
+	newDevice := device.NewDeviceFromNewDevice(newDeviceArgs)
 	result := s.DBConnection.Create(&newDevice)
 	if result.Error != nil {
 		return &newDevice, result.Error

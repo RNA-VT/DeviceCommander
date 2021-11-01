@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/google/uuid"
 	"github.com/rna-vt/devicecommander/graph/model"
 )
 
@@ -23,6 +24,28 @@ type Interface interface {
 // layer of abstraction away from the gqlgen/postgres models.
 type Device struct {
 	model.Device
+}
+
+func NewDeviceFromNewDevice(newDeviceArgs model.NewDevice) model.Device {
+	newDevice := model.Device{
+		ID:   uuid.New(),
+		Host: newDeviceArgs.Host,
+		Port: newDeviceArgs.Port,
+	}
+
+	if newDeviceArgs.Mac != nil {
+		newDevice.MAC = *newDeviceArgs.Mac
+	}
+
+	if newDeviceArgs.Name != nil {
+		newDevice.Name = *newDeviceArgs.Name
+	}
+
+	if newDeviceArgs.Description != nil {
+		newDevice.Description = *newDeviceArgs.Description
+	}
+
+	return newDevice
 }
 
 // NewDeviceWrapper creates a new instance of a device.Wrapper

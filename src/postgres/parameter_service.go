@@ -52,7 +52,7 @@ func (s ParameterService) Initialise() (ParameterService, error) {
 
 	s.DBConnection = db
 
-	err = db.AutoMigrate(&model.Parameter{})
+	err = RunMigration(db)
 	if err != nil {
 		return s, err
 	}
@@ -66,11 +66,11 @@ func (s ParameterService) Create(newParameterArgs model.NewParameter) (*model.Pa
 
 	result := s.DBConnection.Create(&newParameter)
 	if result.Error != nil {
-		return newParameter, result.Error
+		return &newParameter, result.Error
 	}
 
 	logger.Debug("Created Parameter " + newParameter.ID.String())
-	return newParameter, nil
+	return &newParameter, nil
 }
 
 func (s ParameterService) Update(input model.UpdateParameter) error {

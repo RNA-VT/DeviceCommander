@@ -35,6 +35,16 @@ func (s *PostgresDeviceServiceSuite) SetupSuite() {
 	}
 
 	s.service = deviceService
+
+	newDevs := test.GenerateRandomNewDevices(1)
+	newDev := newDevs[0]
+
+	dev, err := s.service.Create(newDev)
+	assert.Nil(s.T(), err)
+
+	// add device to test list for deletion after
+	s.testDevices = append(s.testDevices, *dev)
+
 }
 
 func (s *PostgresDeviceServiceSuite) TestGet() {

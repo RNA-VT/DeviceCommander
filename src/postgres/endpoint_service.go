@@ -52,12 +52,7 @@ func (s EndpointService) Initialise() (EndpointService, error) {
 
 	s.DBConnection = db
 
-	err = db.AutoMigrate(&model.Endpoint{})
-	if err != nil {
-		return s, err
-	}
-
-	err = db.AutoMigrate(&model.Parameter{})
+	err = RunMigration(db)
 	if err != nil {
 		return s, err
 	}
