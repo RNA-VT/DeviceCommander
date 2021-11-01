@@ -100,23 +100,10 @@ func (s EndpointService) Delete(id string) (*model.Endpoint, error) {
 	}
 	toBeDeleted.ID = endUUID
 
-	results, err := s.Get(toBeDeleted)
-	// result := s.DBConnection.First(&toBeDeleted, "ID = ?", id)
-	if err != nil {
-		return &toBeDeleted, err
-	}
+	s.DBConnection.Delete(model.Parameter{}, model.Parameter{
+		EndpointID: endUUID,
+	})
 
-	if len(results) == 0 {
-		return &toBeDeleted, fmt.Errorf("endpoint %s has already been deleted", id)
-	}
-
-	toBeDeleted = *results[0]
-
-	for _, param := range toBeDeleted.Parameters {
-		s.DBConnection.Delete(model.Parameter{}, param)
-	}
-
-	// TODO: Implement soft deletes
 	s.DBConnection.Delete(model.Endpoint{}, toBeDeleted)
 
 	logger.Debug("Deleted endpoint " + id)
@@ -135,7 +122,7 @@ func (s EndpointService) Get(query model.Endpoint) ([]*model.Endpoint, error) {
 
 func (s EndpointService) GetAll() ([]*model.Endpoint, error) {
 	endpoints := []*model.Endpoint{}
-	result := s.DBConnection.Find(&endpoints)
+	result := s.DBConnection.Preload(clause.Associations).Find(&endpoints)
 	if result.Error != nil {
 		return endpoints, result.Error
 	}

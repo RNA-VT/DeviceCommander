@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 
 	"github.com/rna-vt/devicecommander/device"
 	"github.com/rna-vt/devicecommander/graph/model"
@@ -103,8 +104,21 @@ func (s DeviceService) Delete(id string) (*model.Device, error) {
 	}
 	toBeDeleted.ID = uid
 
+	results, err := s.Get(toBeDeleted)
+	if err != nil {
+		return &toBeDeleted, err
+	}
+
+	if len(results) == 0 {
+		return &toBeDeleted, fmt.Errorf("the device %s has already been deleted", id)
+	}
+
+	s.DBConnection.Select("Parameters").Delete(model.Endpoint{}, model.Endpoint{
+		DeviceID: uid,
+	})
+
 	// TODO: Implement soft deletes
-	s.DBConnection.Delete(model.Device{}, toBeDeleted)
+	s.DBConnection.Select("Endpoints").Delete(model.Device{}, toBeDeleted)
 
 	logger.Debug("Deleted device " + id)
 	return &toBeDeleted, nil
@@ -122,7 +136,7 @@ func (s DeviceService) Get(devQuery model.Device) ([]*model.Device, error) {
 
 func (s DeviceService) GetAll() ([]*model.Device, error) {
 	devices := []*model.Device{}
-	result := s.DBConnection.Find(&devices)
+	result := s.DBConnection.Preload(clause.Associations).Find(&devices)
 	if result.Error != nil {
 		return devices, result.Error
 	}

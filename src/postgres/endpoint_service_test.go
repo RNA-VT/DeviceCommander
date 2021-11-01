@@ -95,6 +95,8 @@ func (s *PostgresEndpointServiceSuite) TestDelete() {
 	})
 	assert.Nil(s.T(), err)
 
+	assert.Nil(s.T(), err)
+
 	assert.Equal(s.T(), 0, len(getResults), "there should be 0 endpoints with the ID of the deleted endpoint")
 }
 

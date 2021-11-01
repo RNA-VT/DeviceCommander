@@ -49,7 +49,6 @@ type ComplexityRoot struct {
 	Device struct {
 		Active      func(childComplexity int) int
 		Description func(childComplexity int) int
-		Endpoints   func(childComplexity int) int
 		Host        func(childComplexity int) int
 		ID          func(childComplexity int) int
 		MAC         func(childComplexity int) int
@@ -166,13 +165,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Device.Description(childComplexity), true
-
-	case "Device.Endpoints":
-		if e.complexity.Device.Endpoints == nil {
-			break
-		}
-
-		return e.complexity.Device.Endpoints(childComplexity), true
 
 	case "Device.Host":
 		if e.complexity.Device.Host == nil {
@@ -541,7 +533,6 @@ var sources = []*ast.Source{
   Host: String
   Port: Int
   Active: Boolean
-  Endpoints: [Endpoint]!
 }
 
 input NewDevice {
@@ -955,41 +946,6 @@ func (ec *executionContext) _Device_Active(ctx context.Context, field graphql.Co
 	res := resTmp.(bool)
 	fc.Result = res
 	return ec.marshalOBoolean2bool(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Device_Endpoints(ctx context.Context, field graphql.CollectedField, obj *model.Device) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Device",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Endpoints, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]model.Endpoint)
-	fc.Result = res
-	return ec.marshalNEndpoint2ᚕgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋgraphᚋmodelᚐEndpoint(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Endpoint_ID(ctx context.Context, field graphql.CollectedField, obj *model.Endpoint) (ret graphql.Marshaler) {
@@ -3574,11 +3530,6 @@ func (ec *executionContext) _Device(ctx context.Context, sel ast.SelectionSet, o
 			out.Values[i] = ec._Device_Port(ctx, field, obj)
 		case "Active":
 			out.Values[i] = ec._Device_Active(ctx, field, obj)
-		case "Endpoints":
-			out.Values[i] = ec._Device_Endpoints(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4294,44 +4245,6 @@ func (ec *executionContext) marshalNDevice2ᚖgithubᚗcomᚋrnaᚑvtᚋdeviceco
 	return ec._Device(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNEndpoint2ᚕgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋgraphᚋmodelᚐEndpoint(ctx context.Context, sel ast.SelectionSet, v []model.Endpoint) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalOEndpoint2githubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋgraphᚋmodelᚐEndpoint(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	return ret
-}
-
 func (ec *executionContext) marshalNEndpoint2ᚕᚖgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋgraphᚋmodelᚐEndpointᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Endpoint) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
@@ -4781,10 +4694,6 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 		return graphql.Null
 	}
 	return graphql.MarshalBoolean(*v)
-}
-
-func (ec *executionContext) marshalOEndpoint2githubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋgraphᚋmodelᚐEndpoint(ctx context.Context, sel ast.SelectionSet, v model.Endpoint) graphql.Marshaler {
-	return ec._Endpoint(ctx, sel, &v)
 }
 
 func (ec *executionContext) unmarshalOInt2int(ctx context.Context, v interface{}) (int, error) {
