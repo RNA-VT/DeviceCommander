@@ -46,24 +46,31 @@ func (s *PostgresDeviceServiceSuite) SetupSuite() {
 	s.testDevices = append(s.testDevices, *dev)
 }
 
-func (s *PostgresDeviceServiceSuite) TestGet() {
-	newDevs := test.GenerateRandomNewDevices(1)
-	newDev := newDevs[0]
+func (s *PostgresDeviceServiceSuite) CreateTestDevice() model.Device {
+	testDevices := test.GenerateRandomNewDevices(1)
+	testDevice := testDevices[0]
 
-	dev, err := s.service.Create(newDev)
+	newDevice, err := s.service.Create(testDevice)
 	assert.Nil(s.T(), err)
 
-	// add device to test list for deletion after
-	s.testDevices = append(s.testDevices, *dev)
+	s.testDevices = append(s.testDevices, *newDevice)
+
+	return *newDevice
+}
+
+func (s *PostgresDeviceServiceSuite) TestGet() {
+	testDevice := s.CreateTestDevice()
 
 	results, err := s.service.Get(model.Device{
-		ID: dev.ID,
+		ID: testDevice.ID,
 	})
 	assert.Nil(s.T(), err)
 
 	assert.Equal(s.T(), len(results), 1, "there should only be a single return when searching by id")
 
-	assert.Equal(s.T(), results[0], dev, "the return from create should be equal to the return from get")
+	assert.Equal(s.T(), len(results[0].Endpoints), len(testDevice.Endpoints), "the return from get should have the same number of endpoints as the original object")
+
+	assert.Equal(s.T(), *results[0], testDevice, "the return from create should be equal to the return from get")
 }
 
 func (s *PostgresDeviceServiceSuite) TestDelete() {

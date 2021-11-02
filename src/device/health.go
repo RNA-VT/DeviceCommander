@@ -16,7 +16,7 @@ func (d Device) CheckHealth() (Device, error) {
 
 	url := d.URL() + "/health"
 
-	logger.Info(fmt.Sprintf("Checking Device: [%s] at %s", d.ID, url))
+	logger.Info(fmt.Sprintf("Checking Device: [%s] at %s", d.Device.ID, url))
 
 	resp, err := http.Get(url)
 	if err != nil {
@@ -26,7 +26,7 @@ func (d Device) CheckHealth() (Device, error) {
 
 	d.EvaluateHealthCheckResponse(resp)
 	result := d.EvaluateHealthCheckResponse(resp)
-	d.Failures = d.ProcessHealthCheckResult(result)
+	d.Device.Failures = d.ProcessHealthCheckResult(result)
 
 	// TODO: need to cleanup unresponsive nodes somewhere
 	// if d.Unresponsive() {
@@ -52,12 +52,12 @@ func (d Device) EvaluateHealthCheckResponse(resp *http.Response) bool {
 	healthy := false
 	switch resp.StatusCode {
 	case 200:
-		logger.WithFields(log.Fields{"event": "isHealthy"}).Info(d.ID)
+		logger.WithFields(log.Fields{"event": "isHealthy"}).Info(d.Device.ID)
 		healthy = true
 	case 404:
-		logger.Error("Registered Device Not Found: " + d.ID.String())
+		logger.Error("Registered Device Not Found: " + d.Device.ID.String())
 	default:
-		logger.Error("Unexpected Result: " + d.ID.String())
+		logger.Error("Unexpected Result: " + d.Device.ID.String())
 		logger.Error("Status Code: " + strconv.Itoa(resp.StatusCode))
 		logger.Error("Response: " + string(body))
 	}

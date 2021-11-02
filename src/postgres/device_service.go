@@ -113,6 +113,12 @@ func (s DeviceService) Delete(id string) (*model.Device, error) {
 		return &toBeDeleted, fmt.Errorf("the device %s has already been deleted", id)
 	}
 
+	for _, e := range results[0].Endpoints {
+		s.DBConnection.Delete(model.Parameter{}, model.Parameter{
+			EndpointID: e.ID,
+		})
+	}
+
 	s.DBConnection.Select("Parameters").Delete(model.Endpoint{}, model.Endpoint{
 		DeviceID: uid,
 	})
@@ -126,7 +132,7 @@ func (s DeviceService) Delete(id string) (*model.Device, error) {
 
 func (s DeviceService) Get(devQuery model.Device) ([]*model.Device, error) {
 	devices := []*model.Device{}
-	result := s.DBConnection.Where(devQuery).Find(&devices)
+	result := s.DBConnection.Preload(clause.Associations).Where(devQuery).Find(&devices)
 	if result.Error != nil {
 		return devices, result.Error
 	}

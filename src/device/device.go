@@ -24,14 +24,15 @@ type Interface interface {
 // Device is a wrapper for the Device model. It aims to provide a helpful
 // layer of abstraction away from the gqlgen/postgres models.
 type Device struct {
-	model.Device
+	Device *model.Device
 }
 
 func NewDeviceFromNewDevice(newDeviceArgs model.NewDevice) model.Device {
 	newDevice := model.Device{
-		ID:   uuid.New(),
-		Host: newDeviceArgs.Host,
-		Port: newDeviceArgs.Port,
+		ID:        uuid.New(),
+		Host:      newDeviceArgs.Host,
+		Port:      newDeviceArgs.Port,
+		Endpoints: []model.Endpoint{},
 	}
 
 	if newDeviceArgs.Mac != nil {
@@ -50,12 +51,12 @@ func NewDeviceFromNewDevice(newDeviceArgs model.NewDevice) model.Device {
 }
 
 // NewDeviceWrapper creates a new instance of a device.Wrapper
-func NewDeviceWrapper(d *model.Device) (*Device, error) {
+func NewDeviceWrapper(d *model.Device) *Device {
 	dev := Device{
-		// Device: d,
+		Device: d,
 	}
 
-	return &dev, nil
+	return &dev
 }
 
 // NewDevice creates a barebones new instance of a Device with a host and port.
@@ -87,7 +88,7 @@ func NewDeviceFromRequestBody(body io.ReadCloser) (model.NewDevice, error) {
 
 // URL returns a network address including the ip address and port that this device is listening on
 func (d Device) URL() string {
-	return fmt.Sprintf("%s://%s:%d", d.protocol(), d.Host, d.Port)
+	return fmt.Sprintf("%s://%s:%d", d.protocol(), d.Device.Host, d.Device.Port)
 }
 
 // protocol determines the http/https protocol by Port allocation
@@ -106,11 +107,11 @@ func (d Device) ProcessHealthCheckResult(result bool) int {
 	if result { // Healthy
 		return 0
 	}
-	return d.Failures + 1
+	return d.Device.Failures + 1
 }
 
 // Failed - If true, device should be deregistered
 func (d Device) Unresponsive() bool {
 	failThreshold := 3
-	return d.Failures >= failThreshold
+	return d.Device.Failures >= failThreshold
 }

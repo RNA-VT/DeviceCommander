@@ -52,7 +52,7 @@ func (s *PostgresEndpointServiceSuite) SetupSuite() {
 }
 
 func (s *PostgresEndpointServiceSuite) CreateTestEndpoint() model.Endpoint {
-	testEndpoints := test.GenerateRandomNewEndpoints(s.testDevices[0].ID.String(), 5)
+	testEndpoints := test.GenerateRandomNewEndpoints(s.testDevices[0].ID.String(), 1)
 	testEndpoint := testEndpoints[0]
 
 	end, err := s.endpointService.Create(testEndpoint)
