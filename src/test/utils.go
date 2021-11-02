@@ -95,10 +95,12 @@ func GenerateRandomNewParameter(count int) []model.NewParameter {
 func GenerateRandomNewParameterForEndpoint(endpointID string, count int) []model.NewParameter {
 	collection := []model.NewParameter{}
 	for i := 0; i < count; i++ {
+		tmpDesc := GenerateRandomString(100)
 		tmpParam := model.NewParameter{
-			EndpointID: endpointID,
-			Name:       "foobar",
-			Type:       "SET",
+			EndpointID:  endpointID,
+			Name:        "foobar",
+			Description: &tmpDesc,
+			Type:        "SET",
 		}
 
 		collection = append(collection, tmpParam)

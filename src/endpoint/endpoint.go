@@ -13,9 +13,8 @@ func NewEndpointFromNewEndpoint(input model.NewEndpoint) *model.Endpoint {
 		log.Error(err)
 	}
 
-	endID := uuid.New()
 	end := model.Endpoint{
-		ID:       endID,
+		ID:       uuid.New(),
 		DeviceID: deviceUUID,
 		Type:     input.Type,
 		Method:   input.Method,

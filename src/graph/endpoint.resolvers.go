@@ -5,7 +5,6 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/rna-vt/devicecommander/graph/generated"
 	"github.com/rna-vt/devicecommander/graph/model"
@@ -20,11 +19,11 @@ func (r *endpointResolver) DeviceID(ctx context.Context, obj *model.Endpoint) (s
 }
 
 func (r *parameterResolver) ID(ctx context.Context, obj *model.Parameter) (string, error) {
-	panic(fmt.Errorf("not implemented"))
+	return obj.ID.String(), nil
 }
 
 func (r *parameterResolver) EndpointID(ctx context.Context, obj *model.Parameter) (string, error) {
-	panic(fmt.Errorf("not implemented"))
+	return obj.ID.String(), nil
 }
 
 func (r *queryResolver) Endpoints(ctx context.Context) ([]*model.Endpoint, error) {
