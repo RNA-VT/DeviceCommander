@@ -119,7 +119,7 @@ func (s DeviceService) Delete(id string) (*model.Device, error) {
 		})
 	}
 
-	s.DBConnection.Select("Parameters").Delete(model.Endpoint{}, model.Endpoint{
+	s.DBConnection.Delete(model.Endpoint{}, model.Endpoint{
 		DeviceID: uid,
 	})
 

@@ -9,6 +9,7 @@ gqlgen:
 
 mockery:
 	mockery --dir ./postgres --all --keeptree
+	mockery --dir ./device --all --keeptree
 
 run-test:
 	grc go test ./... -count=1

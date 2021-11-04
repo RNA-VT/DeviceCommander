@@ -4,7 +4,6 @@ import (
 	"log"
 	"testing"
 
-	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 
@@ -21,14 +20,8 @@ type PostgresDeviceServiceSuite struct {
 
 func (s *PostgresDeviceServiceSuite) SetupSuite() {
 	utilities.ConfigureEnvironment()
+	dbConfig := GetDBConfigFromEnv()
 
-	dbConfig := DBConfig{
-		Name:     viper.GetString("POSTGRES_NAME"),
-		Host:     viper.GetString("POSTGRES_HOST"),
-		Port:     viper.GetString("POSTGRES_PORT"),
-		UserName: viper.GetString("POSTGRES_USER"),
-		Password: viper.GetString("POSTGRES_PASSWORD"),
-	}
 	deviceService, err := NewDeviceService(dbConfig)
 	if err != nil {
 		log.Fatal(err)

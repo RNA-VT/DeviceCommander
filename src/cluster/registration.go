@@ -15,7 +15,7 @@ func getRegistrationLogger() *log.Entry {
 
 // DeviceDiscovery will start an ArpScanner and use its results to create new
 // Devices in the database if they do not already exist.
-func DeviceDiscovery(c *Cluster) {
+func (c Cluster) DeviceDiscovery() {
 	logger := getRegistrationLogger()
 
 	newDevices := make(chan model.NewDevice, 10)

@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 
@@ -38,6 +39,8 @@ func (s *DeviceGraphQLSuite) TestCreateDevice() {
 	_, err := mutator.CreateDevice(s.ctx, newDevice)
 	assert.Nil(s.T(), err)
 
+	s.mockDeviceService.AssertCalled(s.T(), "Create", newDevice)
+
 	s.mockDeviceService.AssertExpectations(s.T())
 }
 
@@ -48,15 +51,21 @@ func (s *DeviceGraphQLSuite) TestGetDevices() {
 	_, err := queryResolver.Devices(s.ctx)
 	assert.Nil(s.T(), err)
 
+	s.mockDeviceService.AssertCalled(s.T(), "GetAll")
+
 	s.mockDeviceService.AssertExpectations(s.T())
 }
 
 func (s *DeviceGraphQLSuite) TestDeleteDevice() {
 	mutator := s.resolver.Mutation()
 
-	s.mockDeviceService.On("Delete", "uuid.string").Return(&model.Device{}, nil)
-	_, err := mutator.DeleteDevice(s.ctx, "uuid.string")
+	randomUUID := uuid.New().String()
+
+	s.mockDeviceService.On("Delete", randomUUID).Return(&model.Device{}, nil)
+	_, err := mutator.DeleteDevice(s.ctx, randomUUID)
 	assert.Nil(s.T(), err)
+
+	s.mockDeviceService.AssertCalled(s.T(), "Delete", randomUUID)
 
 	s.mockDeviceService.AssertExpectations(s.T())
 }
@@ -72,6 +81,8 @@ func (s *DeviceGraphQLSuite) TestUpdateDevice() {
 	s.mockDeviceService.On("Update", updateInput).Return(nil)
 	_, err := mutator.UpdateDevice(s.ctx, updateInput)
 	assert.Nil(s.T(), err)
+
+	s.mockDeviceService.AssertCalled(s.T(), "Update", updateInput)
 
 	s.mockDeviceService.AssertExpectations(s.T())
 }

@@ -11,7 +11,7 @@ import (
 	"github.com/rna-vt/devicecommander/graph/model"
 )
 
-type Interface interface {
+type IDevice interface {
 	NewDeviceFromRequestBody(body io.ReadCloser) (model.NewDevice, error)
 	URL() string
 	protocol() string
@@ -51,12 +51,12 @@ func NewDeviceFromNewDevice(newDeviceArgs model.NewDevice) model.Device {
 }
 
 // NewDeviceWrapper creates a new instance of a device.Wrapper
-func NewDeviceWrapper(d *model.Device) *Device {
+func NewDeviceWrapper(d model.Device) Device {
 	dev := Device{
-		Device: d,
+		Device: &d,
 	}
 
-	return &dev
+	return dev
 }
 
 // NewDevice creates a barebones new instance of a Device with a host and port.

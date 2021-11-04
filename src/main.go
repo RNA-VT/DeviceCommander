@@ -10,6 +10,7 @@ import (
 
 	"github.com/rna-vt/devicecommander/app"
 	"github.com/rna-vt/devicecommander/cluster"
+	"github.com/rna-vt/devicecommander/device"
 	"github.com/rna-vt/devicecommander/postgres"
 	"github.com/rna-vt/devicecommander/routes"
 	"github.com/rna-vt/devicecommander/utilities"
@@ -33,6 +34,8 @@ func main() {
 		return
 	}
 
+	deviceClient := device.NewHTTPDeviceClient()
+
 	endpointService, err := postgres.NewEndpointService(dbConfig)
 	if err != nil {
 		log.Error(err)
@@ -40,10 +43,7 @@ func main() {
 	}
 
 	app := app.Application{
-		Cluster: cluster.Cluster{
-			Name:          viper.GetString("CLUSTER_NAME"),
-			DeviceService: deviceService,
-		},
+		Cluster:         cluster.NewCluster(viper.GetString("CLUSTER_NAME"), deviceService, deviceClient),
 		Echo:            echo.New(),
 		Hostname:        fmt.Sprintf("%s:%s", viper.GetString("HOST"), viper.GetString("PORT")),
 		DeviceService:   deviceService,

@@ -40,7 +40,7 @@ func (s *DeviceServiceSuite) TestNewDeviceWrapper() {
 
 	newDeviceResult := NewDeviceFromNewDevice(testNewDevice)
 
-	wrapper := NewDeviceWrapper(&newDeviceResult)
+	wrapper := NewDeviceWrapper(newDeviceResult)
 
 	assert.Equal(s.T(), wrapper.Device.ID, newDeviceResult.ID, "the wrapper should have the same ID as the Device")
 }
@@ -64,11 +64,16 @@ func (s *DeviceServiceSuite) TestDeviceURL() {
 
 	newDeviceResult := NewDeviceFromNewDevice(testNewDevice)
 
-	wrapper := NewDeviceWrapper(&newDeviceResult)
+	wrapper := NewDeviceWrapper(newDeviceResult)
 
+	devURL := wrapper.URL()
 	// validate the URL
-	_, err := url.ParseRequestURI(wrapper.URL())
+	_, err := url.ParseRequestURI(devURL)
 	assert.Nil(s.T(), err)
+
+	lastChar := devURL[len(devURL)-1:]
+
+	assert.NotEqual(s.T(), lastChar, "/", "the URL should not end in a \"/\"")
 }
 
 // In order for 'go test' to run this suite, we need to create
