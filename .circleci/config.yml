@@ -72,20 +72,20 @@ jobs:
       - store_test_results: # upload test results for display in Test Summary
           path: /tmp/test-results
 
-      - run:
-        name: "Build binary"
-        command: |
-          go build -o /tmp/device-commander
+      # - run:
+      #   name: "Build binary"
+      #   command: |
+      #     go build -o /tmp/device-commander
 
-      - store_test_results: # upload test results for display in Test Summary
-        path: /tmp/device-commander
+      # - store_test_results: # upload test results for display in Test Summary
+      #   path: /tmp/device-commander
 
-      - run:
-        name: "Publish Release on GitHub"
-        command: |
-          go get github.com/tcnksm/ghr
-          VERSION=$(device-commander --version)
-          ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./artifacts/
+      # - run:
+      #   name: "Publish Release on GitHub"
+      #   command: |
+      #     go get github.com/tcnksm/ghr
+      #     VERSION=$(device-commander --version)
+      #     ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./artifacts/
 
   lint:
     docker:
