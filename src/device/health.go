@@ -36,30 +36,3 @@ func (d Device) RunHealthCheck(client IDeviceClient) (Device, error) {
 	// }
 	return d, nil
 }
-
-// // evaluateHealthCheckResponse inspects the repsponse from a device and extracts
-// // a few details. Firstly it will create useful logs for better understanding
-// // the response from the device health check. Secondly, it will return a true/false
-// // determining the health of the device.
-// func (d Device) EvaluateHealthCheckResponse(resp *http.Response) bool {
-// 	logger := getDeviceLogger()
-// 	defer resp.Body.Close()
-// 	body, err := ioutil.ReadAll(resp.Body)
-// 	if err != nil {
-// 		logger.Error("reading the healtheck failed")
-// 		return false
-// 	}
-// 	healthy := false
-// 	switch resp.StatusCode {
-// 	case 200:
-// 		logger.WithFields(log.Fields{"event": "isHealthy"}).Info(d.Device.ID)
-// 		healthy = true
-// 	case 404:
-// 		logger.Error("Registered Device Not Found: " + d.Device.ID.String())
-// 	default:
-// 		logger.Error("Unexpected Result: " + d.Device.ID.String())
-// 		logger.Error("Status Code: " + strconv.Itoa(resp.StatusCode))
-// 		logger.Error("Response: " + string(body))
-// 	}
-// 	return healthy
-// }
