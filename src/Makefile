@@ -1,3 +1,7 @@
+.MAIN: 
+	go mod vendor
+	go build -o device-commander
+
 lint:
 	golangci-lint run
 

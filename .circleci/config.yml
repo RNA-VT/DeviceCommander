@@ -59,7 +59,7 @@ jobs:
             PACKAGE_NAMES=$(go list ./... | circleci tests split --split-by=timings --timings-type=classname)
             gotestsum --junitfile ${TEST_RESULTS}/gotestsum-report.xml -- $PACKAGE_NAMES
 
-      # - run: make # pull and build dependencies for the project
+      - run: make # pull and build dependencies for the project
 
       - save_cache:
           key: go-mod-v4-{{ checksum "go.sum" }}
@@ -82,6 +82,7 @@ jobs:
           working_directory: ./src
           command: |
             apk add libpcap-dev
+            go mod vendor
             golangci-lint run
 workflows:
   version: 2
