@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/rna-vt/devicecommander/utilities"
+	"github.com/rna-vt/devicecommander/src/utilities"
 )
 
 type TestSuite struct {

@@ -1,17 +1,36 @@
-help:
-	cd src && go run main.go -h
+lint:
+	golangci-lint run
 
-build\:server:
-	cd src && go build
+lint-fix:
+	golangci-lint run --fix
 
-build:\client:
-	cd frontend && npm run build
+gqlgen:
+	~/go/bin/gqlgen generate --verbose
 
-run\:server:
-	cd src &&  go run main.go
+mockery:
+	mockery --dir ./src/postgres --all --keeptree --output src/mocks
+	mockery --dir ./src/device --all --keeptree --output src/mocks
 
-run\:client:
-	cd frontend && npm run start
+run-test:
+	grc go test ./... -count=1
 
-run\:docker:
-	cd environment && docker-compose up
+run:
+	sudo go run main.go
+
+# help:
+# 	cd src && go run main.go -h
+
+# build\:server:
+# 	cd src && go build
+
+# build\:client:
+# 	cd frontend && npm run build
+
+# run\:server:
+# 	cd src &&  go run main.go
+
+# run\:client:
+# 	cd frontend && npm run start
+
+# run\:docker:
+# 	cd environment && docker-compose up

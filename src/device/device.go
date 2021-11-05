@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/rna-vt/devicecommander/graph/model"
+	"github.com/rna-vt/devicecommander/src/graph/model"
 )
 
 type IDevice interface {

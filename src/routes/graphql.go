@@ -5,9 +5,9 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/labstack/echo"
 
-	"github.com/rna-vt/devicecommander/graph"
-	"github.com/rna-vt/devicecommander/graph/generated"
-	"github.com/rna-vt/devicecommander/postgres"
+	"github.com/rna-vt/devicecommander/src/graph"
+	"github.com/rna-vt/devicecommander/src/graph/generated"
+	"github.com/rna-vt/devicecommander/src/postgres"
 )
 
 func (a *APIService) addGraphQLRoutes(e *echo.Echo, deviceService postgres.DeviceCRUDService, endpointService postgres.EndpointCRUDService) {

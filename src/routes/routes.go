@@ -8,8 +8,8 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 
-	"github.com/rna-vt/devicecommander/cluster"
-	"github.com/rna-vt/devicecommander/postgres"
+	"github.com/rna-vt/devicecommander/src/cluster"
+	"github.com/rna-vt/devicecommander/src/postgres"
 )
 
 // APIService -

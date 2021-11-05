@@ -3,9 +3,9 @@ package app
 import (
 	"github.com/labstack/echo"
 
-	"github.com/rna-vt/devicecommander/cluster"
-	"github.com/rna-vt/devicecommander/postgres"
-	"github.com/rna-vt/devicecommander/routes"
+	"github.com/rna-vt/devicecommander/src/cluster"
+	"github.com/rna-vt/devicecommander/src/postgres"
+	"github.com/rna-vt/devicecommander/src/routes"
 )
 
 // The Application encapsulates the required state for the running software

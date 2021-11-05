@@ -6,7 +6,7 @@ import (
 
 	"github.com/labstack/echo"
 
-	"github.com/rna-vt/devicecommander/device"
+	"github.com/rna-vt/devicecommander/src/device"
 )
 
 func (a *APIService) addRegistrationRoutes(e *echo.Echo) {

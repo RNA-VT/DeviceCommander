@@ -3,7 +3,7 @@ package graph
 //go:generate go run github.com/99designs/gqlgen
 
 import (
-	"github.com/rna-vt/devicecommander/postgres"
+	"github.com/rna-vt/devicecommander/src/postgres"
 )
 
 // This file will not be regenerated automatically.

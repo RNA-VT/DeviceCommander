@@ -9,8 +9,8 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 
-	"github.com/rna-vt/devicecommander/device"
-	"github.com/rna-vt/devicecommander/graph/model"
+	"github.com/rna-vt/devicecommander/src/device"
+	"github.com/rna-vt/devicecommander/src/graph/model"
 )
 
 // BaseService prototypes the required interfaces for a CRUD postgres service.

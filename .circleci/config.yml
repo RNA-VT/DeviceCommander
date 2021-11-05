@@ -37,7 +37,6 @@ jobs:
       - run: mkdir -p $TEST_RESULTS # create the test results directory
 
       - restore_cache: # restores saved cache if no changes are detected since last run
-          working_directory: ./src
           keys:
             - go-mod-v4-{{ checksum "go.sum" }}
 
@@ -48,7 +47,6 @@ jobs:
 
       - run:
           name: Run unit tests
-          working_directory: ./src
           environment: # environment variables for the database url and path to migration files
             # CONTACTS_DB_URL: "postgres://circleci-demo-go@localhost:5432/circle_test?sslmode=disable"
             # CONTACTS_DB_MIGRATIONS: /home/circleci/project/db/migrations
@@ -63,7 +61,6 @@ jobs:
       # - run: make # pull and build dependencies for the project
 
       - save_cache:
-          working_directory: ./src
           key: go-mod-v4-{{ checksum "go.sum" }}
           paths:
             - "/go/pkg/mod"
@@ -81,7 +78,6 @@ jobs:
     steps:
       - checkout
       - run:
-          working_directory: ./src
           command: |
             apk add libpcap-dev
             go mod vendor

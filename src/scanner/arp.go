@@ -24,7 +24,7 @@ import (
 	"github.com/google/gopacket/layers"
 	"github.com/google/gopacket/pcap"
 
-	"github.com/rna-vt/devicecommander/graph/model"
+	"github.com/rna-vt/devicecommander/src/graph/model"
 )
 
 type ArpScanner struct {

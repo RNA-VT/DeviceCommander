@@ -8,7 +8,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"github.com/rna-vt/devicecommander/graph/model"
+	"github.com/rna-vt/devicecommander/src/graph/model"
 )
 
 // IDeviceClient implements the common http actions when interacting with a device

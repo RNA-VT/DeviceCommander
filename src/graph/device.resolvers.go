@@ -6,8 +6,8 @@ package graph
 import (
 	"context"
 
-	"github.com/rna-vt/devicecommander/graph/generated"
-	"github.com/rna-vt/devicecommander/graph/model"
+	"github.com/rna-vt/devicecommander/src/graph/generated"
+	"github.com/rna-vt/devicecommander/src/graph/model"
 )
 
 func (r *deviceResolver) ID(ctx context.Context, obj *model.Device) (string, error) {

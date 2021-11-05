@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	model "github.com/rna-vt/devicecommander/graph/model"
+	model "github.com/rna-vt/devicecommander/src/graph/model"
 	mock "github.com/stretchr/testify/mock"
 )
 

@@ -3,8 +3,8 @@ package endpoint
 import (
 	"log"
 
-	"github.com/rna-vt/devicecommander/device"
-	"github.com/rna-vt/devicecommander/graph/model"
+	"github.com/rna-vt/devicecommander/src/device"
+	"github.com/rna-vt/devicecommander/src/graph/model"
 )
 
 type Endpoint interface {

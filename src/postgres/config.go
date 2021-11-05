@@ -4,7 +4,7 @@ import (
 	"github.com/spf13/viper"
 	"gorm.io/gorm"
 
-	"github.com/rna-vt/devicecommander/graph/model"
+	"github.com/rna-vt/devicecommander/src/graph/model"
 )
 
 // DBConfig encapsulates the information rquired for connecting to a database.

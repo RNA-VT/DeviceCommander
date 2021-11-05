@@ -6,7 +6,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo"
 
-	"github.com/rna-vt/devicecommander/graph/model"
+	"github.com/rna-vt/devicecommander/src/graph/model"
 )
 
 func (a *APIService) addInfoRoutes(e *echo.Echo) {

@@ -4,7 +4,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/labstack/gommon/log"
 
-	"github.com/rna-vt/devicecommander/graph/model"
+	"github.com/rna-vt/devicecommander/src/graph/model"
 )
 
 // NewEndpointFromNewEndpoint generates an Endpoint from a NewEndpoint with the correctly

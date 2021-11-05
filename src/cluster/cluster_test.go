@@ -11,11 +11,11 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/rna-vt/devicecommander/device"
-	"github.com/rna-vt/devicecommander/graph/model"
-	"github.com/rna-vt/devicecommander/mocks"
-	"github.com/rna-vt/devicecommander/test"
-	"github.com/rna-vt/devicecommander/utilities"
+	"github.com/rna-vt/devicecommander/src/device"
+	"github.com/rna-vt/devicecommander/src/graph/model"
+	"github.com/rna-vt/devicecommander/src/mocks"
+	"github.com/rna-vt/devicecommander/src/test"
+	"github.com/rna-vt/devicecommander/src/utilities"
 )
 
 type ClusterSuite struct {

@@ -10,8 +10,8 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"github.com/rna-vt/devicecommander/device"
-	"github.com/rna-vt/devicecommander/graph/model"
+	"github.com/rna-vt/devicecommander/src/device"
+	"github.com/rna-vt/devicecommander/src/graph/model"
 )
 
 type DeviceResponse struct {

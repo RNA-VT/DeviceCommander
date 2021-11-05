@@ -12,7 +12,7 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
-	"github.com/rna-vt/devicecommander/graph/model"
+	"github.com/rna-vt/devicecommander/src/graph/model"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
 )
@@ -525,7 +525,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
-	{Name: "graph/schemas/device.graphqls", Input: `type Device {
+	{Name: "src/graph/schemas/device.graphqls", Input: `type Device {
   ID: String!
   MAC: String
   Name: String
@@ -564,7 +564,7 @@ extend type Mutation {
   deleteDevice(id: String!): Device!
 }
 `, BuiltIn: false},
-	{Name: "graph/schemas/endpoint.graphqls", Input: `type Endpoint {
+	{Name: "src/graph/schemas/endpoint.graphqls", Input: `type Endpoint {
     ID: String!
     DeviceID: String!
     Method: String!
@@ -629,7 +629,7 @@ func (ec *executionContext) field_Mutation_createDevice_args(ctx context.Context
 	var arg0 model.NewDevice
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNNewDevice2githubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋgraphᚋmodelᚐNewDevice(ctx, tmp)
+		arg0, err = ec.unmarshalNNewDevice2githubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋsrcᚋgraphᚋmodelᚐNewDevice(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -659,7 +659,7 @@ func (ec *executionContext) field_Mutation_updateDevice_args(ctx context.Context
 	var arg0 model.UpdateDevice
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNUpdateDevice2githubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋgraphᚋmodelᚐUpdateDevice(ctx, tmp)
+		arg0, err = ec.unmarshalNUpdateDevice2githubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋsrcᚋgraphᚋmodelᚐUpdateDevice(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1152,7 +1152,7 @@ func (ec *executionContext) _Endpoint_Parameters(ctx context.Context, field grap
 	}
 	res := resTmp.([]model.Parameter)
 	fc.Result = res
-	return ec.marshalNParameter2ᚕgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋgraphᚋmodelᚐParameter(ctx, field.Selections, res)
+	return ec.marshalNParameter2ᚕgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋsrcᚋgraphᚋmodelᚐParameter(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_createDevice(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1194,7 +1194,7 @@ func (ec *executionContext) _Mutation_createDevice(ctx context.Context, field gr
 	}
 	res := resTmp.(*model.Device)
 	fc.Result = res
-	return ec.marshalNDevice2ᚖgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋgraphᚋmodelᚐDevice(ctx, field.Selections, res)
+	return ec.marshalNDevice2ᚖgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋsrcᚋgraphᚋmodelᚐDevice(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_updateDevice(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1278,7 +1278,7 @@ func (ec *executionContext) _Mutation_deleteDevice(ctx context.Context, field gr
 	}
 	res := resTmp.(*model.Device)
 	fc.Result = res
-	return ec.marshalNDevice2ᚖgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋgraphᚋmodelᚐDevice(ctx, field.Selections, res)
+	return ec.marshalNDevice2ᚖgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋsrcᚋgraphᚋmodelᚐDevice(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _NewEndpoint_DeviceID(ctx context.Context, field graphql.CollectedField, obj *model.NewEndpoint) (ret graphql.Marshaler) {
@@ -1450,7 +1450,7 @@ func (ec *executionContext) _NewEndpoint_Parameters(ctx context.Context, field g
 	}
 	res := resTmp.([]*model.NewParameter)
 	fc.Result = res
-	return ec.marshalNNewParameter2ᚕᚖgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋgraphᚋmodelᚐNewParameter(ctx, field.Selections, res)
+	return ec.marshalNNewParameter2ᚕᚖgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋsrcᚋgraphᚋmodelᚐNewParameter(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _NewParameter_EndpointID(ctx context.Context, field graphql.CollectedField, obj *model.NewParameter) (ret graphql.Marshaler) {
@@ -1794,7 +1794,7 @@ func (ec *executionContext) _Query_devices(ctx context.Context, field graphql.Co
 	}
 	res := resTmp.([]*model.Device)
 	fc.Result = res
-	return ec.marshalNDevice2ᚕᚖgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋgraphᚋmodelᚐDeviceᚄ(ctx, field.Selections, res)
+	return ec.marshalNDevice2ᚕᚖgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋsrcᚋgraphᚋmodelᚐDeviceᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_endpoints(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1829,7 +1829,7 @@ func (ec *executionContext) _Query_endpoints(ctx context.Context, field graphql.
 	}
 	res := resTmp.([]*model.Endpoint)
 	fc.Result = res
-	return ec.marshalNEndpoint2ᚕᚖgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋgraphᚋmodelᚐEndpointᚄ(ctx, field.Selections, res)
+	return ec.marshalNEndpoint2ᚕᚖgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋsrcᚋgraphᚋmodelᚐEndpointᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -4187,11 +4187,11 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) marshalNDevice2githubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋgraphᚋmodelᚐDevice(ctx context.Context, sel ast.SelectionSet, v model.Device) graphql.Marshaler {
+func (ec *executionContext) marshalNDevice2githubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋsrcᚋgraphᚋmodelᚐDevice(ctx context.Context, sel ast.SelectionSet, v model.Device) graphql.Marshaler {
 	return ec._Device(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNDevice2ᚕᚖgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋgraphᚋmodelᚐDeviceᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Device) graphql.Marshaler {
+func (ec *executionContext) marshalNDevice2ᚕᚖgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋsrcᚋgraphᚋmodelᚐDeviceᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Device) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -4215,7 +4215,7 @@ func (ec *executionContext) marshalNDevice2ᚕᚖgithubᚗcomᚋrnaᚑvtᚋdevic
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNDevice2ᚖgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋgraphᚋmodelᚐDevice(ctx, sel, v[i])
+			ret[i] = ec.marshalNDevice2ᚖgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋsrcᚋgraphᚋmodelᚐDevice(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -4235,7 +4235,7 @@ func (ec *executionContext) marshalNDevice2ᚕᚖgithubᚗcomᚋrnaᚑvtᚋdevic
 	return ret
 }
 
-func (ec *executionContext) marshalNDevice2ᚖgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋgraphᚋmodelᚐDevice(ctx context.Context, sel ast.SelectionSet, v *model.Device) graphql.Marshaler {
+func (ec *executionContext) marshalNDevice2ᚖgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋsrcᚋgraphᚋmodelᚐDevice(ctx context.Context, sel ast.SelectionSet, v *model.Device) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -4245,7 +4245,7 @@ func (ec *executionContext) marshalNDevice2ᚖgithubᚗcomᚋrnaᚑvtᚋdeviceco
 	return ec._Device(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNEndpoint2ᚕᚖgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋgraphᚋmodelᚐEndpointᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Endpoint) graphql.Marshaler {
+func (ec *executionContext) marshalNEndpoint2ᚕᚖgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋsrcᚋgraphᚋmodelᚐEndpointᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Endpoint) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -4269,7 +4269,7 @@ func (ec *executionContext) marshalNEndpoint2ᚕᚖgithubᚗcomᚋrnaᚑvtᚋdev
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNEndpoint2ᚖgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋgraphᚋmodelᚐEndpoint(ctx, sel, v[i])
+			ret[i] = ec.marshalNEndpoint2ᚖgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋsrcᚋgraphᚋmodelᚐEndpoint(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -4289,7 +4289,7 @@ func (ec *executionContext) marshalNEndpoint2ᚕᚖgithubᚗcomᚋrnaᚑvtᚋdev
 	return ret
 }
 
-func (ec *executionContext) marshalNEndpoint2ᚖgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋgraphᚋmodelᚐEndpoint(ctx context.Context, sel ast.SelectionSet, v *model.Endpoint) graphql.Marshaler {
+func (ec *executionContext) marshalNEndpoint2ᚖgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋsrcᚋgraphᚋmodelᚐEndpoint(ctx context.Context, sel ast.SelectionSet, v *model.Endpoint) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -4314,12 +4314,12 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
-func (ec *executionContext) unmarshalNNewDevice2githubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋgraphᚋmodelᚐNewDevice(ctx context.Context, v interface{}) (model.NewDevice, error) {
+func (ec *executionContext) unmarshalNNewDevice2githubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋsrcᚋgraphᚋmodelᚐNewDevice(ctx context.Context, v interface{}) (model.NewDevice, error) {
 	res, err := ec.unmarshalInputNewDevice(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNNewParameter2ᚕᚖgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋgraphᚋmodelᚐNewParameter(ctx context.Context, sel ast.SelectionSet, v []*model.NewParameter) graphql.Marshaler {
+func (ec *executionContext) marshalNNewParameter2ᚕᚖgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋsrcᚋgraphᚋmodelᚐNewParameter(ctx context.Context, sel ast.SelectionSet, v []*model.NewParameter) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -4343,7 +4343,7 @@ func (ec *executionContext) marshalNNewParameter2ᚕᚖgithubᚗcomᚋrnaᚑvt�
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalONewParameter2ᚖgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋgraphᚋmodelᚐNewParameter(ctx, sel, v[i])
+			ret[i] = ec.marshalONewParameter2ᚖgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋsrcᚋgraphᚋmodelᚐNewParameter(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -4357,7 +4357,7 @@ func (ec *executionContext) marshalNNewParameter2ᚕᚖgithubᚗcomᚋrnaᚑvt�
 	return ret
 }
 
-func (ec *executionContext) marshalNParameter2ᚕgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋgraphᚋmodelᚐParameter(ctx context.Context, sel ast.SelectionSet, v []model.Parameter) graphql.Marshaler {
+func (ec *executionContext) marshalNParameter2ᚕgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋsrcᚋgraphᚋmodelᚐParameter(ctx context.Context, sel ast.SelectionSet, v []model.Parameter) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -4381,7 +4381,7 @@ func (ec *executionContext) marshalNParameter2ᚕgithubᚗcomᚋrnaᚑvtᚋdevic
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOParameter2githubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋgraphᚋmodelᚐParameter(ctx, sel, v[i])
+			ret[i] = ec.marshalOParameter2githubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋsrcᚋgraphᚋmodelᚐParameter(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -4410,7 +4410,7 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 	return res
 }
 
-func (ec *executionContext) unmarshalNUpdateDevice2githubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋgraphᚋmodelᚐUpdateDevice(ctx context.Context, v interface{}) (model.UpdateDevice, error) {
+func (ec *executionContext) unmarshalNUpdateDevice2githubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋsrcᚋgraphᚋmodelᚐUpdateDevice(ctx context.Context, v interface{}) (model.UpdateDevice, error) {
 	res, err := ec.unmarshalInputUpdateDevice(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -4720,14 +4720,14 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 	return graphql.MarshalInt(*v)
 }
 
-func (ec *executionContext) marshalONewParameter2ᚖgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋgraphᚋmodelᚐNewParameter(ctx context.Context, sel ast.SelectionSet, v *model.NewParameter) graphql.Marshaler {
+func (ec *executionContext) marshalONewParameter2ᚖgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋsrcᚋgraphᚋmodelᚐNewParameter(ctx context.Context, sel ast.SelectionSet, v *model.NewParameter) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._NewParameter(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOParameter2githubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋgraphᚋmodelᚐParameter(ctx context.Context, sel ast.SelectionSet, v model.Parameter) graphql.Marshaler {
+func (ec *executionContext) marshalOParameter2githubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋsrcᚋgraphᚋmodelᚐParameter(ctx context.Context, sel ast.SelectionSet, v model.Parameter) graphql.Marshaler {
 	return ec._Parameter(ctx, sel, &v)
 }
 
