@@ -112,6 +112,7 @@ workflows:
     jobs:
       - lint
       - test
+      - build
       - publish-github-release:
           requires:
             - build
