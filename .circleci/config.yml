@@ -94,7 +94,9 @@ jobs:
       - checkout
       - run:
           name: Waiting for Postgres to be ready
-          command: go build -o device-commander
+          command: |
+            sudo apt-get install libpcap-dev
+            go build -o device-commander
 
   lint:
     docker:
