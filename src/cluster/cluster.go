@@ -26,6 +26,7 @@ type Cluster struct {
 	DeviceService postgres.DeviceCRUDService
 	DeviceClient  device.IDeviceClient
 	logger        *log.Entry
+	discoveryStop chan bool
 	healthStop    chan bool
 }
 
@@ -39,6 +40,7 @@ func NewCluster(
 		DeviceService: deviceService,
 		DeviceClient:  deviceClient,
 		logger:        log.WithFields(log.Fields{"module": "cluster"}),
+		discoveryStop: make(chan bool),
 		healthStop:    make(chan bool),
 	}
 }
@@ -51,10 +53,10 @@ func (c Cluster) PrintClusterInfo() {
 		return
 	}
 	for i := 0; i < len(devices); i++ {
-		log.Println("----Device---")
-		log.Println(fmt.Sprintf("%+v", devices[i]))
+		c.logger.Println("----Device---")
+		c.logger.Println(fmt.Sprintf("%+v", devices[i]))
 	}
-	log.Println()
+	c.logger.Println()
 }
 
 // Start begins the collection of new devices (registration) and device health
@@ -63,18 +65,27 @@ func (c *Cluster) Start() {
 	// Discovery and collection of new devices.
 	go c.RunDeviceDiscoveryLoop(viper.GetInt("DISCOVERY_PERIOD"))
 
-	// Health Check
-	go c.RunHealthCheckLoop(viper.GetInt("HEALTH_CHECK_PERIOD"))
+	// // Health Check
+	// go c.RunHealthCheckLoop(viper.GetInt("HEALTH_CHECK_PERIOD"))
 }
 
+// RunDeviceDiscoveryLoop contiuously searches for other responsive devices on the network.
 func (c Cluster) RunDeviceDiscoveryLoop(discoveryPeriod int) {
 	ticker := time.NewTicker(time.Duration(discoveryPeriod) * time.Second)
 	for range ticker.C {
-		c.logger.Info("Begin Device Discovery... ")
-		c.DeviceDiscovery()
+		select {
+		case <-c.discoveryStop:
+			c.logger.Info("Ticker stopped by healthStop chan")
+			return
+		default:
+			c.logger.Info("Begin Device Discovery... ")
+			c.DeviceDiscovery(viper.GetInt("ARP_SCAN_DURATION"))
+		}
 	}
 }
 
+// RunHealthCheckLoop continuously probes the Health state of Active nodes stored in the DB.
+// The important results of this health check will be tracked in the DB.
 func (c Cluster) RunHealthCheckLoop(healthCheckPeriod int) {
 	ticker := time.NewTicker(time.Duration(healthCheckPeriod) * time.Second)
 	for range ticker.C {
@@ -100,13 +111,13 @@ func (c Cluster) RunHealthCheckLoop(healthCheckPeriod int) {
 				resp, err := c.DeviceClient.Health(dev)
 				if err != nil {
 					c.logger.Warn(fmt.Sprintf("error checking health for device [%s] %s", d.ID.String(), err))
-				}
-
-				result := c.DeviceClient.EvaluateHealthCheckResponse(resp, dev)
-				if result {
-					log.Trace(fmt.Sprintf("device [%s] is healthy", d.ID.String()))
 				} else {
-					log.Trace(fmt.Sprintf("device [%s] is not healthy", d.ID.String()))
+					result := c.DeviceClient.EvaluateHealthCheckResponse(resp, dev)
+					if result {
+						c.logger.Trace(fmt.Sprintf("device [%s] is healthy", d.ID.String()))
+					} else {
+						c.logger.Trace(fmt.Sprintf("device [%s] is not healthy", d.ID.String()))
+					}
 				}
 			}
 		}

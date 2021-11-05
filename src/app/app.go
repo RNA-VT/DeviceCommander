@@ -23,13 +23,9 @@ func (a *Application) SystemInfo() string {
 }
 
 func (a *Application) Start() {
-	api := routes.APIService{
-		Cluster:         &a.Cluster,
-		DeviceService:   a.DeviceService,
-		EndpointService: a.EndpointService,
-	}
+	api := routes.NewAPIService(&a.Cluster, a.DeviceService, a.EndpointService)
 
 	a.Cluster.Start()
 
-	routes.ConfigureRoutes(a.Hostname, a.Echo, &api)
+	api.ConfigureRoutes(a.Hostname, a.Echo)
 }

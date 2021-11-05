@@ -7,6 +7,8 @@ import (
 	"github.com/rna-vt/devicecommander/graph/model"
 )
 
+// NewEndpointFromNewEndpoint generates an Endpoint from a NewEndpoint with the correctly
+// instantiated fields. This should be the primary way in which an Endpoint is generated.
 func NewEndpointFromNewEndpoint(input model.NewEndpoint) *model.Endpoint {
 	deviceUUID, err := uuid.Parse(input.DeviceID)
 	if err != nil {
@@ -38,6 +40,8 @@ func NewEndpointFromNewEndpoint(input model.NewEndpoint) *model.Endpoint {
 	return &end
 }
 
+// NewParameterFromNewParameter generates a Parameter{} from a NewParameter with the correctly
+// instantiated fields. This should be the primary way in which a Parameter is generated.
 func NewParameterFromNewParameter(input model.NewParameter) model.Parameter {
 	endpointID, err := uuid.Parse(input.EndpointID)
 	if err != nil {

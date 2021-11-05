@@ -52,7 +52,7 @@ func (a *ArpScanner) Start() {
 		go func(iface net.Interface) {
 			defer wg.Done()
 			if err := a.scan(&iface); err != nil {
-				logger.Info(fmt.Sprintf("interface %v: %v", iface.Name, err))
+				logger.Trace(fmt.Sprintf("interface %v: %v", iface.Name, err))
 			}
 		}(iface)
 	}

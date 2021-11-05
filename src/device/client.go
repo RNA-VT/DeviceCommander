@@ -2,6 +2,7 @@ package device
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 
@@ -10,22 +11,32 @@ import (
 	"github.com/rna-vt/devicecommander/graph/model"
 )
 
+// IDeviceClient implements the common http actions when interacting with a device
 type IDeviceClient interface {
 	Info(Device) (model.NewDevice, error)
 	Health(Device) (*http.Response, error)
 	EvaluateHealthCheckResponse(resp *http.Response, d Device) bool
 }
 
+// HTTPDeviceClient is an implementation of the IDeviceClient. It communicates
+// with the device via http.
 type HTTPDeviceClient struct {
 	logger *log.Entry
 }
 
+// NewHTTPDeviceClient creates an instantiated HTTPDeviceClientl. This should be the
+// primary method of generating a HTTPDeviceClient struct.
 func NewHTTPDeviceClient() HTTPDeviceClient {
 	return HTTPDeviceClient{
 		log.WithFields(log.Fields{"module": "device-client"}),
 	}
 }
 
+func (c HTTPDeviceClient) Info(d Device) (model.NewDevice, error) {
+	panic("function not implemented")
+}
+
+// Health on the HTTPDeviceClient queries the device.URL `/health` endpoint to determine health.
 func (c HTTPDeviceClient) Health(d Device) (*http.Response, error) {
 	url := d.URL() + "/health"
 
@@ -38,17 +49,15 @@ func (c HTTPDeviceClient) Health(d Device) (*http.Response, error) {
 	return resp, nil
 }
 
-func (c HTTPDeviceClient) Info(d Device) (model.NewDevice, error) {
-	panic("function not implemented")
-}
-
+// EvaluateHealthCheckResponse determines the final outcome of the HealthCheck by examining a http.Response.
+// The only requirements for a positive health response is a status code of 200 and a parseable body.
 func (c HTTPDeviceClient) EvaluateHealthCheckResponse(resp *http.Response, d Device) bool {
-	// defer resp.Body.Close()
-	// body, err := ioutil.ReadAll(resp.Body)
-	// if err != nil {
-	// 	c.logger.Error("failed to read the healthcheck response")
-	// 	return false
-	// }
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		c.logger.Error("failed to read the healthcheck response")
+		return false
+	}
 	healthy := false
 	switch resp.StatusCode {
 	case 200:
@@ -59,7 +68,7 @@ func (c HTTPDeviceClient) EvaluateHealthCheckResponse(resp *http.Response, d Dev
 	default:
 		c.logger.Error("Unexpected Result: " + d.Device.ID.String())
 		c.logger.Error("Status Code: " + strconv.Itoa(resp.StatusCode))
-		// c.logger.Error("Response: " + string(body))
+		c.logger.Error("Response: " + string(body))
 	}
 	return healthy
 }

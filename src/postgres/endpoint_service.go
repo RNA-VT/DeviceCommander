@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
+	log "github.com/sirupsen/logrus"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -27,6 +28,7 @@ type EndpointService struct {
 	DbConfig     DBConfig
 	DBConnection *gorm.DB
 	Initialized  bool
+	logger       *log.Entry
 }
 
 // NewDeviceService creates a new instance of a DeviceService with a DBConfig.
@@ -34,6 +36,7 @@ func NewEndpointService(config DBConfig) (EndpointService, error) {
 	service := EndpointService{
 		DbConfig:    config,
 		Initialized: false,
+		logger:      log.WithFields(log.Fields{"module": "postgres", "service": "endpoint"}),
 	}
 	service, err := service.Initialise()
 	if err != nil {
@@ -43,6 +46,7 @@ func NewEndpointService(config DBConfig) (EndpointService, error) {
 	return service, nil
 }
 
+// Initialise on the EndpointService struct opens the postgres connection defined in the EndpointService.DBConfig.
 func (s EndpointService) Initialise() (EndpointService, error) {
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Shanghai", s.DbConfig.Host, s.DbConfig.UserName, s.DbConfig.Password, s.DbConfig.Name, s.DbConfig.Port)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
@@ -61,7 +65,6 @@ func (s EndpointService) Initialise() (EndpointService, error) {
 }
 
 func (s EndpointService) Create(newDeviceArgs model.NewEndpoint) (*model.Endpoint, error) {
-	logger := getPostgresLogger()
 	newEndpoint := endpoint.NewEndpointFromNewEndpoint(newDeviceArgs)
 
 	result := s.DBConnection.Create(&newEndpoint)
@@ -69,12 +72,11 @@ func (s EndpointService) Create(newDeviceArgs model.NewEndpoint) (*model.Endpoin
 		return newEndpoint, result.Error
 	}
 
-	logger.Debug("Created endpoint " + newEndpoint.ID.String())
+	s.logger.Trace("Created endpoint " + newEndpoint.ID.String())
 	return newEndpoint, nil
 }
 
 func (s EndpointService) Update(input model.UpdateEndpoint) error {
-	logger := getPostgresLogger()
 	id, err := uuid.Parse(input.ID)
 	if err != nil {
 		return err
@@ -87,12 +89,11 @@ func (s EndpointService) Update(input model.UpdateEndpoint) error {
 		return result.Error
 	}
 
-	logger.Debug("Updated endpoint " + end.ID.String())
+	s.logger.Trace("Updated endpoint " + end.ID.String())
 	return nil
 }
 
 func (s EndpointService) Delete(id string) (*model.Endpoint, error) {
-	logger := getPostgresLogger()
 	var toBeDeleted model.Endpoint
 	endUUID, err := uuid.Parse(id)
 	if err != nil {
@@ -106,7 +107,7 @@ func (s EndpointService) Delete(id string) (*model.Endpoint, error) {
 
 	s.DBConnection.Delete(model.Endpoint{}, toBeDeleted)
 
-	logger.Debug("Deleted endpoint " + id)
+	s.logger.Debug("Deleted endpoint " + id)
 	return &toBeDeleted, nil
 }
 

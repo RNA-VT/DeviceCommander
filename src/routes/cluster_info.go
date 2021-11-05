@@ -22,10 +22,8 @@ func (a APIService) health(c echo.Context) error {
 }
 
 func (a APIService) getClusterInfo(c echo.Context) error {
-	logger := getRouteLogger()
 	devices, err := a.DeviceService.GetAll()
 	if err != nil {
-		logger.Error(err)
 		return err
 	}
 
