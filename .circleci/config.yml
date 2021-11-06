@@ -93,9 +93,10 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Waiting for Postgres to be ready
+          name: build go binary
           command: |
             sudo apt-get install libpcap-dev
+            echo "Building device-commander binary"
             go build -o device-commander
 
   lint:
