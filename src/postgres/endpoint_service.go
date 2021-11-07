@@ -23,7 +23,7 @@ type EndpointCRUDService interface {
 	GetAll() ([]*model.Endpoint, error)
 }
 
-// DeviceService implements the BaseService for CRUD actions involving the Devices.
+// EndpointService implements the BaseService for CRUD actions involving Endpoints.
 type EndpointService struct {
 	DbConfig     DBConfig
 	DBConnection *gorm.DB
@@ -31,7 +31,7 @@ type EndpointService struct {
 	logger       *log.Entry
 }
 
-// NewDeviceService creates a new instance of a DeviceService with a DBConfig.
+// NewEndpointService creates a new instance of an EndpointService with a DBConfig.
 func NewEndpointService(config DBConfig) (EndpointService, error) {
 	service := EndpointService{
 		DbConfig:    config,
@@ -93,6 +93,8 @@ func (s EndpointService) Update(input model.UpdateEndpoint) error {
 	return nil
 }
 
+// Delete on the EndpointService removes a single row from the Endpoint table by the specific ID AND all of the Parameters
+// associated with the EndpointID.
 func (s EndpointService) Delete(id string) (*model.Endpoint, error) {
 	var toBeDeleted model.Endpoint
 	endUUID, err := uuid.Parse(id)
@@ -111,6 +113,8 @@ func (s EndpointService) Delete(id string) (*model.Endpoint, error) {
 	return &toBeDeleted, nil
 }
 
+// Get on the EndpointService will retrieve all of the rows that match the query. The
+// associated objects (parameters) will be preloaded for convenience.
 func (s EndpointService) Get(query model.Endpoint) ([]*model.Endpoint, error) {
 	endpoints := []*model.Endpoint{}
 	result := s.DBConnection.Preload(clause.Associations).Where(query).Find(&endpoints)

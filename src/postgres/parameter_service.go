@@ -124,7 +124,7 @@ func (s ParameterService) Delete(id string) (*model.Parameter, error) {
 }
 
 // Get on the ParameterService will retrieve all of the rows that match the query. The
-// associated objects (endpoints) will be preloaded for convenience.
+// associated object (endpoint) will be preloaded for convenience.
 func (s ParameterService) Get(query model.Parameter) ([]*model.Parameter, error) {
 	Parameters := []*model.Parameter{}
 	result := s.DBConnection.Preload(clause.Associations).Where(query).Find(&Parameters)
