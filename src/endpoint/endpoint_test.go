@@ -26,7 +26,7 @@ func (s *EndpointSuite) CreateTestNewEndpoint() model.NewEndpoint {
 
 func (s *EndpointSuite) TestNewEndpoint() {
 	testNewEndpoint := s.CreateTestNewEndpoint()
-	testEndpoint := NewEndpointFromNewEndpoint(testNewEndpoint)
+	testEndpoint := EndpointFromNewEndpoint(testNewEndpoint)
 
 	assert.NotNil(s.T(), testEndpoint.ID, "the endpoint ID should be initialized")
 
@@ -36,7 +36,7 @@ func (s *EndpointSuite) TestNewEndpoint() {
 func (s *EndpointSuite) TestNewParameter() {
 	testNewEndpoint := s.CreateTestNewEndpoint()
 
-	testEndpoint := NewEndpointFromNewEndpoint(testNewEndpoint)
+	testEndpoint := EndpointFromNewEndpoint(testNewEndpoint)
 
 	testNewParameter := test.GenerateRandomNewParameterForEndpoint(testEndpoint.ID.String(), 1)[0]
 	newParameter := NewParameterFromNewParameter(testNewParameter)

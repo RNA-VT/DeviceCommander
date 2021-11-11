@@ -27,9 +27,9 @@ type Device struct {
 	logger *log.Entry
 }
 
-// NewDeviceFromNewDevice generates a Device from a NewDevice with the correct instantiations.
+// DeviceFromNewDevice generates a Device from a NewDevice with the correct instantiations.
 // This should be the primary method for creationg model.Device(s).
-func NewDeviceFromNewDevice(newDeviceArgs model.NewDevice) model.Device {
+func DeviceFromNewDevice(newDeviceArgs model.NewDevice) model.Device {
 	newDevice := model.Device{
 		ID:        uuid.New(),
 		Host:      newDeviceArgs.Host,

@@ -41,7 +41,7 @@ func (s *ClusterSuite) GenerateDevices(count int) []*model.Device {
 	devs := test.GenerateRandomNewDevices(count)
 	collection := []*model.Device{}
 	for _, d := range devs {
-		tmpDev := device.NewDeviceFromNewDevice(d)
+		tmpDev := device.DeviceFromNewDevice(d)
 		collection = append(collection, &tmpDev)
 	}
 	return collection
