@@ -65,7 +65,7 @@ func (s EndpointService) Initialise() (EndpointService, error) {
 }
 
 func (s EndpointService) Create(newDeviceArgs model.NewEndpoint) (*model.Endpoint, error) {
-	newEndpoint := endpoint.NewEndpointFromNewEndpoint(newDeviceArgs)
+	newEndpoint := endpoint.EndpointFromNewEndpoint(newDeviceArgs)
 
 	result := s.DBConnection.Create(&newEndpoint)
 	if result.Error != nil {

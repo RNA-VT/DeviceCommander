@@ -66,7 +66,7 @@ func (s DeviceService) Initialise() (DeviceService, error) {
 // Create on the DeviceService creates a new row in the Device table.
 // Due to the nested nature of Parameters
 func (s DeviceService) Create(newDeviceArgs model.NewDevice) (*model.Device, error) {
-	newDevice := device.NewDeviceFromNewDevice(newDeviceArgs)
+	newDevice := device.DeviceFromNewDevice(newDeviceArgs)
 	result := s.DBConnection.Create(&newDevice)
 	if result.Error != nil {
 		return &newDevice, result.Error
