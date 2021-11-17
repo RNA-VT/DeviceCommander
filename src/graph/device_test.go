@@ -32,7 +32,7 @@ func (s *DeviceGraphQLSuite) TestCreateDevice() {
 
 	newDevice := model.NewDevice{
 		Host: "0.0.0.0",
-		Port: 0000,
+		Port: 0o000,
 	}
 
 	s.mockDeviceRepository.On("Create", newDevice).Return(&model.Device{}, nil)
