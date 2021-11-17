@@ -1,9 +1,10 @@
 package postgres
 
 import (
-	"log"
 	"testing"
 
+	"github.com/google/uuid"
+	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 
@@ -76,19 +77,15 @@ func (s *PostgresDeviceRepositorySuite) TestGet() {
 }
 
 func (s *PostgresDeviceRepositorySuite) TestDelete() {
-	newDevs := test.GenerateRandomNewDevices(1)
-	newDev := newDevs[0]
+	testDevice := s.CreateTestDevice()
 
-	dev, err := s.repository.Create(newDev)
-	assert.Nil(s.T(), err)
+	deleteResult, err := s.repository.Delete(testDevice.ID.String())
+	assert.Nil(s.T(), err, "there should be no error when deleting a newly created device")
 
-	deleteResult, err := s.repository.Delete(dev.ID.String())
-	assert.Nil(s.T(), err)
-
-	assert.Equal(s.T(), deleteResult.ID, dev.ID, "the return from a delete should contain the deleted object")
+	assert.Equal(s.T(), deleteResult.ID, testDevice.ID, "the return from a delete should contain the deleted object")
 
 	getResults, err := s.repository.Get(model.Device{
-		ID: dev.ID,
+		ID: testDevice.ID,
 	})
 	assert.Nil(s.T(), err)
 
@@ -96,35 +93,40 @@ func (s *PostgresDeviceRepositorySuite) TestDelete() {
 }
 
 func (s *PostgresDeviceRepositorySuite) TestUpdate() {
-	newDevs := test.GenerateRandomNewDevices(1)
-	newDev := newDevs[0]
-
-	dev, err := s.repository.Create(newDev)
-	assert.Nil(s.T(), err)
-
-	// add device to test list for deletion after
-	s.testDevices = append(s.testDevices, *dev)
+	testDevice := s.CreateTestDevice()
 
 	tmpMAC := test.GenerateRandomMacAddress()
-
-	err = s.repository.Update(model.UpdateDevice{
-		ID:  dev.ID.String(),
+	err := s.repository.Update(model.UpdateDevice{
+		ID:  testDevice.ID.String(),
 		Mac: &tmpMAC,
 	})
 	assert.Nil(s.T(), err)
 
 	getResults, err := s.repository.Get(model.Device{
-		ID: dev.ID,
+		ID: testDevice.ID,
 	})
 	assert.Nil(s.T(), err)
 
 	assert.Equal(s.T(), getResults[0].MAC, tmpMAC, "the updated device should have the new MAC address")
 }
 
+func (s *PostgresDeviceRepositorySuite) TestUpdateNonExistent() {
+	tmpMAC := test.GenerateRandomMacAddress()
+	tmpUUID := uuid.New()
+	err := s.repository.Update(model.UpdateDevice{
+		ID:  tmpUUID.String(),
+		Mac: &tmpMAC,
+	})
+
+	assert.NotNil(s.T(), err, "updating a device that does not exist should throw an error")
+}
+
 func (s *PostgresDeviceRepositorySuite) AfterTest(_, _ string) {
 	for _, d := range s.testDevices {
 		_, err := s.repository.Delete(d.ID.String())
-		assert.Nil(s.T(), err)
+		if err != nil {
+			log.Warn(err)
+		}
 	}
 
 	s.testDevices = []model.Device{}

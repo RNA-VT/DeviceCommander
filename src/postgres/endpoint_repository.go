@@ -78,9 +78,13 @@ func (r EndpointRepository) Update(input model.UpdateEndpoint) error {
 
 	end := model.Endpoint{ID: id}
 
-	result := r.DBConnection.Session(&gorm.Session{FullSaveAssociations: true}).Model(end).Updates(input)
+	result := r.DBConnection.Model(end).Updates(input)
 	if result.Error != nil {
 		return result.Error
+	}
+
+	if result.RowsAffected < 1 {
+		return NewNonExistentError("endpoint", "update", input.ID)
 	}
 
 	r.logger.Trace("Updated endpoint " + end.ID.String())

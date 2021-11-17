@@ -66,6 +66,8 @@ func (r DeviceRepository) Create(newDeviceArgs model.NewDevice) (*model.Device, 
 	return &newDevice, nil
 }
 
+// Update on the DeviceRepository updates a single Device based off the ID of the UpdateDevice arguement.
+// It will return an error if no device is updated.
 func (r DeviceRepository) Update(input model.UpdateDevice) error {
 	id, err := uuid.Parse(input.ID)
 	if err != nil {
@@ -77,22 +79,23 @@ func (r DeviceRepository) Update(input model.UpdateDevice) error {
 		return result.Error
 	}
 
+	if result.RowsAffected < 1 {
+		return NewNonExistentError("device", "update", input.ID)
+	}
+
 	r.logger.Trace("Updated device " + device.ID.String())
 	return nil
 }
 
 func (r DeviceRepository) Delete(id string) (*model.Device, error) {
-	var toBeDeleted model.Device
-	result := r.DBConnection.First(&toBeDeleted, "ID = ?", id)
-	if result.Error != nil {
-		return &toBeDeleted, result.Error
-	}
-
 	uid, err := uuid.Parse(id)
 	if err != nil {
-		return &toBeDeleted, err
+		return &model.Device{}, err
 	}
-	toBeDeleted.ID = uid
+
+	toBeDeleted := model.Device{
+		ID: uid,
+	}
 
 	results, err := r.Get(toBeDeleted)
 	if err != nil {
@@ -100,7 +103,7 @@ func (r DeviceRepository) Delete(id string) (*model.Device, error) {
 	}
 
 	if len(results) == 0 {
-		return &toBeDeleted, fmt.Errorf("the device %s has already been deleted", id)
+		return &toBeDeleted, NewNonExistentError("device", "delete", id)
 	}
 
 	for _, e := range results[0].Endpoints {

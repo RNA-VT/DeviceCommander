@@ -119,26 +119,6 @@ func (s *PostgresParameterRepositorySuite) TestUpdate() {
 	assert.Equal(s.T(), tmpDesc, *getResults[0].Description, "the updated parameter should have the new description")
 }
 
-func (s *PostgresParameterRepositorySuite) TestParamUpdate() {
-	testParameter := s.CreateTestParameter()
-
-	tmpDesc := "Radom test update 710"
-	paramUpdate := model.UpdateParameter{
-		ID:          testParameter.ID.String(),
-		Description: &tmpDesc,
-	}
-
-	err := s.parameterRepository.Update(paramUpdate)
-	assert.Nil(s.T(), err)
-
-	getResults, err := s.parameterRepository.Get(model.Parameter{
-		ID: testParameter.ID,
-	})
-	assert.Nil(s.T(), err)
-
-	assert.Equal(s.T(), tmpDesc, *getResults[0].Description, "the updated parameter should have the new description")
-}
-
 func (s *PostgresParameterRepositorySuite) TearDownSuite() {
 	for _, p := range s.testParameters {
 		_, err := s.parameterRepository.Delete(p.ID.String())

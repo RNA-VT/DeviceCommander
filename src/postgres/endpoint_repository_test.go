@@ -3,6 +3,7 @@ package postgres
 import (
 	"testing"
 
+	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
@@ -98,7 +99,7 @@ func (s *PostgresEndpointRepositorySuite) TestDelete() {
 func (s *PostgresEndpointRepositorySuite) TestUpdate() {
 	testEndpoint := s.CreateTestEndpoint()
 
-	tmpDesc := "Radom test update"
+	tmpDesc := "update random test"
 	err := s.endpointRepository.Update(model.UpdateEndpoint{
 		ID:          testEndpoint.ID.String(),
 		Description: &tmpDesc,
@@ -110,27 +111,20 @@ func (s *PostgresEndpointRepositorySuite) TestUpdate() {
 	})
 	assert.Nil(s.T(), err)
 
-	assert.Equal(s.T(), tmpDesc, *getResults[0].Description, "the updated device should have the new description")
+	assert.Equal(s.T(), tmpDesc, *getResults[0].Description, "the updated endpoint should have the new description")
+
+	assert.Equal(s.T(), testEndpoint.Method, getResults[0].Method, "the updated endpoint's method should remain unchanged")
 }
 
-func (s *PostgresEndpointRepositorySuite) TestParamUpdate() {
-	testEndpoint := s.CreateTestEndpoint()
-
-	tmpDesc := "Radom test update 710"
-	paramUpdate := model.UpdateEndpoint{
-		ID:          testEndpoint.ID.String(),
+func (s *PostgresEndpointRepositorySuite) TestUpdateNonExistent() {
+	tmpDesc := "non existent random test"
+	tmpUUID := uuid.New()
+	err := s.endpointRepository.Update(model.UpdateEndpoint{
+		ID:          tmpUUID.String(),
 		Description: &tmpDesc,
-	}
-
-	err := s.endpointRepository.Update(paramUpdate)
-	assert.Nil(s.T(), err)
-
-	getResults, err := s.endpointRepository.Get(model.Endpoint{
-		ID: testEndpoint.ID,
 	})
-	assert.Nil(s.T(), err)
 
-	assert.Equal(s.T(), tmpDesc, *getResults[0].Description, "the updated device should have the new description")
+	assert.NotNil(s.T(), err, "updating an endpoint that does not exist should throw an error")
 }
 
 func (s *PostgresEndpointRepositorySuite) TearDownSuite() {

@@ -32,6 +32,8 @@ func (s *EndpointSuite) TestNewEndpoint() {
 	assert.NotNil(s.T(), testEndpoint.Parameters, "the Parameters field should be initialized")
 
 	assert.NotNil(s.T(), testEndpoint.ID, "the endpoint ID should be initialized")
+
+	assert.Equal(s.T(), testNewEndpoint.Description, testEndpoint.Description, "the description should carry through to the NewEndpoint")
 }
 
 // In order for 'go test' to run this suite, we need to create
