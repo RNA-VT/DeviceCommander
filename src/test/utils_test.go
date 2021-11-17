@@ -35,9 +35,6 @@ func (s *TestSuite) TestGenerateRandomNewEndpoints() {
 	testNewEndpoint := testNewEndpoints[0]
 
 	assert.Equal(s.T(), testNewEndpoint.DeviceID, tmpDeviceID, "the NewEndpoint should have the correct DeviceID")
-
-	assert.NotNil(s.T(), testNewEndpoint.Parameters, "the NewEndpoint's parameters should atleast be initialized")
-	assert.Greater(s.T(), len(testNewEndpoint.Parameters), 0, "the test NewEndpoint should have atleast 1 Parameter")
 }
 
 func (s *TestSuite) GenerateRandomNewParameter() {

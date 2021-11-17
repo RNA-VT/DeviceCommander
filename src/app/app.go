@@ -4,17 +4,18 @@ import (
 	"github.com/labstack/echo"
 
 	"github.com/rna-vt/devicecommander/src/cluster"
-	"github.com/rna-vt/devicecommander/src/postgres"
+	"github.com/rna-vt/devicecommander/src/device"
+	"github.com/rna-vt/devicecommander/src/endpoint"
 	"github.com/rna-vt/devicecommander/src/routes"
 )
 
 // The Application encapsulates the required state for the running software
 type Application struct {
-	Cluster         cluster.Cluster
-	Echo            *echo.Echo
-	Hostname        string
-	DeviceService   postgres.DeviceCRUDService
-	EndpointService postgres.EndpointCRUDService
+	Cluster            cluster.Cluster
+	Echo               *echo.Echo
+	Hostname           string
+	DeviceRepository   device.IDeviceCRUDRepository
+	EndpointRepository endpoint.IEndpointCRUDRepository
 }
 
 // SystemInfo returns a stringified version of this api
@@ -23,7 +24,7 @@ func (a *Application) SystemInfo() string {
 }
 
 func (a *Application) Start() {
-	api := routes.NewAPIService(&a.Cluster, a.DeviceService, a.EndpointService)
+	api := routes.NewAPIService(&a.Cluster, a.DeviceRepository, a.EndpointRepository)
 
 	a.Cluster.Start()
 

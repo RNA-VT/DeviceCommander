@@ -12,7 +12,6 @@ type NewEndpoint {
     Method: String!
     Type: String!
     Description: String
-    Parameters: [NewParameter]!
 }
 
 type UpdateEndpoint {

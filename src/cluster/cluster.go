@@ -9,7 +9,6 @@ import (
 
 	"github.com/rna-vt/devicecommander/src/device"
 	"github.com/rna-vt/devicecommander/src/graph/model"
-	"github.com/rna-vt/devicecommander/src/postgres"
 )
 
 type ICluster interface {
@@ -22,32 +21,32 @@ type ICluster interface {
 // It does things like probe the current active set for health and collection
 // of new devices.
 type Cluster struct {
-	Name          string
-	DeviceService postgres.DeviceCRUDService
-	DeviceClient  device.IDeviceClient
-	logger        *log.Entry
-	discoveryStop chan bool
-	healthStop    chan bool
+	Name             string
+	DeviceRepository device.IDeviceCRUDRepository
+	DeviceClient     device.IDeviceClient
+	logger           *log.Entry
+	discoveryStop    chan bool
+	healthStop       chan bool
 }
 
 func NewCluster(
 	name string,
-	deviceService postgres.DeviceCRUDService,
+	deviceRepository device.IDeviceCRUDRepository,
 	deviceClient device.IDeviceClient,
 ) Cluster {
 	return Cluster{
-		Name:          name,
-		DeviceService: deviceService,
-		DeviceClient:  deviceClient,
-		logger:        log.WithFields(log.Fields{"module": "cluster"}),
-		discoveryStop: make(chan bool),
-		healthStop:    make(chan bool),
+		Name:             name,
+		DeviceRepository: deviceRepository,
+		DeviceClient:     deviceClient,
+		logger:           log.WithFields(log.Fields{"module": "cluster"}),
+		discoveryStop:    make(chan bool),
+		healthStop:       make(chan bool),
 	}
 }
 
 // PrintClusterInfo will cleanly print out info about the cluster
 func (c Cluster) PrintClusterInfo() {
-	devices, err := c.DeviceService.GetAll()
+	devices, err := c.DeviceRepository.GetAll()
 	if err != nil {
 		c.logger.Error(err)
 		return
@@ -65,8 +64,8 @@ func (c *Cluster) Start() {
 	// Discovery and collection of new devices.
 	go c.RunDeviceDiscoveryLoop(viper.GetInt("DISCOVERY_PERIOD"))
 
-	// // Health Check
-	// go c.RunHealthCheckLoop(viper.GetInt("HEALTH_CHECK_PERIOD"))
+	// Health Check
+	go c.RunHealthCheckLoop(viper.GetInt("HEALTH_CHECK_PERIOD"))
 }
 
 // RunDeviceDiscoveryLoop contiuously searches for other responsive devices on the network.
@@ -94,7 +93,7 @@ func (c Cluster) RunHealthCheckLoop(healthCheckPeriod int) {
 			c.logger.Info("Ticker stopped by healthStop chan")
 			return
 		default:
-			devs, err := c.DeviceService.Get(model.Device{
+			devs, err := c.DeviceRepository.Get(model.Device{
 				Active: true,
 			})
 

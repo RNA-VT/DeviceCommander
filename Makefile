@@ -17,9 +17,6 @@ run-test:
 run:
 	sudo go run main.go
 
-docs:
-	graphdoc -e http://localhost:8001/v1/graphql/query -o ./spec/graphql
-
 # help:
 # 	cd src && go run main.go -h
 

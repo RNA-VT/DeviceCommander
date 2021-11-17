@@ -28,7 +28,7 @@ func main() {
 		UserName: viper.GetString("POSTGRES_USER"),
 		Password: viper.GetString("POSTGRES_PASSWORD"),
 	}
-	deviceService, err := postgres.NewDeviceService(dbConfig)
+	deviceRepository, err := postgres.NewDeviceRepository(dbConfig)
 	if err != nil {
 		log.Error(err)
 		return
@@ -36,18 +36,18 @@ func main() {
 
 	deviceClient := device.NewHTTPDeviceClient()
 
-	endpointService, err := postgres.NewEndpointService(dbConfig)
+	endpointRepository, err := postgres.NewEndpointRepository(dbConfig)
 	if err != nil {
 		log.Error(err)
 		return
 	}
 
 	app := app.Application{
-		Cluster:         cluster.NewCluster(viper.GetString("CLUSTER_NAME"), deviceService, deviceClient),
-		Echo:            echo.New(),
-		Hostname:        fmt.Sprintf("%s:%s", viper.GetString("HOST"), viper.GetString("PORT")),
-		DeviceService:   deviceService,
-		EndpointService: endpointService,
+		Cluster:            cluster.NewCluster(viper.GetString("CLUSTER_NAME"), deviceRepository, deviceClient),
+		Echo:               echo.New(),
+		Hostname:           fmt.Sprintf("%s:%s", viper.GetString("HOST"), viper.GetString("PORT")),
+		DeviceRepository:   deviceRepository,
+		EndpointRepository: endpointRepository,
 	}
 	var API routes.APIService
 

@@ -75,7 +75,6 @@ type ComplexityRoot struct {
 		Description func(childComplexity int) int
 		DeviceID    func(childComplexity int) int
 		Method      func(childComplexity int) int
-		Parameters  func(childComplexity int) int
 		Type        func(childComplexity int) int
 	}
 
@@ -299,13 +298,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.NewEndpoint.Method(childComplexity), true
-
-	case "NewEndpoint.Parameters":
-		if e.complexity.NewEndpoint.Parameters == nil {
-			break
-		}
-
-		return e.complexity.NewEndpoint.Parameters(childComplexity), true
 
 	case "NewEndpoint.Type":
 		if e.complexity.NewEndpoint.Type == nil {
@@ -578,7 +570,6 @@ type NewEndpoint {
     Method: String!
     Type: String!
     Description: String
-    Parameters: [NewParameter]!
 }
 
 type UpdateEndpoint {
@@ -1416,41 +1407,6 @@ func (ec *executionContext) _NewEndpoint_Description(ctx context.Context, field 
 	res := resTmp.(*string)
 	fc.Result = res
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _NewEndpoint_Parameters(ctx context.Context, field graphql.CollectedField, obj *model.NewEndpoint) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "NewEndpoint",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Parameters, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]*model.NewParameter)
-	fc.Result = res
-	return ec.marshalNNewParameter2ᚕᚖgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋsrcᚋgraphᚋmodelᚐNewParameter(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _NewParameter_EndpointID(ctx context.Context, field graphql.CollectedField, obj *model.NewParameter) (ret graphql.Marshaler) {
@@ -3677,11 +3633,6 @@ func (ec *executionContext) _NewEndpoint(ctx context.Context, sel ast.SelectionS
 			}
 		case "Description":
 			out.Values[i] = ec._NewEndpoint_Description(ctx, field, obj)
-		case "Parameters":
-			out.Values[i] = ec._NewEndpoint_Parameters(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4319,44 +4270,6 @@ func (ec *executionContext) unmarshalNNewDevice2githubᚗcomᚋrnaᚑvtᚋdevice
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNNewParameter2ᚕᚖgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋsrcᚋgraphᚋmodelᚐNewParameter(ctx context.Context, sel ast.SelectionSet, v []*model.NewParameter) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalONewParameter2ᚖgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋsrcᚋgraphᚋmodelᚐNewParameter(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	return ret
-}
-
 func (ec *executionContext) marshalNParameter2ᚕgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋsrcᚋgraphᚋmodelᚐParameter(ctx context.Context, sel ast.SelectionSet, v []model.Parameter) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
@@ -4718,13 +4631,6 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 		return graphql.Null
 	}
 	return graphql.MarshalInt(*v)
-}
-
-func (ec *executionContext) marshalONewParameter2ᚖgithubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋsrcᚋgraphᚋmodelᚐNewParameter(ctx context.Context, sel ast.SelectionSet, v *model.NewParameter) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._NewParameter(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOParameter2githubᚗcomᚋrnaᚑvtᚋdevicecommanderᚋsrcᚋgraphᚋmodelᚐParameter(ctx context.Context, sel ast.SelectionSet, v model.Parameter) graphql.Marshaler {

@@ -20,19 +20,19 @@ import (
 
 type ClusterSuite struct {
 	suite.Suite
-	mockDeviceService mocks.DeviceCRUDService
-	mockDeviceClient  mocks.IDeviceClient
-	cluster           Cluster
+	mockDeviceRepository mocks.DeviceCRUDRepository
+	mockDeviceClient     mocks.IDeviceClient
+	cluster              Cluster
 }
 
 func (s *ClusterSuite) SetupSuite() {
 	utilities.ConfigureEnvironment()
-	s.mockDeviceService = mocks.DeviceCRUDService{}
+	s.mockDeviceRepository = mocks.DeviceCRUDRepository{}
 	s.mockDeviceClient = mocks.IDeviceClient{}
 
 	s.cluster = NewCluster(
 		"testing",
-		&s.mockDeviceService,
+		&s.mockDeviceRepository,
 		&s.mockDeviceClient,
 	)
 }
@@ -41,7 +41,7 @@ func (s *ClusterSuite) GenerateDevices(count int) []*model.Device {
 	devs := test.GenerateRandomNewDevices(count)
 	collection := []*model.Device{}
 	for _, d := range devs {
-		tmpDev := device.DeviceFromNewDevice(d)
+		tmpDev := device.FromNewDevice(d)
 		collection = append(collection, &tmpDev)
 	}
 	return collection
@@ -52,7 +52,7 @@ func (s *ClusterSuite) TestRunHealthCheckLoop() {
 
 	fmt.Println(len(mockDevices))
 
-	s.mockDeviceService.On("Get", mock.AnythingOfType("model.Device")).Return(mockDevices, nil)
+	s.mockDeviceRepository.On("Get", mock.AnythingOfType("model.Device")).Return(mockDevices, nil)
 
 	tmpResponse := http.Response{
 		Status: "200",
@@ -69,9 +69,9 @@ func (s *ClusterSuite) TestRunHealthCheckLoop() {
 
 	s.cluster.healthStop <- true
 
-	s.mockDeviceService.AssertCalled(s.T(), "Get", model.Device{Active: true})
+	s.mockDeviceRepository.AssertCalled(s.T(), "Get", model.Device{Active: true})
 
-	s.mockDeviceService.AssertNumberOfCalls(s.T(), "Get", 1)
+	s.mockDeviceRepository.AssertNumberOfCalls(s.T(), "Get", 1)
 
 	// s.mockDeviceClient.AssertNumberOfCalls(s.T(), "Health", 3)
 }

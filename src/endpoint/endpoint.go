@@ -2,61 +2,55 @@ package endpoint
 
 import (
 	"github.com/google/uuid"
-	"github.com/labstack/gommon/log"
+	log "github.com/sirupsen/logrus"
 
+	"github.com/rna-vt/devicecommander/src/device"
 	"github.com/rna-vt/devicecommander/src/graph/model"
 )
 
-// EndpointFromNewEndpoint generates an Endpoint from a NewEndpoint with the correctly
+type IEndpoint interface {
+	Execute(map[string]interface{}) error
+}
+
+// DeviceEndpoint implements the Endpoint interface. It provides a functional
+// layer for interacting with a specific Device's endpoint.
+type DeviceEndpoint struct {
+	model.Endpoint
+	Device device.Device
+}
+
+// FromNewEndpoint generates an Endpoint from a NewEndpoint with the correctly
 // instantiated fields. This should be the primary way in which an Endpoint is generated.
-func EndpointFromNewEndpoint(input model.NewEndpoint) *model.Endpoint {
+func FromNewEndpoint(input model.NewEndpoint) (model.Endpoint, error) {
 	deviceUUID, err := uuid.Parse(input.DeviceID)
 	if err != nil {
 		log.Error(err)
 	}
 
 	end := model.Endpoint{
-		ID:       uuid.New(),
-		DeviceID: deviceUUID,
-		Type:     input.Type,
-		Method:   input.Method,
+		ID:         uuid.New(),
+		DeviceID:   deviceUUID,
+		Type:       input.Type,
+		Method:     input.Method,
+		Parameters: []model.Parameter{},
 	}
 
 	if input.Description != nil {
 		end.Description = input.Description
 	}
 
-	if input.Parameters != nil {
-		end.Parameters = []model.Parameter{}
-
-		for _, p := range input.Parameters {
-			tmpP := NewParameterFromNewParameter(*p)
-			end.Parameters = append(end.Parameters, tmpP)
-		}
-	} else {
-		end.Parameters = []model.Parameter{}
-	}
-
-	return &end
+	return end, nil
 }
 
-// NewParameterFromNewParameter generates a Parameter{} from a NewParameter with the correctly
-// instantiated fields. This should be the primary way in which a Parameter is generated.
-func NewParameterFromNewParameter(input model.NewParameter) model.Parameter {
-	endpointID, err := uuid.Parse(input.EndpointID)
-	if err != nil {
-		log.Error(err)
-	}
-	param := model.Parameter{
-		ID:         uuid.New(),
-		EndpointID: endpointID,
-		Name:       input.Name,
-		Type:       input.Type,
-	}
+// NewDeviceEndpoint generates a DeviceEndpoint
+func NewDeviceEndpoint() *DeviceEndpoint {
+	return &DeviceEndpoint{}
+}
 
-	if input.Description != nil {
-		param.Description = input.Description
-	}
-
-	return param
+// Execute carries out the action associated with the Device's endpoint
+// by communicating with the device.
+func (e DeviceEndpoint) Execute(map[string]interface{}) error {
+	log.Println(e.Method)
+	log.Println(e.Device.URL())
+	return nil
 }

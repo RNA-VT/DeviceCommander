@@ -12,11 +12,10 @@ type NewDevice struct {
 }
 
 type NewEndpoint struct {
-	DeviceID    string          `json:"DeviceID"`
-	Method      string          `json:"Method"`
-	Type        string          `json:"Type"`
-	Description *string         `json:"Description"`
-	Parameters  []*NewParameter `json:"Parameters"`
+	DeviceID    string  `json:"DeviceID"`
+	Method      string  `json:"Method"`
+	Type        string  `json:"Type"`
+	Description *string `json:"Description"`
 }
 
 type NewParameter struct {

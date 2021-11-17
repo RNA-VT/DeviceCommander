@@ -25,7 +25,7 @@ func (s *DeviceServiceSuite) SetupSuite() {
 func (s *DeviceServiceSuite) TestDeviceFromNewDeviceWith() {
 	testNewDevice := test.GenerateRandomNewDevices(1)[0]
 
-	newDeviceResult := DeviceFromNewDevice(testNewDevice)
+	newDeviceResult := FromNewDevice(testNewDevice)
 
 	assert.Equal(s.T(), newDeviceResult.MAC, *testNewDevice.Mac, "the MAC address is properly assigned")
 
@@ -38,7 +38,7 @@ func (s *DeviceServiceSuite) TestDeviceFromNewDeviceWith() {
 func (s *DeviceServiceSuite) TestNewDeviceWrapper() {
 	testNewDevice := test.GenerateRandomNewDevices(1)[0]
 
-	newDeviceResult := DeviceFromNewDevice(testNewDevice)
+	newDeviceResult := FromNewDevice(testNewDevice)
 
 	wrapper := NewDeviceWrapper(newDeviceResult)
 
@@ -62,7 +62,7 @@ func (s *DeviceServiceSuite) TestNewDeviceFromRequestBody() {
 func (s *DeviceServiceSuite) TestDeviceURL() {
 	testNewDevice := test.GenerateRandomNewDevices(1)[0]
 
-	newDeviceResult := DeviceFromNewDevice(testNewDevice)
+	newDeviceResult := FromNewDevice(testNewDevice)
 
 	wrapper := NewDeviceWrapper(newDeviceResult)
 

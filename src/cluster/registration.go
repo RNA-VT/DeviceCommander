@@ -48,12 +48,12 @@ func (c Cluster) DeviceDiscovery(scanDurationSeconds int) {
 			devSearch := model.Device{
 				MAC: *tmpNewDevice.Mac,
 			}
-			results, err := c.DeviceService.Get(devSearch)
+			results, err := c.DeviceRepository.Get(devSearch)
 			if err != nil {
 				logger.Error(err)
 			} else {
 				if len(results) == 0 {
-					completeDevice, err := c.DeviceService.Create(tmpNewDevice)
+					completeDevice, err := c.DeviceRepository.Create(tmpNewDevice)
 					if err != nil {
 						logger.Error(err)
 					} else {

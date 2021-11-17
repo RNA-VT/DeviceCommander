@@ -7,43 +7,44 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 
+	"github.com/rna-vt/devicecommander/src/device"
 	"github.com/rna-vt/devicecommander/src/graph/model"
 	"github.com/rna-vt/devicecommander/src/test"
 	"github.com/rna-vt/devicecommander/src/utilities"
 )
 
-type PostgresDeviceServiceSuite struct {
+type PostgresDeviceRepositorySuite struct {
 	suite.Suite
 	testDevices []model.Device
-	service     DeviceCRUDService
+	repository  device.IDeviceCRUDRepository
 }
 
-func (s *PostgresDeviceServiceSuite) SetupSuite() {
+func (s *PostgresDeviceRepositorySuite) SetupSuite() {
 	utilities.ConfigureEnvironment()
 	dbConfig := GetDBConfigFromEnv()
 
-	deviceService, err := NewDeviceService(dbConfig)
+	deviceRepository, err := NewDeviceRepository(dbConfig)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	s.service = deviceService
+	s.repository = deviceRepository
 
 	newDevs := test.GenerateRandomNewDevices(1)
 	newDev := newDevs[0]
 
-	dev, err := s.service.Create(newDev)
+	dev, err := s.repository.Create(newDev)
 	assert.Nil(s.T(), err)
 
 	// add device to test list for deletion after
 	s.testDevices = append(s.testDevices, *dev)
 }
 
-func (s *PostgresDeviceServiceSuite) CreateTestDevice() model.Device {
+func (s *PostgresDeviceRepositorySuite) CreateTestDevice() model.Device {
 	testDevices := test.GenerateRandomNewDevices(1)
 	testDevice := testDevices[0]
 
-	newDevice, err := s.service.Create(testDevice)
+	newDevice, err := s.repository.Create(testDevice)
 	assert.Nil(s.T(), err)
 
 	s.testDevices = append(s.testDevices, *newDevice)
@@ -51,10 +52,18 @@ func (s *PostgresDeviceServiceSuite) CreateTestDevice() model.Device {
 	return *newDevice
 }
 
-func (s *PostgresDeviceServiceSuite) TestGet() {
+func (s *PostgresDeviceRepositorySuite) TestDeviceRepositoryImplementsCRUDInterface() {
+	// val := MyType("hello")
+	// testDevice := s.CreateTestDevice()
+	// _, ok := interface{}(testDevice).(DeviceCRUDRepository)
+
+	// assert.Equal(s.T(), true, ok, "the device repository must implement the DeviceCRUDRepository interface")
+}
+
+func (s *PostgresDeviceRepositorySuite) TestGet() {
 	testDevice := s.CreateTestDevice()
 
-	results, err := s.service.Get(model.Device{
+	results, err := s.repository.Get(model.Device{
 		ID: testDevice.ID,
 	})
 	assert.Nil(s.T(), err)
@@ -66,19 +75,19 @@ func (s *PostgresDeviceServiceSuite) TestGet() {
 	assert.Equal(s.T(), *results[0], testDevice, "the return from create should be equal to the return from get")
 }
 
-func (s *PostgresDeviceServiceSuite) TestDelete() {
+func (s *PostgresDeviceRepositorySuite) TestDelete() {
 	newDevs := test.GenerateRandomNewDevices(1)
 	newDev := newDevs[0]
 
-	dev, err := s.service.Create(newDev)
+	dev, err := s.repository.Create(newDev)
 	assert.Nil(s.T(), err)
 
-	deleteResult, err := s.service.Delete(dev.ID.String())
+	deleteResult, err := s.repository.Delete(dev.ID.String())
 	assert.Nil(s.T(), err)
 
 	assert.Equal(s.T(), deleteResult.ID, dev.ID, "the return from a delete should contain the deleted object")
 
-	getResults, err := s.service.Get(model.Device{
+	getResults, err := s.repository.Get(model.Device{
 		ID: dev.ID,
 	})
 	assert.Nil(s.T(), err)
@@ -86,11 +95,11 @@ func (s *PostgresDeviceServiceSuite) TestDelete() {
 	assert.Equal(s.T(), len(getResults), 0, "there should be 0 devices with the ID of the deleted device")
 }
 
-func (s *PostgresDeviceServiceSuite) TestUpdate() {
+func (s *PostgresDeviceRepositorySuite) TestUpdate() {
 	newDevs := test.GenerateRandomNewDevices(1)
 	newDev := newDevs[0]
 
-	dev, err := s.service.Create(newDev)
+	dev, err := s.repository.Create(newDev)
 	assert.Nil(s.T(), err)
 
 	// add device to test list for deletion after
@@ -98,15 +107,13 @@ func (s *PostgresDeviceServiceSuite) TestUpdate() {
 
 	tmpMAC := test.GenerateRandomMacAddress()
 
-	err = s.service.Update(model.UpdateDevice{
+	err = s.repository.Update(model.UpdateDevice{
 		ID:  dev.ID.String(),
 		Mac: &tmpMAC,
 	})
 	assert.Nil(s.T(), err)
 
-	// assert.Equal(s.T(), deleteResult.ID, dev.ID, "the return from a delete should contain the deleted object")
-
-	getResults, err := s.service.Get(model.Device{
+	getResults, err := s.repository.Get(model.Device{
 		ID: dev.ID,
 	})
 	assert.Nil(s.T(), err)
@@ -114,9 +121,9 @@ func (s *PostgresDeviceServiceSuite) TestUpdate() {
 	assert.Equal(s.T(), getResults[0].MAC, tmpMAC, "the updated device should have the new MAC address")
 }
 
-func (s *PostgresDeviceServiceSuite) AfterTest(_, _ string) {
+func (s *PostgresDeviceRepositorySuite) AfterTest(_, _ string) {
 	for _, d := range s.testDevices {
-		_, err := s.service.Delete(d.ID.String())
+		_, err := s.repository.Delete(d.ID.String())
 		assert.Nil(s.T(), err)
 	}
 
@@ -127,6 +134,6 @@ func (s *PostgresDeviceServiceSuite) AfterTest(_, _ string) {
 
 // In order for 'go test' to run this suite, we need to create
 // a normal test function and pass our suite to suite.Run
-func TestPostgresDeviceServiceSuite(t *testing.T) {
-	suite.Run(t, new(PostgresDeviceServiceSuite))
+func TestPostgresDeviceRepositorySuite(t *testing.T) {
+	suite.Run(t, new(PostgresDeviceRepositorySuite))
 }

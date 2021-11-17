@@ -26,24 +26,12 @@ func (s *EndpointSuite) CreateTestNewEndpoint() model.NewEndpoint {
 
 func (s *EndpointSuite) TestNewEndpoint() {
 	testNewEndpoint := s.CreateTestNewEndpoint()
-	testEndpoint := EndpointFromNewEndpoint(testNewEndpoint)
+	testEndpoint, err := FromNewEndpoint(testNewEndpoint)
+	assert.Nil(s.T(), err, "creating a new Endpoint from a NewEndpoint should not throw an error")
+
+	assert.NotNil(s.T(), testEndpoint.Parameters, "the Parameters field should be initialized")
 
 	assert.NotNil(s.T(), testEndpoint.ID, "the endpoint ID should be initialized")
-
-	assert.Equal(s.T(), len(testNewEndpoint.Parameters), len(testEndpoint.Parameters), "there should be the same amount of parameters in the NewEndpoint as there are in the Endpoint")
-}
-
-func (s *EndpointSuite) TestNewParameter() {
-	testNewEndpoint := s.CreateTestNewEndpoint()
-
-	testEndpoint := EndpointFromNewEndpoint(testNewEndpoint)
-
-	testNewParameter := test.GenerateRandomNewParameterForEndpoint(testEndpoint.ID.String(), 1)[0]
-	newParameter := NewParameterFromNewParameter(testNewParameter)
-
-	assert.NotNil(s.T(), newParameter.ID, "the parameter ID should be initialized")
-
-	assert.Equal(s.T(), testEndpoint.ID, newParameter.EndpointID, "the new parameter should have the correct EndpointID relation")
 }
 
 // In order for 'go test' to run this suite, we need to create

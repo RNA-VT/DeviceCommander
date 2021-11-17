@@ -60,17 +60,12 @@ func GenerateRandomNewDevices(count int) []model.NewDevice {
 func GenerateRandomNewEndpoints(deviceID string, count int) []model.NewEndpoint {
 	collection := []model.NewEndpoint{}
 	for i := 0; i < count; i++ {
-		tmpParam := GenerateRandomNewParameter(2)
 		tmpDesc := GenerateRandomString(100)
 		tmpEndpoint := model.NewEndpoint{
 			DeviceID:    deviceID,
 			Method:      "dmx-config",
 			Type:        "SET",
 			Description: &tmpDesc,
-			Parameters: []*model.NewParameter{
-				&tmpParam[0],
-				&tmpParam[1],
-			},
 		}
 		collection = append(collection, tmpEndpoint)
 	}

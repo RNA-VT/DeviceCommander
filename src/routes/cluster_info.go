@@ -22,7 +22,7 @@ func (a APIService) health(c echo.Context) error {
 }
 
 func (a APIService) getClusterInfo(c echo.Context) error {
-	devices, err := a.DeviceService.GetAll()
+	devices, err := a.DeviceRepository.GetAll()
 	if err != nil {
 		return err
 	}
@@ -31,7 +31,7 @@ func (a APIService) getClusterInfo(c echo.Context) error {
 }
 
 func (a APIService) getDevices(c echo.Context) error {
-	devices, err := a.DeviceService.GetAll()
+	devices, err := a.DeviceRepository.GetAll()
 	if err != nil {
 		return err
 	}
@@ -45,7 +45,7 @@ func (a *APIService) getDevice(c echo.Context) error {
 	}
 
 	tmpDev := model.Device{ID: id}
-	device, err := a.DeviceService.Get(tmpDev)
+	device, err := a.DeviceRepository.Get(tmpDev)
 	if err != nil {
 		return err
 	}

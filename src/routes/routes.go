@@ -9,23 +9,24 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/rna-vt/devicecommander/src/cluster"
-	"github.com/rna-vt/devicecommander/src/postgres"
+	"github.com/rna-vt/devicecommander/src/device"
+	"github.com/rna-vt/devicecommander/src/endpoint"
 )
 
 // APIService -
 type APIService struct {
-	Cluster         *cluster.Cluster
-	DeviceService   postgres.DeviceCRUDService
-	EndpointService postgres.EndpointCRUDService
-	logger          *log.Entry
+	Cluster            *cluster.Cluster
+	DeviceRepository   device.IDeviceCRUDRepository
+	EndpointRepository endpoint.IEndpointCRUDRepository
+	logger             *log.Entry
 }
 
-func NewAPIService(cluster *cluster.Cluster, deviceService postgres.DeviceCRUDService, endpointService postgres.EndpointCRUDService) *APIService {
+func NewAPIService(cluster *cluster.Cluster, deviceRepository device.IDeviceCRUDRepository, endpointRepository endpoint.IEndpointCRUDRepository) *APIService {
 	api := APIService{
-		Cluster:         cluster,
-		DeviceService:   deviceService,
-		EndpointService: endpointService,
-		logger:          log.WithFields(log.Fields{"module": "routes"}),
+		Cluster:            cluster,
+		DeviceRepository:   deviceRepository,
+		EndpointRepository: endpointRepository,
+		logger:             log.WithFields(log.Fields{"module": "routes"}),
 	}
 
 	return &api
@@ -55,7 +56,7 @@ func (api APIService) ConfigureRoutes(listenURL string, e *echo.Echo) {
 
 	api.addRegistrationRoutes(e)
 	api.addInfoRoutes(e)
-	api.addGraphQLRoutes(e, api.DeviceService, api.EndpointService)
+	api.addGraphQLRoutes(e, api.DeviceRepository, api.EndpointRepository)
 
 	api.logger.Info("Configured routes listening on " + listenURL)
 

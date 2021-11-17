@@ -7,73 +7,75 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 
+	"github.com/rna-vt/devicecommander/src/endpoint"
 	"github.com/rna-vt/devicecommander/src/graph/model"
+	"github.com/rna-vt/devicecommander/src/parameter"
 	"github.com/rna-vt/devicecommander/src/test"
 	"github.com/rna-vt/devicecommander/src/utilities"
 )
 
-type PostgresParameterServiceSuite struct {
+type PostgresParameterRepositorySuite struct {
 	suite.Suite
-	testDevices      []model.Device
-	testEndpoints    []model.Endpoint
-	testParameters   []model.Parameter
-	deviceService    DeviceService
-	endpointService  EndpointCRUDService
-	parameterService ParameterCRUDService
+	testDevices         []model.Device
+	testEndpoints       []model.Endpoint
+	testParameters      []model.Parameter
+	deviceRepository    DeviceRepository
+	endpointRepository  endpoint.IEndpointCRUDRepository
+	parameterRepository parameter.IParameterCRUDRepository
 }
 
-func (s *PostgresParameterServiceSuite) SetupSuite() {
+func (s *PostgresParameterRepositorySuite) SetupSuite() {
 	utilities.ConfigureEnvironment()
 	dbConfig := GetDBConfigFromEnv()
 
-	deviceService, err := NewDeviceService(dbConfig)
+	deviceRepository, err := NewDeviceRepository(dbConfig)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	endpointService, err := NewEndpointService(dbConfig)
+	endpointRepository, err := NewEndpointRepository(dbConfig)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	parameterService, err := NewParameterService(dbConfig)
+	parameterRepository, err := NewParameterRepository(dbConfig)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	s.deviceService = deviceService
-	s.endpointService = endpointService
-	s.parameterService = parameterService
+	s.deviceRepository = deviceRepository
+	s.endpointRepository = endpointRepository
+	s.parameterRepository = parameterRepository
 
 	newDevs := test.GenerateRandomNewDevices(1)
-	dev, err := s.deviceService.Create(newDevs[0])
+	dev, err := s.deviceRepository.Create(newDevs[0])
 	assert.Nil(s.T(), err)
 
 	testEndpoint := test.GenerateRandomNewEndpoints(dev.ID.String(), 1)
 
-	end, err := s.endpointService.Create(testEndpoint[0])
+	end, err := s.endpointRepository.Create(testEndpoint[0])
 	assert.Nil(s.T(), err)
 
 	s.testDevices = append(s.testDevices, *dev)
 	s.testEndpoints = append(s.testEndpoints, *end)
 }
 
-func (s *PostgresParameterServiceSuite) CreateTestParameter() model.Parameter {
+func (s *PostgresParameterRepositorySuite) CreateTestParameter() model.Parameter {
 	currentTestEndpoint := s.testEndpoints[0]
 	testParameters := test.GenerateRandomNewParameterForEndpoint(currentTestEndpoint.ID.String(), 1)
 
-	param, err := s.parameterService.Create(testParameters[0])
-	assert.Nil(s.T(), err)
+	param, err := s.parameterRepository.Create(testParameters[0])
+	assert.Nil(s.T(), err, "creating a test parameter should not throw an error")
 
 	s.testParameters = append(s.testParameters, *param)
 
 	return *param
 }
 
-func (s *PostgresParameterServiceSuite) TestGet() {
+func (s *PostgresParameterRepositorySuite) TestGet() {
 	testParameter := s.CreateTestParameter()
 
-	results, err := s.parameterService.Get(model.Parameter{
+	results, err := s.parameterRepository.Get(model.Parameter{
 		ID: testParameter.ID,
 	})
 	assert.Nil(s.T(), err)
@@ -83,15 +85,15 @@ func (s *PostgresParameterServiceSuite) TestGet() {
 	assert.Equal(s.T(), &testParameter, results[0], "the return from create should be equal to the return from get")
 }
 
-func (s *PostgresParameterServiceSuite) TestDelete() {
+func (s *PostgresParameterRepositorySuite) TestDelete() {
 	testParameter := s.CreateTestParameter()
 
-	deleteResult, err := s.parameterService.Delete(testParameter.ID.String())
+	deleteResult, err := s.parameterRepository.Delete(testParameter.ID.String())
 	assert.Nil(s.T(), err)
 
 	assert.Equal(s.T(), deleteResult.ID, testParameter.ID, "the return from a delete should contain the deleted object")
 
-	getResults, err := s.parameterService.Get(model.Parameter{
+	getResults, err := s.parameterRepository.Get(model.Parameter{
 		ID: testParameter.ID,
 	})
 	assert.Nil(s.T(), err)
@@ -99,17 +101,17 @@ func (s *PostgresParameterServiceSuite) TestDelete() {
 	assert.Equal(s.T(), 0, len(getResults), "there should be 0 parameters with the ID of the deleted device")
 }
 
-func (s *PostgresParameterServiceSuite) TestUpdate() {
+func (s *PostgresParameterRepositorySuite) TestUpdate() {
 	testParameter := s.CreateTestParameter()
 
 	tmpDesc := "Radom test update"
-	err := s.parameterService.Update(model.UpdateParameter{
+	err := s.parameterRepository.Update(model.UpdateParameter{
 		ID:          testParameter.ID.String(),
 		Description: &tmpDesc,
 	})
 	assert.Nil(s.T(), err)
 
-	getResults, err := s.parameterService.Get(model.Parameter{
+	getResults, err := s.parameterRepository.Get(model.Parameter{
 		ID: testParameter.ID,
 	})
 	assert.Nil(s.T(), err)
@@ -117,7 +119,7 @@ func (s *PostgresParameterServiceSuite) TestUpdate() {
 	assert.Equal(s.T(), tmpDesc, *getResults[0].Description, "the updated parameter should have the new description")
 }
 
-func (s *PostgresParameterServiceSuite) TestParamUpdate() {
+func (s *PostgresParameterRepositorySuite) TestParamUpdate() {
 	testParameter := s.CreateTestParameter()
 
 	tmpDesc := "Radom test update 710"
@@ -126,10 +128,10 @@ func (s *PostgresParameterServiceSuite) TestParamUpdate() {
 		Description: &tmpDesc,
 	}
 
-	err := s.parameterService.Update(paramUpdate)
+	err := s.parameterRepository.Update(paramUpdate)
 	assert.Nil(s.T(), err)
 
-	getResults, err := s.parameterService.Get(model.Parameter{
+	getResults, err := s.parameterRepository.Get(model.Parameter{
 		ID: testParameter.ID,
 	})
 	assert.Nil(s.T(), err)
@@ -137,25 +139,25 @@ func (s *PostgresParameterServiceSuite) TestParamUpdate() {
 	assert.Equal(s.T(), tmpDesc, *getResults[0].Description, "the updated parameter should have the new description")
 }
 
-func (s *PostgresParameterServiceSuite) TearDownSuite() {
+func (s *PostgresParameterRepositorySuite) TearDownSuite() {
 	for _, p := range s.testParameters {
-		_, err := s.parameterService.Delete(p.ID.String())
+		_, err := s.parameterRepository.Delete(p.ID.String())
 		log.Warn(err)
 	}
 
 	for _, e := range s.testEndpoints {
-		_, err := s.parameterService.Delete(e.ID.String())
+		_, err := s.parameterRepository.Delete(e.ID.String())
 		log.Warn(err)
 	}
 
 	for _, d := range s.testDevices {
-		_, err := s.deviceService.Delete(d.ID.String())
+		_, err := s.deviceRepository.Delete(d.ID.String())
 		assert.Nil(s.T(), err)
 	}
 }
 
 // In order for 'go test' to run this suite, we need to create
 // a normal test function and pass our suite to suite.Run
-func TestPostgresParameterServiceSuite(t *testing.T) {
-	suite.Run(t, new(PostgresParameterServiceSuite))
+func TestPostgresParameterRepositorySuite(t *testing.T) {
+	suite.Run(t, new(PostgresParameterRepositorySuite))
 }
