@@ -10,6 +10,8 @@ gqlgen:
 mockery:
 	mockery --dir ./src/postgres --all --keeptree --output src/mocks
 	mockery --dir ./src/device --all --keeptree --output src/mocks
+	mockery --dir ./src/endpoint --all --keeptree --output src/mocks
+	mockery --dir ./src/parameter --all --keeptree --output src/mocks
 
 run-test:
 	grc go test ./... -count=1

@@ -15,12 +15,12 @@ import (
 type DeviceGraphQLSuite struct {
 	suite.Suite
 	resolver             Resolver
-	mockDeviceRepository mocks.DeviceCRUDRepository
+	mockDeviceRepository mocks.IDeviceCRUDRepository
 	ctx                  context.Context
 }
 
 func (s *DeviceGraphQLSuite) SetupSuite() {
-	s.mockDeviceRepository = mocks.DeviceCRUDRepository{}
+	s.mockDeviceRepository = mocks.IDeviceCRUDRepository{}
 	s.resolver = Resolver{
 		DeviceRepository: &s.mockDeviceRepository,
 	}
@@ -32,7 +32,7 @@ func (s *DeviceGraphQLSuite) TestCreateDevice() {
 
 	newDevice := model.NewDevice{
 		Host: "0.0.0.0",
-		Port: 0o000,
+		Port: 0000,
 	}
 
 	s.mockDeviceRepository.On("Create", newDevice).Return(&model.Device{}, nil)

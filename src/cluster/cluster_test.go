@@ -20,14 +20,14 @@ import (
 
 type ClusterSuite struct {
 	suite.Suite
-	mockDeviceRepository mocks.DeviceCRUDRepository
+	mockDeviceRepository mocks.IDeviceCRUDRepository
 	mockDeviceClient     mocks.IDeviceClient
 	cluster              Cluster
 }
 
 func (s *ClusterSuite) SetupSuite() {
 	utilities.ConfigureEnvironment()
-	s.mockDeviceRepository = mocks.DeviceCRUDRepository{}
+	s.mockDeviceRepository = mocks.IDeviceCRUDRepository{}
 	s.mockDeviceClient = mocks.IDeviceClient{}
 
 	s.cluster = NewCluster(
