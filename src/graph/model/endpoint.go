@@ -9,7 +9,7 @@ type Endpoint struct {
 	Type        string      `json:"Type"`
 	Description *string     `json:"Description"`
 	Path        *string     `json:"Path"`
-	Parameters  []Parameter `json:"Paramaters,omitempty"`
+	Parameters  []Parameter `json:"Parameters,omitempty"`
 }
 
 type Parameter struct {

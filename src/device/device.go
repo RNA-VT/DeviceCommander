@@ -20,13 +20,6 @@ type IDevice interface {
 	RunHealthCheck(client IDeviceClient) (Device, error)
 }
 
-// Device is a wrapper for the Device model. It aims to provide a helpful
-// layer of abstraction away from the gqlgen/postgres models.
-type Device struct {
-	Device *model.Device
-	logger *log.Entry
-}
-
 // DeviceFromNewDevice generates a Device from a NewDevice with the correct instantiations.
 // This should be the primary method for creationg model.Device(s).
 func FromNewDevice(newDeviceArgs model.NewDevice) model.Device {
@@ -50,6 +43,13 @@ func FromNewDevice(newDeviceArgs model.NewDevice) model.Device {
 	}
 
 	return newDevice
+}
+
+// Device is a wrapper for the Device model. It aims to provide a helpful
+// layer of abstraction away from the gqlgen/postgres models.
+type Device struct {
+	Device *model.Device
+	logger *log.Entry
 }
 
 // NewDeviceWrapper creates a new instance of a device.Wrapper.

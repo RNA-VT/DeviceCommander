@@ -30,3 +30,7 @@ func (d Device) RunHealthCheck(client IDeviceClient) (Device, error) {
 	// }
 	return d, nil
 }
+
+func (d Device) GetSpecification(client IDeviceClient) (Device, error) {
+	return Device{}, nil
+}

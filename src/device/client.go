@@ -1,6 +1,7 @@
 package device
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -16,6 +17,8 @@ type IDeviceClient interface {
 	Info(Device) (model.NewDevice, error)
 	Health(Device) (*http.Response, error)
 	EvaluateHealthCheckResponse(resp *http.Response, d Device) bool
+	Specification(Device) (*http.Response, error)
+	EvaluateSpecificationResponse(*http.Response) (model.Device, error)
 }
 
 // HTTPDeviceClient is an implementation of the IDeviceClient. It communicates
@@ -71,4 +74,27 @@ func (c HTTPDeviceClient) EvaluateHealthCheckResponse(resp *http.Response, d Dev
 		c.logger.Error("Response: " + string(body))
 	}
 	return healthy
+}
+
+func (c HTTPDeviceClient) Specification(d Device) (*http.Response, error) {
+	url := d.URL() + "/specification"
+
+	r, err := http.Get(url)
+	if err != nil {
+		return &http.Response{}, err
+	}
+
+	return r, nil
+}
+
+func (c HTTPDeviceClient) EvaluateSpecificationResponse(resp *http.Response) (model.Device, error) {
+	dev := model.Device{}
+	defer resp.Body.Close()
+
+	err := json.NewDecoder(resp.Body).Decode(&dev)
+	if err != nil {
+		return dev, err
+	}
+
+	return dev, nil
 }

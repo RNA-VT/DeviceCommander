@@ -2,14 +2,20 @@ package device
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
+	"net"
+	"net/http"
+	"net/http/httptest"
 	"net/url"
+	"strconv"
 	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 
+	"github.com/rna-vt/devicecommander/src/graph/model"
 	"github.com/rna-vt/devicecommander/src/test"
 	"github.com/rna-vt/devicecommander/src/utilities"
 )
@@ -57,6 +63,74 @@ func (s *DeviceServiceSuite) TestNewDeviceFromRequestBody() {
 	assert.Nil(s.T(), err)
 
 	assert.Equal(s.T(), testNewDevice, newDevice, "the device should remain unchanged")
+}
+
+func isJSON(s string) bool {
+	var js interface{}
+	return json.Unmarshal([]byte(s), &js) == nil
+}
+
+func (s *DeviceServiceSuite) TestEvaluateSpecificationResponse() {
+	body := `
+		{
+			"Name":"something or other",
+			"Endpoints": [
+				{
+					"Method": "attack",
+					"Parameters": [
+						{
+							"Name": "weapon"
+						},
+						{
+							"Name": "inTheNameOf"
+						}
+					]
+				},
+				{
+					"Method": "defend",
+					"Parameters": [
+						{
+							"Name": "bodyPart"
+						}
+					]
+				}
+			]
+		}
+	`
+	assert.Equal(s.T(), true, isJSON(body), "the test json should be valid json")
+
+	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, body)
+	}))
+	mockServerURL, err := url.Parse(mockServer.URL)
+	assert.Nil(s.T(), err, "the mock server should have a valid URL")
+
+	host, port, err := net.SplitHostPort(mockServerURL.Host)
+	assert.Nil(s.T(), err, "splitting the mock server Host should not throw errors")
+
+	mockServerPort, err := strconv.Atoi(port)
+	assert.Nil(s.T(), err, "the mock server should have an int port")
+
+	client := HTTPDeviceClient{}
+
+	testDevice := Device{
+		Device: &model.Device{
+			Host: host,
+			Port: mockServerPort,
+		},
+	}
+
+	resp, err := client.Specification(testDevice)
+	assert.Nil(s.T(), err, "requesting a mock spec should not throw an error")
+
+	dev, err := client.EvaluateSpecificationResponse(resp)
+	assert.Nil(s.T(), err, "evaluating a json string response should not throw an error")
+
+	assert.Equal(s.T(), "something or other", dev.Name, "the Name in the json string should be applied to the Device")
+
+	assert.Equal(s.T(), 2, len(dev.Endpoints), "there should be 2 Endpoints in the return")
+
+	assert.Equal(s.T(), 2, len(dev.Endpoints[0].Parameters), "there should be 2 Parameters in the first Endpoint")
 }
 
 func (s *DeviceServiceSuite) TestDeviceURL() {
