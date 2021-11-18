@@ -5,19 +5,21 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/labstack/echo"
 
-	"github.com/rna-vt/devicecommander/graph"
-	"github.com/rna-vt/devicecommander/graph/generated"
-	"github.com/rna-vt/devicecommander/postgres"
+	"github.com/rna-vt/devicecommander/src/device"
+	"github.com/rna-vt/devicecommander/src/endpoint"
+	"github.com/rna-vt/devicecommander/src/graph"
+	"github.com/rna-vt/devicecommander/src/graph/generated"
 )
 
-func (a *APIService) addGraphQLRoutes(e *echo.Echo, deviceService postgres.DeviceCRUDService) {
+func (a *APIService) addGraphQLRoutes(e *echo.Echo, deviceRepository device.IDeviceCRUDRepository, endpointRepository endpoint.IEndpointCRUDRepository) {
 	baseRoute := "/v1/graphql"
 	api := e.Group(baseRoute)
 
 	graphqlHandler := handler.NewDefaultServer(
 		generated.NewExecutableSchema(
 			generated.Config{Resolvers: &graph.Resolver{
-				DeviceService: deviceService,
+				DeviceRepository:   deviceRepository,
+				EndpointRepository: endpointRepository,
 			}},
 		),
 	)

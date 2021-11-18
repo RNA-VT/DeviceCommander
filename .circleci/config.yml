@@ -47,7 +47,6 @@ jobs:
 
       - run:
           name: Run unit tests
-          working_directory: ./src
           environment: # environment variables for the database url and path to migration files
             # CONTACTS_DB_URL: "postgres://circleci-demo-go@localhost:5432/circle_test?sslmode=disable"
             # CONTACTS_DB_MIGRATIONS: /home/circleci/project/db/migrations
@@ -60,7 +59,7 @@ jobs:
             gotestsum --junitfile ${TEST_RESULTS}/gotestsum-report.xml -- $PACKAGE_NAMES
 
       # - run: make # pull and build dependencies for the project
-
+      
       - save_cache:
           key: go-mod-v4-{{ checksum "go.sum" }}
           paths:
@@ -72,6 +71,21 @@ jobs:
 
       - store_test_results: # upload test results for display in Test Summary
           path: /tmp/test-results
+  build:
+    docker: # run the steps with Docker
+      # CircleCI Go images available at: https://hub.docker.com/r/circleci/golang/
+      - image: circleci/golang:1.16
+        auth:
+          username: mydockerhub-user
+          password: $DOCKERHUB_PASSWORD  # context / project UI env-var reference
+    steps:
+      - checkout
+      - run:
+          name: build go binary
+          command: |
+            sudo apt-get install libpcap-dev
+            echo "Building device-commander binary"
+            go build -o device-commander
 
   lint:
     docker:
@@ -79,9 +93,9 @@ jobs:
     steps:
       - checkout
       - run:
-          working_directory: ./src
           command: |
             apk add libpcap-dev
+            go mod vendor
             golangci-lint run
 workflows:
   version: 2
@@ -89,6 +103,7 @@ workflows:
     jobs:
       - lint
       - test
+      - build
       - docker/publish:
           name: build-and-publish
           image: rnavt/devicecommander

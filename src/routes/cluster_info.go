@@ -6,7 +6,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo"
 
-	"github.com/rna-vt/devicecommander/graph/model"
+	"github.com/rna-vt/devicecommander/src/graph/model"
 )
 
 func (a *APIService) addInfoRoutes(e *echo.Echo) {
@@ -22,10 +22,8 @@ func (a APIService) health(c echo.Context) error {
 }
 
 func (a APIService) getClusterInfo(c echo.Context) error {
-	logger := getRouteLogger()
-	devices, err := a.DeviceService.GetAll()
+	devices, err := a.DeviceRepository.GetAll()
 	if err != nil {
-		logger.Error(err)
 		return err
 	}
 
@@ -33,7 +31,7 @@ func (a APIService) getClusterInfo(c echo.Context) error {
 }
 
 func (a APIService) getDevices(c echo.Context) error {
-	devices, err := a.DeviceService.GetAll()
+	devices, err := a.DeviceRepository.GetAll()
 	if err != nil {
 		return err
 	}
@@ -47,7 +45,7 @@ func (a *APIService) getDevice(c echo.Context) error {
 	}
 
 	tmpDev := model.Device{ID: id}
-	device, err := a.DeviceService.Get(tmpDev)
+	device, err := a.DeviceRepository.Get(tmpDev)
 	if err != nil {
 		return err
 	}

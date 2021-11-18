@@ -4,24 +4,25 @@ import (
 	"context"
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/rna-vt/devicecommander/graph/model"
-	"github.com/rna-vt/devicecommander/mocks"
+	"github.com/rna-vt/devicecommander/src/graph/model"
+	"github.com/rna-vt/devicecommander/src/mocks"
 )
 
 type DeviceGraphQLSuite struct {
 	suite.Suite
-	resolver          Resolver
-	mockDeviceService mocks.DeviceCRUDService
-	ctx               context.Context
+	resolver             Resolver
+	mockDeviceRepository mocks.IDeviceCRUDRepository
+	ctx                  context.Context
 }
 
 func (s *DeviceGraphQLSuite) SetupSuite() {
-	s.mockDeviceService = mocks.DeviceCRUDService{}
+	s.mockDeviceRepository = mocks.IDeviceCRUDRepository{}
 	s.resolver = Resolver{
-		DeviceService: &s.mockDeviceService,
+		DeviceRepository: &s.mockDeviceRepository,
 	}
 	s.ctx = context.Background()
 }
@@ -34,31 +35,39 @@ func (s *DeviceGraphQLSuite) TestCreateDevice() {
 		Port: 0o000,
 	}
 
-	s.mockDeviceService.On("Create", newDevice).Return(&model.Device{}, nil)
+	s.mockDeviceRepository.On("Create", newDevice).Return(&model.Device{}, nil)
 	_, err := mutator.CreateDevice(s.ctx, newDevice)
 	assert.Nil(s.T(), err)
 
-	s.mockDeviceService.AssertExpectations(s.T())
+	s.mockDeviceRepository.AssertCalled(s.T(), "Create", newDevice)
+
+	s.mockDeviceRepository.AssertExpectations(s.T())
 }
 
 func (s *DeviceGraphQLSuite) TestGetDevices() {
 	queryResolver := s.resolver.Query()
 
-	s.mockDeviceService.On("GetAll").Return([]*model.Device{}, nil)
+	s.mockDeviceRepository.On("GetAll").Return([]*model.Device{}, nil)
 	_, err := queryResolver.Devices(s.ctx)
 	assert.Nil(s.T(), err)
 
-	s.mockDeviceService.AssertExpectations(s.T())
+	s.mockDeviceRepository.AssertCalled(s.T(), "GetAll")
+
+	s.mockDeviceRepository.AssertExpectations(s.T())
 }
 
 func (s *DeviceGraphQLSuite) TestDeleteDevice() {
 	mutator := s.resolver.Mutation()
 
-	s.mockDeviceService.On("Delete", "uuid.string").Return(&model.Device{}, nil)
-	_, err := mutator.DeleteDevice(s.ctx, "uuid.string")
+	randomUUID := uuid.New().String()
+
+	s.mockDeviceRepository.On("Delete", randomUUID).Return(&model.Device{}, nil)
+	_, err := mutator.DeleteDevice(s.ctx, randomUUID)
 	assert.Nil(s.T(), err)
 
-	s.mockDeviceService.AssertExpectations(s.T())
+	s.mockDeviceRepository.AssertCalled(s.T(), "Delete", randomUUID)
+
+	s.mockDeviceRepository.AssertExpectations(s.T())
 }
 
 func (s *DeviceGraphQLSuite) TestUpdateDevice() {
@@ -69,11 +78,13 @@ func (s *DeviceGraphQLSuite) TestUpdateDevice() {
 		Name: &tmpName,
 	}
 
-	s.mockDeviceService.On("Update", updateInput).Return(nil)
+	s.mockDeviceRepository.On("Update", updateInput).Return(nil)
 	_, err := mutator.UpdateDevice(s.ctx, updateInput)
 	assert.Nil(s.T(), err)
 
-	s.mockDeviceService.AssertExpectations(s.T())
+	s.mockDeviceRepository.AssertCalled(s.T(), "Update", updateInput)
+
+	s.mockDeviceRepository.AssertExpectations(s.T())
 }
 
 // In order for 'go test' to run this suite, we need to create

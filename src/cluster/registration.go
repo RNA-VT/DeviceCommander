@@ -2,11 +2,12 @@ package cluster
 
 import (
 	"fmt"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 
-	"github.com/rna-vt/devicecommander/graph/model"
-	"github.com/rna-vt/devicecommander/scanner"
+	"github.com/rna-vt/devicecommander/src/graph/model"
+	"github.com/rna-vt/devicecommander/src/scanner"
 )
 
 func getRegistrationLogger() *log.Entry {
@@ -15,13 +16,13 @@ func getRegistrationLogger() *log.Entry {
 
 // DeviceDiscovery will start an ArpScanner and use its results to create new
 // Devices in the database if they do not already exist.
-func DeviceDiscovery(c *Cluster) {
+func (c Cluster) DeviceDiscovery(scanDurationSeconds int) {
 	logger := getRegistrationLogger()
 
 	newDevices := make(chan model.NewDevice, 10)
 	defer close(newDevices)
 	stop := make(chan struct{})
-	defer close(stop)
+	// defer close(stop)
 	arpScanner := scanner.ArpScanner{
 		LoopDelay:     60,
 		NewDeviceChan: newDevices,
@@ -30,22 +31,34 @@ func DeviceDiscovery(c *Cluster) {
 
 	go arpScanner.Start()
 
-	searchLimit := 10
-	for i := 0; i < searchLimit; i++ {
-		tmpNewDevice := <-newDevices
-		devSearch := model.Device{
-			MAC: *tmpNewDevice.Mac,
-		}
-		results, err := c.DeviceService.Get(devSearch)
-		if err != nil {
-			logger.Error(err)
-		} else {
-			if len(results) == 0 {
-				completeDevice, err := c.DeviceService.Create(tmpNewDevice)
-				if err != nil {
-					logger.Error(err)
-				} else {
-					logger.Debug(fmt.Sprintf("registered mac address [%s] with id [%s]", completeDevice.MAC, completeDevice.ID))
+	// listen for scanDurationSeconds... then shut it down.
+	c.logger.Info(fmt.Sprintf("ARP scanning for %d seconds...", scanDurationSeconds))
+	time.AfterFunc(time.Duration(scanDurationSeconds)*time.Second, func() {
+		close(stop)
+	})
+
+	for {
+		var tmpNewDevice model.NewDevice
+		select {
+		case <-stop:
+			c.logger.Debug("Exit NewDevice stream watch")
+			return
+		case tmpNewDevice = <-newDevices:
+			// tmpNewDevice := <-newDevices
+			devSearch := model.Device{
+				MAC: *tmpNewDevice.Mac,
+			}
+			results, err := c.DeviceRepository.Get(devSearch)
+			if err != nil {
+				logger.Error(err)
+			} else {
+				if len(results) == 0 {
+					completeDevice, err := c.DeviceRepository.Create(tmpNewDevice)
+					if err != nil {
+						logger.Error(err)
+					} else {
+						logger.Debug(fmt.Sprintf("registered mac address [%s] with id [%s]", completeDevice.MAC, completeDevice.ID))
+					}
 				}
 			}
 		}

@@ -6,7 +6,7 @@ import (
 
 	"github.com/labstack/echo"
 
-	"github.com/rna-vt/devicecommander/device"
+	"github.com/rna-vt/devicecommander/src/device"
 )
 
 func (a *APIService) addRegistrationRoutes(e *echo.Echo) {
@@ -24,7 +24,7 @@ func (a *APIService) joinNetwork(c echo.Context) error {
 		return err
 	}
 
-	newDevice, err := a.DeviceService.Create(dev)
+	newDevice, err := a.DeviceRepository.Create(dev)
 	if err != nil {
 		return err
 	}
