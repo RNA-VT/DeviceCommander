@@ -2,7 +2,8 @@ package parameter
 
 import "github.com/rna-vt/devicecommander/src/graph/model"
 
-// CRUDRepository prototypes the required interfaces for a Parameter CRUD postgres repository.
+// IParameterCRUDRepository prototypes the required interfaces for
+// CRUD actions on a collection of Parameters.
 type IParameterCRUDRepository interface {
 	Create(model.NewParameter) (*model.Parameter, error)
 	Update(model.UpdateParameter) error

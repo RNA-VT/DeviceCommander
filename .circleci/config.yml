@@ -48,8 +48,6 @@ jobs:
       - run:
           name: Run unit tests
           environment: # environment variables for the database url and path to migration files
-            # CONTACTS_DB_URL: "postgres://circleci-demo-go@localhost:5432/circle_test?sslmode=disable"
-            # CONTACTS_DB_MIGRATIONS: /home/circleci/project/db/migrations
             POSTGRES_HOST: localhost
 
           # store the results of our tests in the $TEST_RESULTS directory

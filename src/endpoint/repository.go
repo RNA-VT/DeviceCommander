@@ -2,7 +2,8 @@ package endpoint
 
 import "github.com/rna-vt/devicecommander/src/graph/model"
 
-// BaseRepository prototypes the required interfaces for a CRUD postgres repository.
+// IEndpointCRUDRepository prototypes the required interfaces for CRUD
+// management of a collection of Endpoints.
 type IEndpointCRUDRepository interface {
 	Create(model.NewEndpoint) (*model.Endpoint, error)
 	Update(model.UpdateEndpoint) error

@@ -72,8 +72,6 @@ func (s *ClusterSuite) TestRunHealthCheckLoop() {
 	s.mockDeviceRepository.AssertCalled(s.T(), "Get", model.Device{Active: true})
 
 	s.mockDeviceRepository.AssertNumberOfCalls(s.T(), "Get", 1)
-
-	// s.mockDeviceClient.AssertNumberOfCalls(s.T(), "Health", 3)
 }
 
 // In order for 'go test' to run this suite, we need to create
