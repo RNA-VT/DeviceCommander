@@ -16,12 +16,12 @@ import (
 // APIService -
 type APIService struct {
 	Cluster            *cluster.Cluster
-	DeviceRepository   device.IDeviceCRUDRepository
-	EndpointRepository endpoint.IEndpointCRUDRepository
+	DeviceRepository   device.Repository
+	EndpointRepository endpoint.Repository
 	logger             *log.Entry
 }
 
-func NewAPIService(cluster *cluster.Cluster, deviceRepository device.IDeviceCRUDRepository, endpointRepository endpoint.IEndpointCRUDRepository) *APIService {
+func NewAPIService(cluster *cluster.Cluster, deviceRepository device.Repository, endpointRepository endpoint.Repository) *APIService {
 	api := APIService{
 		Cluster:            cluster,
 		DeviceRepository:   deviceRepository,

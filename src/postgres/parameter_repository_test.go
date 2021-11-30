@@ -7,8 +7,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 
+	"github.com/rna-vt/devicecommander/graph/model"
 	"github.com/rna-vt/devicecommander/src/endpoint"
-	"github.com/rna-vt/devicecommander/src/graph/model"
 	"github.com/rna-vt/devicecommander/src/parameter"
 	"github.com/rna-vt/devicecommander/src/test"
 	"github.com/rna-vt/devicecommander/src/utilities"
@@ -20,8 +20,8 @@ type PostgresParameterRepositorySuite struct {
 	testEndpoints       []model.Endpoint
 	testParameters      []model.Parameter
 	deviceRepository    DeviceRepository
-	endpointRepository  endpoint.IEndpointCRUDRepository
-	parameterRepository parameter.IParameterCRUDRepository
+	endpointRepository  endpoint.Repository
+	parameterRepository parameter.Repository
 }
 
 func (s *PostgresParameterRepositorySuite) SetupSuite() {

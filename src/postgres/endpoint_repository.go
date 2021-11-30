@@ -9,8 +9,8 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 
+	"github.com/rna-vt/devicecommander/graph/model"
 	"github.com/rna-vt/devicecommander/src/endpoint"
-	"github.com/rna-vt/devicecommander/src/graph/model"
 )
 
 // EndpointRepository implements the BaseRepository for CRUD actions involving Endpoints.

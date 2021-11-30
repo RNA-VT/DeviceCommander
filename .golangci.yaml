@@ -28,4 +28,4 @@ linters-settings:
   govet:
     check-shadowing: true
   gci:
-    local-prefixes: github.com/rna-vt
+    local-prefixes: github.com/rna-vt/devicecommander

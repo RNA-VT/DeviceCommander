@@ -1,10 +1,10 @@
 package device
 
-import "github.com/rna-vt/devicecommander/src/graph/model"
+import "github.com/rna-vt/devicecommander/graph/model"
 
 // DeviceCRUDRepository prototypes the required interfaces necessary to
 // interact with a collection of Devices in a Postgres DB.
-type IDeviceCRUDRepository interface {
+type Repository interface {
 	Create(model.NewDevice) (*model.Device, error)
 	Update(model.UpdateDevice) error
 	Delete(string) (*model.Device, error)

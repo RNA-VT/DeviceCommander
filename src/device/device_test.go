@@ -15,7 +15,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/rna-vt/devicecommander/src/graph/model"
+	"github.com/rna-vt/devicecommander/graph/model"
 	"github.com/rna-vt/devicecommander/src/test"
 	"github.com/rna-vt/devicecommander/src/utilities"
 )
@@ -59,7 +59,7 @@ func (s *DeviceServiceSuite) TestNewDeviceFromRequestBody() {
 
 	r := ioutil.NopCloser(strings.NewReader(string(b))) // r type is io.ReadCloser
 
-	newDevice, err := NewDeviceFromRequestBody(r)
+	newDevice, err := BasicDevice{}.NewDeviceFromRequestBody(r)
 	assert.Nil(s.T(), err)
 
 	assert.Equal(s.T(), testNewDevice, newDevice, "the device should remain unchanged")
@@ -113,7 +113,7 @@ func (s *DeviceServiceSuite) TestEvaluateSpecificationResponse() {
 
 	client := HTTPDeviceClient{}
 
-	testDevice := Device{
+	testDevice := BasicDevice{
 		Device: &model.Device{
 			Host: host,
 			Port: mockServerPort,

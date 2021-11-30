@@ -14,13 +14,13 @@ type Application struct {
 	Cluster            cluster.Cluster
 	Echo               *echo.Echo
 	Hostname           string
-	DeviceRepository   device.IDeviceCRUDRepository
-	EndpointRepository endpoint.IEndpointCRUDRepository
+	DeviceRepository   device.Repository
+	EndpointRepository endpoint.Repository
 }
 
 // SystemInfo returns a stringified version of this api
 func (a *Application) SystemInfo() string {
-	return "Cluster: " + a.Cluster.Name + "\nEcho Server: " + a.Echo.Server.TLSConfig.ServerName
+	return "Cluster: " + a.Cluster.Name() + "\nEcho Server: " + a.Echo.Server.TLSConfig.ServerName
 }
 
 func (a *Application) Start() {

@@ -11,26 +11,26 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 
+	"github.com/rna-vt/devicecommander/graph/model"
+	mockdevice "github.com/rna-vt/devicecommander/mocks/device"
 	"github.com/rna-vt/devicecommander/src/device"
-	"github.com/rna-vt/devicecommander/src/graph/model"
-	"github.com/rna-vt/devicecommander/src/mocks"
 	"github.com/rna-vt/devicecommander/src/test"
 	"github.com/rna-vt/devicecommander/src/utilities"
 )
 
 type ClusterSuite struct {
 	suite.Suite
-	mockDeviceRepository mocks.IDeviceCRUDRepository
-	mockDeviceClient     mocks.IDeviceClient
+	mockDeviceRepository mockdevice.Repository
+	mockDeviceClient     mockdevice.Client
 	cluster              Cluster
 }
 
 func (s *ClusterSuite) SetupSuite() {
 	utilities.ConfigureEnvironment()
-	s.mockDeviceRepository = mocks.IDeviceCRUDRepository{}
-	s.mockDeviceClient = mocks.IDeviceClient{}
+	s.mockDeviceRepository = mockdevice.Repository{}
+	s.mockDeviceClient = mockdevice.Client{}
 
-	s.cluster = NewCluster(
+	s.cluster = NewDeviceCluster(
 		"testing",
 		&s.mockDeviceRepository,
 		&s.mockDeviceClient,
@@ -59,15 +59,15 @@ func (s *ClusterSuite) TestRunHealthCheckLoop() {
 		Body:   io.NopCloser(strings.NewReader("healthy")),
 	}
 
-	s.mockDeviceClient.On("Health", mock.AnythingOfType("device.Device")).Return(&tmpResponse, nil)
+	s.mockDeviceClient.On("Health", mock.AnythingOfType("device.BasicDevice")).Return(&tmpResponse, nil)
 
-	s.mockDeviceClient.On("EvaluateHealthCheckResponse", mock.AnythingOfType("*http.Response"), mock.AnythingOfType("device.Device")).Return(true)
+	s.mockDeviceClient.On("EvaluateHealthCheckResponse", mock.AnythingOfType("*http.Response"), mock.AnythingOfType("device.BasicDevice")).Return(true)
 
 	go s.cluster.RunHealthCheckLoop(1)
 
 	time.Sleep(1 * time.Second)
 
-	s.cluster.healthStop <- true
+	s.cluster.StopHealth()
 
 	s.mockDeviceRepository.AssertCalled(s.T(), "Get", model.Device{Active: true})
 

@@ -9,11 +9,11 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"github.com/rna-vt/devicecommander/src/graph/model"
+	"github.com/rna-vt/devicecommander/graph/model"
 )
 
 // IDeviceClient implements the common http actions when interacting with a device
-type IDeviceClient interface {
+type Client interface {
 	Info(Device) (model.NewDevice, error)
 	Health(Device) (*http.Response, error)
 	EvaluateHealthCheckResponse(resp *http.Response, d Device) bool
@@ -64,12 +64,12 @@ func (c HTTPDeviceClient) EvaluateHealthCheckResponse(resp *http.Response, d Dev
 	healthy := false
 	switch resp.StatusCode {
 	case 200:
-		c.logger.WithFields(log.Fields{"event": "isHealthy"}).Info(d.Device.ID)
+		c.logger.WithFields(log.Fields{"event": "isHealthy"}).Info(d.ID())
 		healthy = true
 	case 404:
-		c.logger.Error("Registered Device Not Found: " + d.Device.ID.String())
+		c.logger.Error("Registered Device Not Found: " + d.ID().String())
 	default:
-		c.logger.Error("Unexpected Result: " + d.Device.ID.String())
+		c.logger.Error("Unexpected Result: " + d.ID().String())
 		c.logger.Error("Status Code: " + strconv.Itoa(resp.StatusCode))
 		c.logger.Error("Response: " + string(body))
 	}

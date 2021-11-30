@@ -3,7 +3,7 @@ package parameter
 import (
 	"github.com/google/uuid"
 
-	"github.com/rna-vt/devicecommander/src/graph/model"
+	"github.com/rna-vt/devicecommander/graph/model"
 )
 
 type Parameter struct {

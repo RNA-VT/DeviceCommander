@@ -43,7 +43,7 @@ func main() {
 	}
 
 	app := app.Application{
-		Cluster:            cluster.NewCluster(viper.GetString("CLUSTER_NAME"), deviceRepository, deviceClient),
+		Cluster:            cluster.NewDeviceCluster(viper.GetString("CLUSTER_NAME"), deviceRepository, deviceClient),
 		Echo:               echo.New(),
 		Hostname:           fmt.Sprintf("%s:%s", viper.GetString("HOST"), viper.GetString("PORT")),
 		DeviceRepository:   deviceRepository,

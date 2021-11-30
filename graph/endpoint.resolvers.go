@@ -5,30 +5,33 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
-	"github.com/rna-vt/devicecommander/src/graph/generated"
-	"github.com/rna-vt/devicecommander/src/graph/model"
+	"github.com/rna-vt/devicecommander/graph/generated"
+	"github.com/rna-vt/devicecommander/graph/model"
 )
 
 func (r *endpointResolver) ID(ctx context.Context, obj *model.Endpoint) (string, error) {
-	panic(fmt.Errorf("not implemented"))
+	return obj.ID.String(), nil
 }
 
 func (r *endpointResolver) DeviceID(ctx context.Context, obj *model.Endpoint) (string, error) {
-	panic(fmt.Errorf("not implemented"))
+	return obj.DeviceID.String(), nil
 }
 
 func (r *parameterResolver) ID(ctx context.Context, obj *model.Parameter) (string, error) {
-	panic(fmt.Errorf("not implemented"))
+	return obj.ID.String(), nil
 }
 
 func (r *parameterResolver) EndpointID(ctx context.Context, obj *model.Parameter) (string, error) {
-	panic(fmt.Errorf("not implemented"))
+	return obj.ID.String(), nil
 }
 
 func (r *queryResolver) Endpoints(ctx context.Context) ([]*model.Endpoint, error) {
-	panic(fmt.Errorf("not implemented"))
+	endpoints, err := r.EndpointRepository.GetAll()
+	if err != nil {
+		return endpoints, err
+	}
+	return endpoints, nil
 }
 
 // Endpoint returns generated.EndpointResolver implementation.

@@ -8,16 +8,17 @@ import (
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/rna-vt/devicecommander/src/graph/model"
+	"github.com/rna-vt/devicecommander/graph/model"
 )
 
-type IDevice interface {
+type Device interface {
 	NewDeviceFromRequestBody(body io.ReadCloser) (model.NewDevice, error)
+	ID() uuid.UUID
 	URL() string
 	protocol() string
-	ProcessHealthCheckResult(result bool)
+	ProcessHealthCheckResult(result bool) int
 	Unresponsive() bool
-	RunHealthCheck(client IDeviceClient) (Device, error)
+	RunHealthCheck(client Client) error
 }
 
 // DeviceFromNewDevice generates a Device from a NewDevice with the correct instantiations.
@@ -47,14 +48,14 @@ func FromNewDevice(newDeviceArgs model.NewDevice) model.Device {
 
 // Device is a wrapper for the Device model. It aims to provide a helpful
 // layer of abstraction away from the gqlgen/postgres models.
-type Device struct {
+type BasicDevice struct {
 	Device *model.Device
 	logger *log.Entry
 }
 
 // NewDeviceWrapper creates a new instance of a device.Wrapper.
-func NewDeviceWrapper(d model.Device) Device {
-	dev := Device{
+func NewDeviceWrapper(d model.Device) BasicDevice {
+	dev := BasicDevice{
 		Device: &d,
 		logger: log.WithFields(log.Fields{"module": "device"}),
 	}
@@ -74,7 +75,7 @@ func NewDevice(host string, port int) (model.Device, error) {
 }
 
 // NewDeviceFromRequestBody creates a new instance of a NewDevice.
-func NewDeviceFromRequestBody(body io.ReadCloser) (model.NewDevice, error) {
+func (d BasicDevice) NewDeviceFromRequestBody(body io.ReadCloser) (model.NewDevice, error) {
 	defer body.Close()
 	decoder := json.NewDecoder(body)
 	var dev model.NewDevice
@@ -86,13 +87,17 @@ func NewDeviceFromRequestBody(body io.ReadCloser) (model.NewDevice, error) {
 	return dev, nil
 }
 
+func (d BasicDevice) ID() uuid.UUID {
+	return d.Device.ID
+}
+
 // URL returns a network address including the ip address and port that this device is listening on.
-func (d Device) URL() string {
+func (d BasicDevice) URL() string {
 	return fmt.Sprintf("%s://%s:%d", d.protocol(), d.Device.Host, d.Device.Port)
 }
 
 // protocol determines the http/https protocol by Port allocation.
-func (d Device) protocol() string {
+func (d BasicDevice) protocol() string {
 	var protocol string
 	if d.Device.Port == 443 {
 		protocol = "https"
@@ -103,7 +108,7 @@ func (d Device) protocol() string {
 }
 
 // ProcessHealthCheckResult updates health check failure count & returns the failure count.
-func (d Device) ProcessHealthCheckResult(result bool) int {
+func (d BasicDevice) ProcessHealthCheckResult(result bool) int {
 	if result { // Healthy
 		return 0
 	}
@@ -112,7 +117,7 @@ func (d Device) ProcessHealthCheckResult(result bool) int {
 
 // Unresponsive determines the state of the device relative to its past performance.
 // If true, device should be deregistered.
-func (d Device) Unresponsive() bool {
+func (d BasicDevice) Unresponsive() bool {
 	failThreshold := 3
 	return d.Device.Failures >= failThreshold
 }

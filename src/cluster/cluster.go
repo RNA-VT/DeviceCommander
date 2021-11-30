@@ -7,35 +7,40 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 
+	"github.com/rna-vt/devicecommander/graph/model"
 	"github.com/rna-vt/devicecommander/src/device"
-	"github.com/rna-vt/devicecommander/src/graph/model"
 )
 
-type ICluster interface {
+type Cluster interface {
+	Name() string
 	PrintClusterInfo()
 	Start()
-	DeviceDiscovery()
+	DeviceDiscovery(int)
+	RunHealthCheckLoop(int)
+
+	StopHealth()
+	StopDiscovery()
 }
 
 // Cluster is responsible for maintaing the cluster like state of DeviceCommander.
 // It does things like probe the current active set for health and collection
 // of new devices.
-type Cluster struct {
-	Name             string
-	DeviceRepository device.IDeviceCRUDRepository
-	DeviceClient     device.IDeviceClient
+type DeviceCluster struct {
+	name             string
+	DeviceRepository device.Repository
+	DeviceClient     device.Client
 	logger           *log.Entry
 	discoveryStop    chan bool
 	healthStop       chan bool
 }
 
-func NewCluster(
+func NewDeviceCluster(
 	name string,
-	deviceRepository device.IDeviceCRUDRepository,
-	deviceClient device.IDeviceClient,
-) Cluster {
-	return Cluster{
-		Name:             name,
+	deviceRepository device.Repository,
+	deviceClient device.Client,
+) DeviceCluster {
+	return DeviceCluster{
+		name:             name,
 		DeviceRepository: deviceRepository,
 		DeviceClient:     deviceClient,
 		logger:           log.WithFields(log.Fields{"module": "cluster"}),
@@ -45,7 +50,7 @@ func NewCluster(
 }
 
 // PrintClusterInfo will cleanly print out info about the cluster
-func (c Cluster) PrintClusterInfo() {
+func (c DeviceCluster) PrintClusterInfo() {
 	devices, err := c.DeviceRepository.GetAll()
 	if err != nil {
 		c.logger.Error(err)
@@ -58,9 +63,13 @@ func (c Cluster) PrintClusterInfo() {
 	c.logger.Println()
 }
 
+func (c DeviceCluster) Name() string {
+	return c.name
+}
+
 // Start begins the collection of new devices (registration) and device health
 // check goroutines.
-func (c *Cluster) Start() {
+func (c DeviceCluster) Start() {
 	// Discovery and collection of new devices.
 	go c.RunDeviceDiscoveryLoop(viper.GetInt("DISCOVERY_PERIOD"))
 
@@ -68,8 +77,16 @@ func (c *Cluster) Start() {
 	go c.RunHealthCheckLoop(viper.GetInt("HEALTH_CHECK_PERIOD"))
 }
 
+func (c DeviceCluster) StopHealth() {
+	c.healthStop <- true
+}
+
+func (c DeviceCluster) StopDiscovery() {
+	c.discoveryStop <- true
+}
+
 // RunDeviceDiscoveryLoop contiuously searches for other responsive devices on the network.
-func (c Cluster) RunDeviceDiscoveryLoop(discoveryPeriod int) {
+func (c DeviceCluster) RunDeviceDiscoveryLoop(discoveryPeriod int) {
 	ticker := time.NewTicker(time.Duration(discoveryPeriod) * time.Second)
 	for range ticker.C {
 		select {
@@ -85,7 +102,7 @@ func (c Cluster) RunDeviceDiscoveryLoop(discoveryPeriod int) {
 
 // RunHealthCheckLoop continuously probes the Health state of Active nodes stored in the DB.
 // The important results of this health check will be tracked in the DB.
-func (c Cluster) RunHealthCheckLoop(healthCheckPeriod int) {
+func (c DeviceCluster) RunHealthCheckLoop(healthCheckPeriod int) {
 	ticker := time.NewTicker(time.Duration(healthCheckPeriod) * time.Second)
 	for range ticker.C {
 		select {

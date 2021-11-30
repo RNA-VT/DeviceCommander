@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/rna-vt/devicecommander/graph/model"
 	"github.com/rna-vt/devicecommander/src/device"
-	"github.com/rna-vt/devicecommander/src/graph/model"
 	"github.com/rna-vt/devicecommander/src/scanner"
 )
 
 // DeviceDiscovery will start an ArpScanner and use its results to create new
 // Devices in the database if they do not already exist.
-func (c Cluster) DeviceDiscovery(scanDurationSeconds int) {
+func (c DeviceCluster) DeviceDiscovery(scanDurationSeconds int) {
 	newDevices := make(chan model.NewDevice, 10)
 	defer close(newDevices)
 	stop := make(chan struct{})
@@ -41,7 +41,7 @@ func (c Cluster) DeviceDiscovery(scanDurationSeconds int) {
 	}
 }
 
-func (c Cluster) HandleDiscoveredDevice(newDevice model.NewDevice) {
+func (c DeviceCluster) HandleDiscoveredDevice(newDevice model.NewDevice) {
 	fmt.Println(newDevice.Host)
 	results, err := c.DeviceRepository.Get(model.Device{
 		MAC: *newDevice.Mac,
@@ -61,7 +61,7 @@ func (c Cluster) HandleDiscoveredDevice(newDevice model.NewDevice) {
 		c.logger.Debug(fmt.Sprintf("registered mac address [%s] with id [%s]", completeDevice.MAC, completeDevice.ID))
 
 		deviceWrapper := device.NewDeviceWrapper(*completeDevice)
-		deviceWrapper, err = deviceWrapper.RunHealthCheck(c.DeviceClient)
+		err = deviceWrapper.RunHealthCheck(c.DeviceClient)
 		if err != nil {
 			c.logger.Error(err)
 			return
