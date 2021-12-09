@@ -2,15 +2,11 @@ FROM golang:1.17-alpine as go-builder
 
 RUN apk add libpcap-dev build-base
 
-RUN mkdir -p /go/src/DeviceCommander/
+WORKDIR /app
 
-ADD /src /go/src/DeviceCommander/
-
-WORKDIR /go/src/DeviceCommander/
+COPY . /app/
 
 RUN go build -o device-commander
-
-RUN ls
 
 RUN chmod +x device-commander
 
@@ -27,10 +23,9 @@ RUN chmod +x device-commander
 # Build final image
 FROM debian:10.4-slim
 
-COPY --from=go-builder /go/src/DeviceCommander/device-commander /usr/local/bin/device-commander
+COPY --from=go-builder /app/device-commander /usr/local/bin/device-commander
 # COPY --from=node-builder /src/build /src/build
 
-RUN touch /config.yaml
 
 ENV ENV "production"
 
