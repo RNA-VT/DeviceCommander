@@ -23,7 +23,7 @@ func (r *parameterResolver) ID(ctx context.Context, obj *model.Parameter) (strin
 }
 
 func (r *parameterResolver) EndpointID(ctx context.Context, obj *model.Parameter) (string, error) {
-	return obj.ID.String(), nil
+	return obj.EndpointID.String(), nil
 }
 
 func (r *queryResolver) Endpoints(ctx context.Context) ([]*model.Endpoint, error) {

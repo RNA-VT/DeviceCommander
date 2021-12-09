@@ -1,29 +1,30 @@
-package postgres
+package parameter
 
 import (
 	"fmt"
 
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
-	"gorm.io/driver/postgres"
+	postgresDriver "gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 
 	"github.com/rna-vt/devicecommander/graph/model"
 	"github.com/rna-vt/devicecommander/src/parameter"
+	"github.com/rna-vt/devicecommander/src/postgres"
 )
 
 // ParameterRepository implements the BaseRepository for CRUD actions involving the Devices.
-type ParameterRepository struct {
-	DbConfig     DBConfig
+type Repository struct {
+	DbConfig     postgres.DBConfig
 	DBConnection *gorm.DB
 	Initialized  bool
 	logger       *log.Entry
 }
 
 // NewParameterRepository creates a new instance of a DeviceRepository with a DBConfig.
-func NewParameterRepository(config DBConfig) (ParameterRepository, error) {
-	repository := ParameterRepository{
+func NewParameterRepository(config postgres.DBConfig) (Repository, error) {
+	repository := Repository{
 		DbConfig:    config,
 		Initialized: false,
 		logger:      log.WithFields(log.Fields{"module": "postgres", "repository": "parameter"}),
@@ -37,16 +38,16 @@ func NewParameterRepository(config DBConfig) (ParameterRepository, error) {
 }
 
 // Initialise on the ParameterRepository struct opens the postgres connection defined in the ParameterRepository.DBConfig
-func (r ParameterRepository) Initialise() (ParameterRepository, error) {
+func (r Repository) Initialise() (Repository, error) {
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Shanghai", r.DbConfig.Host, r.DbConfig.UserName, r.DbConfig.Password, r.DbConfig.Name, r.DbConfig.Port)
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(postgresDriver.Open(dsn), &gorm.Config{})
 	if err != nil {
 		return r, err
 	}
 
 	r.DBConnection = db
 
-	err = RunMigration(db)
+	err = postgres.RunMigration(db)
 	if err != nil {
 		return r, err
 	}
@@ -55,7 +56,7 @@ func (r ParameterRepository) Initialise() (ParameterRepository, error) {
 }
 
 // Create on the ParameterRepository creates a new row in the Parameter table in the postgres database.
-func (r ParameterRepository) Create(newParameterArgs model.NewParameter) (*model.Parameter, error) {
+func (r Repository) Create(newParameterArgs model.NewParameter) (*model.Parameter, error) {
 	newParameter, err := parameter.FromNewParameter(newParameterArgs)
 	if err != nil {
 		return &newParameter, err
@@ -71,7 +72,7 @@ func (r ParameterRepository) Create(newParameterArgs model.NewParameter) (*model
 }
 
 // Update on the ParameterRepository updates a new single row in the Parameter table according to the specified UpdateParameter.ID.
-func (r ParameterRepository) Update(input model.UpdateParameter) error {
+func (r Repository) Update(input model.UpdateParameter) error {
 	parameterID, err := uuid.Parse(input.ID)
 	if err != nil {
 		return err
@@ -89,7 +90,7 @@ func (r ParameterRepository) Update(input model.UpdateParameter) error {
 }
 
 // Delete on the ParameterRepository removes a single row from the Parameter table by the specific ID.
-func (r ParameterRepository) Delete(id string) (*model.Parameter, error) {
+func (r Repository) Delete(id string) (*model.Parameter, error) {
 	var toBeDeleted model.Parameter
 
 	parameterID, err := uuid.Parse(id)
@@ -118,7 +119,7 @@ func (r ParameterRepository) Delete(id string) (*model.Parameter, error) {
 
 // Get on the ParameterRepository will retrieve all of the rows that match the query. The
 // associated object (endpoint) will be preloaded for convenience.
-func (r ParameterRepository) Get(query model.Parameter) ([]*model.Parameter, error) {
+func (r Repository) Get(query model.Parameter) ([]*model.Parameter, error) {
 	Parameters := []*model.Parameter{}
 	result := r.DBConnection.Preload(clause.Associations).Where(query).Find(&Parameters)
 	if result.Error != nil {
@@ -130,7 +131,7 @@ func (r ParameterRepository) Get(query model.Parameter) ([]*model.Parameter, err
 
 // GetAll on the ParameterRepository will retrieve all of the rows in the Parameter table. The
 // associated objects (endpoints) will be preloaded for convenience.
-func (r ParameterRepository) GetAll() ([]*model.Parameter, error) {
+func (r Repository) GetAll() ([]*model.Parameter, error) {
 	Parameters := []*model.Parameter{}
 	result := r.DBConnection.Find(&Parameters)
 	if result.Error != nil {

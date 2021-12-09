@@ -1,4 +1,4 @@
-package postgres
+package device
 
 import (
 	"testing"
@@ -10,6 +10,7 @@ import (
 
 	"github.com/rna-vt/devicecommander/graph/model"
 	"github.com/rna-vt/devicecommander/src/device"
+	"github.com/rna-vt/devicecommander/src/postgres"
 	"github.com/rna-vt/devicecommander/src/test"
 	"github.com/rna-vt/devicecommander/src/utilities"
 )
@@ -22,9 +23,9 @@ type PostgresDeviceRepositorySuite struct {
 
 func (s *PostgresDeviceRepositorySuite) SetupSuite() {
 	utilities.ConfigureEnvironment()
-	dbConfig := GetDBConfigFromEnv()
+	dbConfig := postgres.GetDBConfigFromEnv()
 
-	deviceRepository, err := NewDeviceRepository(dbConfig)
+	deviceRepository, err := NewRepository(dbConfig)
 	if err != nil {
 		log.Fatal(err)
 	}

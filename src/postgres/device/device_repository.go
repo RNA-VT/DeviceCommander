@@ -1,29 +1,30 @@
-package postgres
+package device
 
 import (
 	"fmt"
 
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
-	"gorm.io/driver/postgres"
+	postgresDriver "gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 
 	"github.com/rna-vt/devicecommander/graph/model"
 	"github.com/rna-vt/devicecommander/src/device"
+	"github.com/rna-vt/devicecommander/src/postgres"
 )
 
 // DeviceRepository implements the BaseRepository for CRUD actions involving the Devices.
-type DeviceRepository struct {
-	DbConfig     DBConfig
+type Repository struct {
+	DbConfig     postgres.DBConfig
 	DBConnection *gorm.DB
 	Initialized  bool
 	logger       *log.Entry
 }
 
 // NewDeviceRepository creates a new instance of a DeviceRepository with a DBConfig.
-func NewDeviceRepository(config DBConfig) (DeviceRepository, error) {
-	repository := DeviceRepository{
+func NewRepository(config postgres.DBConfig) (Repository, error) {
+	repository := Repository{
 		DbConfig:    config,
 		Initialized: false,
 		logger:      log.WithFields(log.Fields{"module": "postgres", "repository": "device"}),
@@ -36,16 +37,16 @@ func NewDeviceRepository(config DBConfig) (DeviceRepository, error) {
 	return repository, nil
 }
 
-func (r DeviceRepository) Initialise() (DeviceRepository, error) {
+func (r Repository) Initialise() (Repository, error) {
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Shanghai", r.DbConfig.Host, r.DbConfig.UserName, r.DbConfig.Password, r.DbConfig.Name, r.DbConfig.Port)
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(postgresDriver.Open(dsn), &gorm.Config{})
 	if err != nil {
 		return r, err
 	}
 
 	r.DBConnection = db
 
-	err = RunMigration(db)
+	err = postgres.RunMigration(db)
 	if err != nil {
 		return r, err
 	}
@@ -55,7 +56,7 @@ func (r DeviceRepository) Initialise() (DeviceRepository, error) {
 
 // Create on the DeviceRepository creates a new row in the Device table.
 // Due to the nested nature of Parameters
-func (r DeviceRepository) Create(newDeviceArgs model.NewDevice) (*model.Device, error) {
+func (r Repository) Create(newDeviceArgs model.NewDevice) (*model.Device, error) {
 	newDevice := device.FromNewDevice(newDeviceArgs)
 	result := r.DBConnection.Create(&newDevice)
 	if result.Error != nil {
@@ -68,7 +69,7 @@ func (r DeviceRepository) Create(newDeviceArgs model.NewDevice) (*model.Device, 
 
 // Update on the DeviceRepository updates a single Device based off the ID of the UpdateDevice arguement.
 // It will return an error if no device is updated.
-func (r DeviceRepository) Update(input model.UpdateDevice) error {
+func (r Repository) Update(input model.UpdateDevice) error {
 	id, err := uuid.Parse(input.ID)
 	if err != nil {
 		return err
@@ -80,14 +81,14 @@ func (r DeviceRepository) Update(input model.UpdateDevice) error {
 	}
 
 	if result.RowsAffected < 1 {
-		return NewNonExistentError("device", "update", input.ID)
+		return postgres.NewNonExistentError("device", "update", input.ID)
 	}
 
 	r.logger.Trace("Updated device " + device.ID.String())
 	return nil
 }
 
-func (r DeviceRepository) Delete(id string) (*model.Device, error) {
+func (r Repository) Delete(id string) (*model.Device, error) {
 	uid, err := uuid.Parse(id)
 	if err != nil {
 		return &model.Device{}, err
@@ -103,7 +104,7 @@ func (r DeviceRepository) Delete(id string) (*model.Device, error) {
 	}
 
 	if len(results) == 0 {
-		return &toBeDeleted, NewNonExistentError("device", "delete", id)
+		return &toBeDeleted, postgres.NewNonExistentError("device", "delete", id)
 	}
 
 	for _, e := range results[0].Endpoints {
@@ -123,7 +124,7 @@ func (r DeviceRepository) Delete(id string) (*model.Device, error) {
 	return &toBeDeleted, nil
 }
 
-func (r DeviceRepository) Get(devQuery model.Device) ([]*model.Device, error) {
+func (r Repository) Get(devQuery model.Device) ([]*model.Device, error) {
 	devices := []*model.Device{}
 	result := r.DBConnection.Preload(clause.Associations).Where(devQuery).Find(&devices)
 	if result.Error != nil {
@@ -133,7 +134,7 @@ func (r DeviceRepository) Get(devQuery model.Device) ([]*model.Device, error) {
 	return devices, nil
 }
 
-func (r DeviceRepository) GetAll() ([]*model.Device, error) {
+func (r Repository) GetAll() ([]*model.Device, error) {
 	devices := []*model.Device{}
 	result := r.DBConnection.Preload(clause.Associations).Find(&devices)
 	if result.Error != nil {

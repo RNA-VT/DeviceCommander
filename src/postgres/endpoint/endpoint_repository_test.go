@@ -1,4 +1,4 @@
-package postgres
+package endpoint
 
 import (
 	"testing"
@@ -11,6 +11,8 @@ import (
 	"github.com/rna-vt/devicecommander/graph/model"
 	"github.com/rna-vt/devicecommander/src/device"
 	"github.com/rna-vt/devicecommander/src/endpoint"
+	"github.com/rna-vt/devicecommander/src/postgres"
+	postgresDevice "github.com/rna-vt/devicecommander/src/postgres/device"
 	"github.com/rna-vt/devicecommander/src/test"
 	"github.com/rna-vt/devicecommander/src/utilities"
 )
@@ -26,13 +28,13 @@ type PostgresEndpointRepositorySuite struct {
 func (s *PostgresEndpointRepositorySuite) SetupSuite() {
 	utilities.ConfigureEnvironment()
 
-	dbConfig := GetDBConfigFromEnv()
-	endpointRepository, err := NewEndpointRepository(dbConfig)
+	dbConfig := postgres.GetDBConfigFromEnv()
+	endpointRepository, err := NewRepository(dbConfig)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	deviceRepository, err := NewDeviceRepository(dbConfig)
+	deviceRepository, err := postgresDevice.NewRepository(dbConfig)
 	if err != nil {
 		log.Fatal(err)
 	}

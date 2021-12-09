@@ -1,4 +1,4 @@
-package postgres
+package parameter
 
 import (
 	"testing"
@@ -10,6 +10,9 @@ import (
 	"github.com/rna-vt/devicecommander/graph/model"
 	"github.com/rna-vt/devicecommander/src/endpoint"
 	"github.com/rna-vt/devicecommander/src/parameter"
+	"github.com/rna-vt/devicecommander/src/postgres"
+	postgresDevice "github.com/rna-vt/devicecommander/src/postgres/device"
+	postgresEndpoint "github.com/rna-vt/devicecommander/src/postgres/endpoint"
 	"github.com/rna-vt/devicecommander/src/test"
 	"github.com/rna-vt/devicecommander/src/utilities"
 )
@@ -19,21 +22,21 @@ type PostgresParameterRepositorySuite struct {
 	testDevices         []model.Device
 	testEndpoints       []model.Endpoint
 	testParameters      []model.Parameter
-	deviceRepository    DeviceRepository
+	deviceRepository    postgresDevice.Repository
 	endpointRepository  endpoint.Repository
 	parameterRepository parameter.Repository
 }
 
 func (s *PostgresParameterRepositorySuite) SetupSuite() {
 	utilities.ConfigureEnvironment()
-	dbConfig := GetDBConfigFromEnv()
+	dbConfig := postgres.GetDBConfigFromEnv()
 
-	deviceRepository, err := NewDeviceRepository(dbConfig)
+	deviceRepository, err := postgresDevice.NewRepository(dbConfig)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	endpointRepository, err := NewEndpointRepository(dbConfig)
+	endpointRepository, err := postgresEndpoint.NewRepository(dbConfig)
 	if err != nil {
 		log.Fatal(err)
 	}
