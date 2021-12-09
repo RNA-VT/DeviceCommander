@@ -1,6 +1,7 @@
 package device
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -8,14 +9,16 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"github.com/rna-vt/devicecommander/src/graph/model"
+	"github.com/rna-vt/devicecommander/graph/model"
 )
 
 // IDeviceClient implements the common http actions when interacting with a device
-type IDeviceClient interface {
+type Client interface {
 	Info(Device) (model.NewDevice, error)
 	Health(Device) (*http.Response, error)
 	EvaluateHealthCheckResponse(resp *http.Response, d Device) bool
+	Specification(Device) (*http.Response, error)
+	EvaluateSpecificationResponse(*http.Response) (model.Device, error)
 }
 
 // HTTPDeviceClient is an implementation of the IDeviceClient. It communicates
@@ -61,14 +64,37 @@ func (c HTTPDeviceClient) EvaluateHealthCheckResponse(resp *http.Response, d Dev
 	healthy := false
 	switch resp.StatusCode {
 	case 200:
-		c.logger.WithFields(log.Fields{"event": "isHealthy"}).Info(d.Device.ID)
+		c.logger.WithFields(log.Fields{"event": "isHealthy"}).Info(d.ID())
 		healthy = true
 	case 404:
-		c.logger.Error("Registered Device Not Found: " + d.Device.ID.String())
+		c.logger.Error("Registered Device Not Found: " + d.ID().String())
 	default:
-		c.logger.Error("Unexpected Result: " + d.Device.ID.String())
+		c.logger.Error("Unexpected Result: " + d.ID().String())
 		c.logger.Error("Status Code: " + strconv.Itoa(resp.StatusCode))
 		c.logger.Error("Response: " + string(body))
 	}
 	return healthy
+}
+
+func (c HTTPDeviceClient) Specification(d Device) (*http.Response, error) {
+	url := d.URL() + "/specification"
+
+	r, err := http.Get(url)
+	if err != nil {
+		return &http.Response{}, err
+	}
+
+	return r, nil
+}
+
+func (c HTTPDeviceClient) EvaluateSpecificationResponse(resp *http.Response) (model.Device, error) {
+	dev := model.Device{}
+	defer resp.Body.Close()
+
+	err := json.NewDecoder(resp.Body).Decode(&dev)
+	if err != nil {
+		return dev, err
+	}
+
+	return dev, nil
 }

@@ -19,7 +19,7 @@ func (a *APIService) addRegistrationRoutes(e *echo.Echo) {
 func (a *APIService) joinNetwork(c echo.Context) error {
 	log.Println("Device asked to join cluster")
 
-	dev, err := device.NewDeviceFromRequestBody(c.Request().Body)
+	dev, err := device.BasicDevice{}.NewDeviceFromRequestBody(c.Request().Body)
 	if err != nil {
 		return err
 	}

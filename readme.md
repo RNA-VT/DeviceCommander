@@ -1,6 +1,7 @@
 # Device Commander
 
-Device Commander is a utility for the management and control of RNA-VT devices, including:
+Device Commander is the beginings of an IOT platform. It will provide a useful layer for managing
+a large collection of compliant devices.
 
 ## Lineage
 

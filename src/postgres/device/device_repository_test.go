@@ -1,4 +1,4 @@
-package postgres
+package device
 
 import (
 	"testing"
@@ -8,8 +8,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 
+	"github.com/rna-vt/devicecommander/graph/model"
 	"github.com/rna-vt/devicecommander/src/device"
-	"github.com/rna-vt/devicecommander/src/graph/model"
+	"github.com/rna-vt/devicecommander/src/postgres"
 	"github.com/rna-vt/devicecommander/src/test"
 	"github.com/rna-vt/devicecommander/src/utilities"
 )
@@ -17,14 +18,14 @@ import (
 type PostgresDeviceRepositorySuite struct {
 	suite.Suite
 	testDevices []model.Device
-	repository  device.IDeviceCRUDRepository
+	repository  device.Repository
 }
 
 func (s *PostgresDeviceRepositorySuite) SetupSuite() {
 	utilities.ConfigureEnvironment()
-	dbConfig := GetDBConfigFromEnv()
+	dbConfig := postgres.GetDBConfigFromEnv()
 
-	deviceRepository, err := NewDeviceRepository(dbConfig)
+	deviceRepository, err := NewRepository(dbConfig)
 	if err != nil {
 		log.Fatal(err)
 	}

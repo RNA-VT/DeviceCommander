@@ -8,19 +8,19 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/rna-vt/devicecommander/src/graph/model"
-	"github.com/rna-vt/devicecommander/src/mocks"
+	"github.com/rna-vt/devicecommander/graph/model"
+	mocks "github.com/rna-vt/devicecommander/mocks/device"
 )
 
 type DeviceGraphQLSuite struct {
 	suite.Suite
 	resolver             Resolver
-	mockDeviceRepository mocks.IDeviceCRUDRepository
+	mockDeviceRepository mocks.Repository
 	ctx                  context.Context
 }
 
 func (s *DeviceGraphQLSuite) SetupSuite() {
-	s.mockDeviceRepository = mocks.IDeviceCRUDRepository{}
+	s.mockDeviceRepository = mocks.Repository{}
 	s.resolver = Resolver{
 		DeviceRepository: &s.mockDeviceRepository,
 	}

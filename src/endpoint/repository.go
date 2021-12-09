@@ -1,10 +1,10 @@
 package endpoint
 
-import "github.com/rna-vt/devicecommander/src/graph/model"
+import "github.com/rna-vt/devicecommander/graph/model"
 
-// IEndpointCRUDRepository prototypes the required interfaces for CRUD
+// Repository prototypes the required interfaces for CRUD
 // management of a collection of Endpoints.
-type IEndpointCRUDRepository interface {
+type Repository interface {
 	Create(model.NewEndpoint) (*model.Endpoint, error)
 	Update(model.UpdateEndpoint) error
 	Delete(string) (*model.Endpoint, error)

@@ -4,21 +4,14 @@ import (
 	"fmt"
 	"time"
 
-	log "github.com/sirupsen/logrus"
-
-	"github.com/rna-vt/devicecommander/src/graph/model"
+	"github.com/rna-vt/devicecommander/graph/model"
+	"github.com/rna-vt/devicecommander/src/device"
 	"github.com/rna-vt/devicecommander/src/scanner"
 )
 
-func getRegistrationLogger() *log.Entry {
-	return log.WithFields(log.Fields{"module": "registration"})
-}
-
 // DeviceDiscovery will start an ArpScanner and use its results to create new
 // Devices in the database if they do not already exist.
-func (c Cluster) DeviceDiscovery(scanDurationSeconds int) {
-	logger := getRegistrationLogger()
-
+func (c DeviceCluster) DeviceDiscovery(scanDurationSeconds int) {
 	newDevices := make(chan model.NewDevice, 10)
 	defer close(newDevices)
 	stop := make(chan struct{})
@@ -38,29 +31,40 @@ func (c Cluster) DeviceDiscovery(scanDurationSeconds int) {
 	})
 
 	for {
-		var tmpNewDevice model.NewDevice
 		select {
 		case <-stop:
 			c.logger.Debug("Exit NewDevice stream watch")
 			return
-		case tmpNewDevice = <-newDevices:
-			// tmpNewDevice := <-newDevices
-			devSearch := model.Device{
-				MAC: *tmpNewDevice.Mac,
-			}
-			results, err := c.DeviceRepository.Get(devSearch)
-			if err != nil {
-				logger.Error(err)
-			} else {
-				if len(results) == 0 {
-					completeDevice, err := c.DeviceRepository.Create(tmpNewDevice)
-					if err != nil {
-						logger.Error(err)
-					} else {
-						logger.Debug(fmt.Sprintf("registered mac address [%s] with id [%s]", completeDevice.MAC, completeDevice.ID))
-					}
-				}
-			}
+		case tmpNewDevice := <-newDevices:
+			c.HandleDiscoveredDevice(tmpNewDevice)
+		}
+	}
+}
+
+func (c DeviceCluster) HandleDiscoveredDevice(newDevice model.NewDevice) {
+	fmt.Println(newDevice.Host)
+	results, err := c.DeviceRepository.Get(model.Device{
+		MAC: *newDevice.Mac,
+	})
+	if err != nil {
+		c.logger.Error(err)
+		return
+	}
+
+	if len(results) == 0 {
+		completeDevice, err := c.DeviceRepository.Create(newDevice)
+		if err != nil {
+			c.logger.Error(err)
+			return
+		}
+
+		c.logger.Debug(fmt.Sprintf("registered mac address [%s] with id [%s]", completeDevice.MAC, completeDevice.ID))
+
+		deviceWrapper := device.NewDeviceWrapper(*completeDevice)
+		err = deviceWrapper.RunHealthCheck(c.DeviceClient)
+		if err != nil {
+			c.logger.Error(err)
+			return
 		}
 	}
 }

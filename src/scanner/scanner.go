@@ -10,8 +10,8 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
+	"github.com/rna-vt/devicecommander/graph/model"
 	"github.com/rna-vt/devicecommander/src/device"
-	"github.com/rna-vt/devicecommander/src/graph/model"
 )
 
 type DeviceResponse struct {
@@ -113,7 +113,7 @@ func ProbeHost(host string) (model.NewDevice, error) {
 		successLogger := logger.WithFields(log.Fields{
 			"event": "success",
 		})
-		dev, err := device.NewDeviceFromRequestBody(resp.Body)
+		dev, err := device.BasicDevice{}.NewDeviceFromRequestBody(resp.Body)
 		if err != nil {
 			return dev, err
 		}

@@ -1,10 +1,10 @@
 package parameter
 
-import "github.com/rna-vt/devicecommander/src/graph/model"
+import "github.com/rna-vt/devicecommander/graph/model"
 
-// IParameterCRUDRepository prototypes the required interfaces for
+// Repository prototypes the required interfaces for
 // CRUD actions on a collection of Parameters.
-type IParameterCRUDRepository interface {
+type Repository interface {
 	Create(model.NewParameter) (*model.Parameter, error)
 	Update(model.UpdateParameter) error
 	Delete(string) (*model.Parameter, error)

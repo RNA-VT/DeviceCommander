@@ -12,6 +12,8 @@ import (
 	"github.com/rna-vt/devicecommander/src/cluster"
 	"github.com/rna-vt/devicecommander/src/device"
 	"github.com/rna-vt/devicecommander/src/postgres"
+	postgresDevice "github.com/rna-vt/devicecommander/src/postgres/device"
+	postgresEndpoint "github.com/rna-vt/devicecommander/src/postgres/endpoint"
 	"github.com/rna-vt/devicecommander/src/routes"
 	"github.com/rna-vt/devicecommander/src/utilities"
 )
@@ -28,7 +30,7 @@ func main() {
 		UserName: viper.GetString("POSTGRES_USER"),
 		Password: viper.GetString("POSTGRES_PASSWORD"),
 	}
-	deviceRepository, err := postgres.NewDeviceRepository(dbConfig)
+	deviceRepository, err := postgresDevice.NewRepository(dbConfig)
 	if err != nil {
 		log.Error(err)
 		return
@@ -36,14 +38,14 @@ func main() {
 
 	deviceClient := device.NewHTTPDeviceClient()
 
-	endpointRepository, err := postgres.NewEndpointRepository(dbConfig)
+	endpointRepository, err := postgresEndpoint.NewRepository(dbConfig)
 	if err != nil {
 		log.Error(err)
 		return
 	}
 
 	app := app.Application{
-		Cluster:            cluster.NewCluster(viper.GetString("CLUSTER_NAME"), deviceRepository, deviceClient),
+		Cluster:            cluster.NewDeviceCluster(viper.GetString("CLUSTER_NAME"), deviceRepository, deviceClient),
 		Echo:               echo.New(),
 		Hostname:           fmt.Sprintf("%s:%s", viper.GetString("HOST"), viper.GetString("PORT")),
 		DeviceRepository:   deviceRepository,

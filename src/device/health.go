@@ -6,7 +6,7 @@ import (
 
 // CheckHealth probes the health endpoint of the device in question. The health
 // endpoint is currently at Device.URL()/health
-func (d Device) RunHealthCheck(client IDeviceClient) (Device, error) {
+func (d BasicDevice) RunHealthCheck(client Client) error {
 	resp, err := client.Health(d)
 	if err != nil {
 		d.logger.Warn(fmt.Sprintf("Error checking [%s] %s", d.Device.ID.String(), err))
@@ -28,5 +28,5 @@ func (d Device) RunHealthCheck(client IDeviceClient) (Device, error) {
 	// 	healthDeregistrationLogger.Info("Failure Threshold Reached... Removing Device: " + d.ID)
 	// 	c.RemoveDevice(d.ID)
 	// }
-	return d, nil
+	return nil
 }

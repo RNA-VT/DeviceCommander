@@ -1,29 +1,30 @@
-package postgres
+package endpoint
 
 import (
 	"fmt"
 
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
-	"gorm.io/driver/postgres"
+	postgresDriver "gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 
+	"github.com/rna-vt/devicecommander/graph/model"
 	"github.com/rna-vt/devicecommander/src/endpoint"
-	"github.com/rna-vt/devicecommander/src/graph/model"
+	"github.com/rna-vt/devicecommander/src/postgres"
 )
 
 // EndpointRepository implements the BaseRepository for CRUD actions involving Endpoints.
-type EndpointRepository struct {
-	DbConfig     DBConfig
+type Repository struct {
+	DbConfig     postgres.DBConfig
 	DBConnection *gorm.DB
 	Initialized  bool
 	logger       *log.Entry
 }
 
 // NewEndpointRepository creates a new instance of an EndpointRepository with a DBConfig.
-func NewEndpointRepository(config DBConfig) (EndpointRepository, error) {
-	repository := EndpointRepository{
+func NewRepository(config postgres.DBConfig) (Repository, error) {
+	repository := Repository{
 		DbConfig:    config,
 		Initialized: false,
 		logger:      log.WithFields(log.Fields{"module": "postgres", "repository": "endpoint"}),
@@ -38,16 +39,16 @@ func NewEndpointRepository(config DBConfig) (EndpointRepository, error) {
 
 // Initialise on the EndpointRepository struct opens the postgres connection
 // defined in the EndpointRepository.DBConfig.
-func (r EndpointRepository) Initialise() (EndpointRepository, error) {
+func (r Repository) Initialise() (Repository, error) {
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Shanghai", r.DbConfig.Host, r.DbConfig.UserName, r.DbConfig.Password, r.DbConfig.Name, r.DbConfig.Port)
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(postgresDriver.Open(dsn), &gorm.Config{})
 	if err != nil {
 		return r, err
 	}
 
 	r.DBConnection = db
 
-	err = RunMigration(db)
+	err = postgres.RunMigration(db)
 	if err != nil {
 		return r, err
 	}
@@ -55,7 +56,7 @@ func (r EndpointRepository) Initialise() (EndpointRepository, error) {
 	return r, nil
 }
 
-func (r EndpointRepository) Create(newDeviceArgs model.NewEndpoint) (*model.Endpoint, error) {
+func (r Repository) Create(newDeviceArgs model.NewEndpoint) (*model.Endpoint, error) {
 	newEndpoint, err := endpoint.FromNewEndpoint(newDeviceArgs)
 	if err != nil {
 		return &newEndpoint, err
@@ -70,7 +71,7 @@ func (r EndpointRepository) Create(newDeviceArgs model.NewEndpoint) (*model.Endp
 	return &newEndpoint, nil
 }
 
-func (r EndpointRepository) Update(input model.UpdateEndpoint) error {
+func (r Repository) Update(input model.UpdateEndpoint) error {
 	id, err := uuid.Parse(input.ID)
 	if err != nil {
 		return err
@@ -84,7 +85,7 @@ func (r EndpointRepository) Update(input model.UpdateEndpoint) error {
 	}
 
 	if result.RowsAffected < 1 {
-		return NewNonExistentError("endpoint", "update", input.ID)
+		return postgres.NewNonExistentError("endpoint", "update", input.ID)
 	}
 
 	r.logger.Trace("Updated endpoint " + end.ID.String())
@@ -93,7 +94,7 @@ func (r EndpointRepository) Update(input model.UpdateEndpoint) error {
 
 // Delete on the EndpointRepository removes a single row from the Endpoint table by the
 // specific ID AND all of the Parameters associated with the EndpointID.
-func (r EndpointRepository) Delete(id string) (*model.Endpoint, error) {
+func (r Repository) Delete(id string) (*model.Endpoint, error) {
 	var toBeDeleted model.Endpoint
 	endUUID, err := uuid.Parse(id)
 	if err != nil {
@@ -113,7 +114,7 @@ func (r EndpointRepository) Delete(id string) (*model.Endpoint, error) {
 
 // Get on the EndpointRepository will retrieve all of the rows that match the query. The
 // associated objects (parameters) will be preloaded for convenience.
-func (r EndpointRepository) Get(query model.Endpoint) ([]*model.Endpoint, error) {
+func (r Repository) Get(query model.Endpoint) ([]*model.Endpoint, error) {
 	endpoints := []*model.Endpoint{}
 	result := r.DBConnection.Preload(clause.Associations).Where(query).Find(&endpoints)
 	if result.Error != nil {
@@ -123,7 +124,7 @@ func (r EndpointRepository) Get(query model.Endpoint) ([]*model.Endpoint, error)
 	return endpoints, nil
 }
 
-func (r EndpointRepository) GetAll() ([]*model.Endpoint, error) {
+func (r Repository) GetAll() ([]*model.Endpoint, error) {
 	endpoints := []*model.Endpoint{}
 	result := r.DBConnection.Preload(clause.Associations).Find(&endpoints)
 	if result.Error != nil {

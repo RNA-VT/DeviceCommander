@@ -5,30 +5,47 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
-	"github.com/rna-vt/devicecommander/src/graph/generated"
-	"github.com/rna-vt/devicecommander/src/graph/model"
+	"github.com/rna-vt/devicecommander/graph/generated"
+	"github.com/rna-vt/devicecommander/graph/model"
 )
 
 func (r *deviceResolver) ID(ctx context.Context, obj *model.Device) (string, error) {
-	panic(fmt.Errorf("not implemented"))
+	return obj.ID.String(), nil
 }
 
 func (r *mutationResolver) CreateDevice(ctx context.Context, input model.NewDevice) (*model.Device, error) {
-	panic(fmt.Errorf("not implemented"))
+	newDevice, err := r.DeviceRepository.Create(input)
+	if err != nil {
+		return newDevice, err
+	}
+
+	return newDevice, nil
 }
 
 func (r *mutationResolver) UpdateDevice(ctx context.Context, input model.UpdateDevice) (string, error) {
-	panic(fmt.Errorf("not implemented"))
+	err := r.DeviceRepository.Update(input)
+	if err != nil {
+		return "", err
+	}
+	return input.ID, nil
 }
 
 func (r *mutationResolver) DeleteDevice(ctx context.Context, id string) (*model.Device, error) {
-	panic(fmt.Errorf("not implemented"))
+	newDevice, err := r.DeviceRepository.Delete(id)
+	if err != nil {
+		return newDevice, err
+	}
+
+	return newDevice, nil
 }
 
 func (r *queryResolver) Devices(ctx context.Context) ([]*model.Device, error) {
-	panic(fmt.Errorf("not implemented"))
+	devices, err := r.DeviceRepository.GetAll()
+	if err != nil {
+		return devices, err
+	}
+	return devices, nil
 }
 
 // Device returns generated.DeviceResolver implementation.

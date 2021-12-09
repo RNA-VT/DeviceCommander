@@ -7,14 +7,13 @@ lint-fix:
 gqlgen:
 	~/go/bin/gqlgen generate --verbose
 
-mockery:
-	mockery --dir ./src/postgres --all --keeptree --output src/mocks
-	mockery --dir ./src/device --all --keeptree --output src/mocks
-	mockery --dir ./src/endpoint --all --keeptree --output src/mocks
-	mockery --dir ./src/parameter --all --keeptree --output src/mocks
+mock:
+	rm -rf mocks
+	mockery --dir ./src --all --keeptree --output mocks
 
-run-test:
-	grc go test ./... -count=1
+.PHONY: test
+test:
+	grc go test --cover ./...
 
 run:
 	sudo go run main.go
