@@ -6,7 +6,7 @@ package graph
 import (
 	"context"
 
-	"github.com/rna-vt/devicecommander/graph/generated"
+	generated1 "github.com/rna-vt/devicecommander/graph/generated"
 	"github.com/rna-vt/devicecommander/graph/model"
 )
 
@@ -34,13 +34,11 @@ func (r *queryResolver) Endpoints(ctx context.Context) ([]*model.Endpoint, error
 	return endpoints, nil
 }
 
-// Endpoint returns generated.EndpointResolver implementation.
-func (r *Resolver) Endpoint() generated.EndpointResolver { return &endpointResolver{r} }
+// Endpoint returns generated1.EndpointResolver implementation.
+func (r *Resolver) Endpoint() generated1.EndpointResolver { return &endpointResolver{r} }
 
-// Parameter returns generated.ParameterResolver implementation.
-func (r *Resolver) Parameter() generated.ParameterResolver { return &parameterResolver{r} }
+// Parameter returns generated1.ParameterResolver implementation.
+func (r *Resolver) Parameter() generated1.ParameterResolver { return &parameterResolver{r} }
 
-type (
-	endpointResolver  struct{ *Resolver }
-	parameterResolver struct{ *Resolver }
-)
+type endpointResolver struct{ *Resolver }
+type parameterResolver struct{ *Resolver }
