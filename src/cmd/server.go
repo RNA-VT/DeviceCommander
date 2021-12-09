@@ -5,6 +5,9 @@ import (
 
 	"github.com/labstack/echo"
 	"github.com/labstack/gommon/log"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+
 	"github.com/rna-vt/devicecommander/src/app"
 	"github.com/rna-vt/devicecommander/src/cluster"
 	"github.com/rna-vt/devicecommander/src/device"
@@ -12,8 +15,6 @@ import (
 	postgresDevice "github.com/rna-vt/devicecommander/src/postgres/device"
 	postgresEndpoint "github.com/rna-vt/devicecommander/src/postgres/endpoint"
 	"github.com/rna-vt/devicecommander/src/routes"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 func init() {
@@ -26,7 +27,6 @@ func NewServerCommand() *cobra.Command {
 		Short: "Run a device-commander server instance.",
 		Long:  "",
 		RunE: func(cmd *cobra.Command, args []string) error {
-
 			dbConfig := postgres.DBConfig{
 				Name:     viper.GetString("POSTGRES_NAME"),
 				Host:     viper.GetString("POSTGRES_HOST"),

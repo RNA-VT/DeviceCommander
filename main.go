@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/rna-vt/devicecommander/src/cmd"
 	"github.com/sirupsen/logrus"
+
+	"github.com/rna-vt/devicecommander/src/cmd"
 )
 
 func main() {

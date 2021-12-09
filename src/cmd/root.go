@@ -1,8 +1,9 @@
 package cmd
 
 import (
-	"github.com/rna-vt/devicecommander/src/utilities"
 	"github.com/spf13/cobra"
+
+	"github.com/rna-vt/devicecommander/src/utilities"
 )
 
 func init() {
