@@ -14,7 +14,6 @@ import (
 	"github.com/rna-vt/devicecommander/src/postgres"
 	postgresDevice "github.com/rna-vt/devicecommander/src/postgres/device"
 	postgresEndpoint "github.com/rna-vt/devicecommander/src/postgres/endpoint"
-	"github.com/rna-vt/devicecommander/src/routes"
 )
 
 func init() {
@@ -27,20 +26,12 @@ func NewServerCommand() *cobra.Command {
 		Short: "Run a device-commander server instance.",
 		Long:  "",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			dbConfig := postgres.DBConfig{
-				Name:     viper.GetString("POSTGRES_NAME"),
-				Host:     viper.GetString("POSTGRES_HOST"),
-				Port:     viper.GetString("POSTGRES_PORT"),
-				UserName: viper.GetString("POSTGRES_USER"),
-				Password: viper.GetString("POSTGRES_PASSWORD"),
-			}
+			dbConfig := postgres.GetDBConfigFromEnv()
 			deviceRepository, err := postgresDevice.NewRepository(dbConfig)
 			if err != nil {
 				log.Error(err)
 				return err
 			}
-
-			deviceClient := device.NewHTTPDeviceClient()
 
 			endpointRepository, err := postgresEndpoint.NewRepository(dbConfig)
 			if err != nil {
@@ -49,15 +40,16 @@ func NewServerCommand() *cobra.Command {
 			}
 
 			app := app.Application{
-				Cluster:            cluster.NewDeviceCluster(viper.GetString("CLUSTER_NAME"), deviceRepository, deviceClient),
+				Cluster: cluster.NewDeviceCluster(
+					viper.GetString("CLUSTER_NAME"),
+					deviceRepository, device.NewHTTPDeviceClient(),
+				),
 				Echo:               echo.New(),
 				Hostname:           fmt.Sprintf("%s:%s", viper.GetString("HOST"), viper.GetString("PORT")),
 				DeviceRepository:   deviceRepository,
 				EndpointRepository: endpointRepository,
 			}
-			var API routes.APIService
 
-			API.Cluster = &app.Cluster
 			app.Start()
 
 			return nil
