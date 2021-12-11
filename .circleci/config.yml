@@ -75,7 +75,7 @@ jobs:
             
   lint:
     docker:
-      - image: golangci/golangci-lint:v1.37-alpine
+      - image: golangci/golangci-lint:v1.43-alpine
     steps:
       - checkout
       - run:
