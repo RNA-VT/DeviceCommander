@@ -23,14 +23,35 @@ import (
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
 	"github.com/google/gopacket/pcap"
+	"github.com/spf13/viper"
 
 	"github.com/rna-vt/devicecommander/graph/model"
 )
 
+const (
+	localHostPrefix        = 127
+	arpHardwareAddressSize = 6
+	protAddressSize        = 4
+)
+
 type ArpScanner struct {
-	LoopDelay     int
-	NewDeviceChan chan model.NewDevice
-	Stop          chan struct{}
+	LoopDelay                    int
+	NewDeviceChan                chan model.NewDevice
+	Stop                         chan struct{}
+	PCAPPort                     int32
+	BroadcastResponseWaitSeconds int
+	DefaultPort                  int
+}
+
+func NewArpScanner(newDeviceChan chan model.NewDevice, stopChan chan struct{}) ArpScanner {
+	return ArpScanner{
+		LoopDelay:                    viper.GetInt("ARP_SCANNER_LOOP_DELAY"),
+		NewDeviceChan:                newDeviceChan,
+		Stop:                         stopChan,
+		PCAPPort:                     viper.GetInt32("ARP_SCANNER_PCAP_PORT"),
+		BroadcastResponseWaitSeconds: viper.GetInt("ARP_SCANNER_BROADCAST_RESPONSE_WAIT_SECONDS"),
+		DefaultPort:                  viper.GetInt("ARP_SCANNER_DEFAULT_DEVICE_PORT"),
+	}
 }
 
 // Start is the entrypoint for the ArpScanner. It will run two concurrent
@@ -89,7 +110,7 @@ func (a *ArpScanner) scan(iface *net.Interface) error {
 		return errors.New("no good IP network found")
 	}
 
-	if addr.IP[0] == 127 {
+	if addr.IP[0] == localHostPrefix {
 		return errors.New("skipping localhost")
 	}
 
@@ -100,7 +121,7 @@ func (a *ArpScanner) scan(iface *net.Interface) error {
 	logger.Info(fmt.Sprintf("Using network range %v for interface %v", addr, iface.Name))
 
 	// Open up a pcap handle for packet reads/writes.
-	handle, err := pcap.OpenLive(iface.Name, 65536, true, pcap.BlockForever)
+	handle, err := pcap.OpenLive(iface.Name, a.PCAPPort, true, pcap.BlockForever)
 	if err != nil {
 		return err
 	}
@@ -117,7 +138,7 @@ func (a *ArpScanner) scan(iface *net.Interface) error {
 		// We don't know exactly how long it'll take for packets to be
 		// sent back to us, but 10 seconds should be more than enough
 		// time ;)
-		time.Sleep(60 * time.Second)
+		time.Sleep(time.Duration(a.BroadcastResponseWaitSeconds) * time.Second)
 	}
 }
 
@@ -155,7 +176,7 @@ func (a *ArpScanner) readARP(handle *pcap.Handle, iface *net.Interface) {
 			newDevice := model.NewDevice{
 				Mac:  &tmpMacAddress,
 				Host: net.IP(arp.SourceProtAddress).String(),
-				Port: 420,
+				Port: a.DefaultPort,
 			}
 
 			// passs new device across channel
@@ -176,8 +197,8 @@ func (a *ArpScanner) writeARP(handle *pcap.Handle, iface *net.Interface, addr *n
 	arp := layers.ARP{
 		AddrType:          layers.LinkTypeEthernet,
 		Protocol:          layers.EthernetTypeIPv4,
-		HwAddressSize:     6,
-		ProtAddressSize:   4,
+		HwAddressSize:     arpHardwareAddressSize,
+		ProtAddressSize:   protAddressSize,
 		Operation:         layers.ARPRequest,
 		SourceHwAddress:   []byte(iface.HardwareAddr),
 		SourceProtAddress: []byte(addr.IP),

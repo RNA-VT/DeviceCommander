@@ -12,15 +12,11 @@ import (
 // DeviceDiscovery will start an ArpScanner and use its results to create new
 // Devices in the database if they do not already exist.
 func (c DeviceCluster) DeviceDiscovery(scanDurationSeconds int) {
-	newDevices := make(chan model.NewDevice, 10)
+	newDevices := make(chan model.NewDevice)
 	defer close(newDevices)
 	stop := make(chan struct{})
 	// defer close(stop)
-	arpScanner := scanner.ArpScanner{
-		LoopDelay:     60,
-		NewDeviceChan: newDevices,
-		Stop:          stop,
-	}
+	arpScanner := scanner.NewArpScanner(newDevices, stop)
 
 	go arpScanner.Start()
 

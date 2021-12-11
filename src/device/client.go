@@ -62,11 +62,12 @@ func (c HTTPDeviceClient) EvaluateHealthCheckResponse(resp *http.Response, d Dev
 		return false
 	}
 	healthy := false
+
 	switch resp.StatusCode {
-	case 200:
+	case http.StatusOK:
 		c.logger.WithFields(log.Fields{"event": "isHealthy"}).Info(d.ID())
 		healthy = true
-	case 404:
+	case http.StatusNotFound:
 		c.logger.Error("Registered Device Not Found: " + d.ID().String())
 	default:
 		c.logger.Error("Unexpected Result: " + d.ID().String())

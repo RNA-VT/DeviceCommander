@@ -11,6 +11,8 @@ import (
 	"github.com/rna-vt/devicecommander/graph/model"
 )
 
+const tlsPort = 443
+
 type Device interface {
 	NewDeviceFromRequestBody(body io.ReadCloser) (model.NewDevice, error)
 	ID() uuid.UUID
@@ -99,7 +101,7 @@ func (d BasicDevice) URL() string {
 // protocol determines the http/https protocol by Port allocation.
 func (d BasicDevice) protocol() string {
 	var protocol string
-	if d.Device.Port == 443 {
+	if d.Device.Port == tlsPort {
 		protocol = "https"
 	} else {
 		protocol = "http"

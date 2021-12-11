@@ -36,4 +36,9 @@ func ConfigureEnvironment() {
 	viper.SetDefault("POSTGRES_PORT", 5432)
 	viper.SetDefault("POSTGRES_USER", "postgres")
 	viper.SetDefault("POSTGRES_PASSWORD", "changeme")
+
+	viper.SetDefault("ARP_SCANNER_LOOP_DELAY", 60)
+	viper.SetDefault("ARP_SCANNER_PCAP_PORT", 65536)
+	viper.SetDefault("ARP_SCANNER_BROADCAST_RESPONSE_WAIT_SECONDS", 10)
+	viper.SetDefault("ARP_SCANNER_DEFAULT_DEVICE_PORT", 420)
 }

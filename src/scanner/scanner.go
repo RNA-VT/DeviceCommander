@@ -59,7 +59,7 @@ func GetLocalAddresses() (IPScanResults, error) {
 	return results, nil
 }
 
-func ScanIPs(ipSet []net.IP) ([]model.NewDevice, error) {
+func ScanIPs(ipSet []net.IP, timeoutSeconds int) ([]model.NewDevice, error) {
 	logger := getScannerLogger()
 	deviceList := []model.NewDevice{}
 
@@ -67,7 +67,7 @@ func ScanIPs(ipSet []net.IP) ([]model.NewDevice, error) {
 
 	ch := make(chan DeviceResponse)
 	for _, ip := range ipSet {
-		go ProbeHostConcurrent(ip.String(), ch)
+		go ProbeHostConcurrent(ip.String(), ch, timeoutSeconds)
 	}
 
 	for i := 1; i < len(ipSet); i++ {
@@ -82,9 +82,9 @@ func ScanIPs(ipSet []net.IP) ([]model.NewDevice, error) {
 	return deviceList, nil
 }
 
-func ProbeHostConcurrent(host string, ch chan<- DeviceResponse) {
+func ProbeHostConcurrent(host string, ch chan<- DeviceResponse, timeoutSeconds int) {
 	success := true
-	device, err := ProbeHost(host)
+	device, err := ProbeHost(host, timeoutSeconds)
 	if err != nil {
 		log.Trace(err)
 		success = false
@@ -95,13 +95,13 @@ func ProbeHostConcurrent(host string, ch chan<- DeviceResponse) {
 	}
 }
 
-func ProbeHost(host string) (model.NewDevice, error) {
+func ProbeHost(host string, timeoutSeconds int) (model.NewDevice, error) {
 	logger := getScannerLogger()
 	url := "http://" + host + "/registration"
 	logger.Trace("Probing ", host)
 
 	client := http.Client{
-		Timeout: 5 * time.Second,
+		Timeout: time.Duration(timeoutSeconds) * time.Second,
 	}
 	resp, err := client.Get(url)
 	if err != nil {
@@ -109,7 +109,7 @@ func ProbeHost(host string) (model.NewDevice, error) {
 	}
 
 	switch resp.StatusCode {
-	case 200:
+	case http.StatusOK:
 		successLogger := logger.WithFields(log.Fields{
 			"event": "success",
 		})
@@ -121,7 +121,7 @@ func ProbeHost(host string) (model.NewDevice, error) {
 		successLogger.Info(fmt.Sprintf("Response from %s accepted", host))
 
 		return dev, nil
-	case 404:
+	case http.StatusNotFound:
 		logger.Debug("Host Not Found: " + host)
 		return model.NewDevice{}, errors.New("host not found " + host)
 	default:

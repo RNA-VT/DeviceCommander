@@ -3,6 +3,7 @@ package device
 import (
 	"testing"
 
+	"github.com/bxcodec/faker/v3"
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
@@ -96,7 +97,7 @@ func (s *PostgresDeviceRepositorySuite) TestDelete() {
 func (s *PostgresDeviceRepositorySuite) TestUpdate() {
 	testDevice := s.CreateTestDevice()
 
-	tmpMAC := test.GenerateRandomMacAddress()
+	tmpMAC := faker.MacAddress()
 	err := s.repository.Update(model.UpdateDevice{
 		ID:  testDevice.ID.String(),
 		Mac: &tmpMAC,
@@ -112,7 +113,7 @@ func (s *PostgresDeviceRepositorySuite) TestUpdate() {
 }
 
 func (s *PostgresDeviceRepositorySuite) TestUpdateNonExistent() {
-	tmpMAC := test.GenerateRandomMacAddress()
+	tmpMAC := faker.MacAddress()
 	tmpUUID := uuid.New()
 	err := s.repository.Update(model.UpdateDevice{
 		ID:  tmpUUID.String(),

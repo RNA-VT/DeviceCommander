@@ -28,9 +28,13 @@ linters:
   - goconst
   - gocritic
   - godot
-  # - gomnd
+  - gomnd
   - ifshort
   - misspell
+  - prealloc
+  - unconvert
+  - unparam
+  - wastedassign
 linters-settings:
   errcheck:
     check-type-assertions: true
@@ -39,3 +43,10 @@ linters-settings:
     check-shadowing: true
   gci:
     local-prefixes: github.com/rna-vt/devicecommander
+  gomnd:
+    settings:
+      mnd:
+        # the list of enabled checks, see https://github.com/tommy-muehle/go-mnd/#checks for description.
+        # ignored-numbers: 1000
+        ignored-files: config_env.go
+        # ignored-functions: ConfigureEnvironment
