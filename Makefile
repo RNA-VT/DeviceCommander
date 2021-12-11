@@ -6,7 +6,7 @@ lint:
 	golangci-lint run
 
 lint-fix:
-	golangci-lint run --fix
+	golangci-lint run --fix -v
 
 gqlgen:
 	~/go/bin/gqlgen generate --verbose

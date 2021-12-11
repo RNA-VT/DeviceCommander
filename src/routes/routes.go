@@ -13,7 +13,7 @@ import (
 	"github.com/rna-vt/devicecommander/src/endpoint"
 )
 
-// APIService -
+// APIService -.
 type APIService struct {
 	Cluster            *cluster.Cluster
 	DeviceRepository   device.Repository
@@ -32,7 +32,7 @@ func NewAPIService(cluster *cluster.Cluster, deviceRepository device.Repository,
 	return &api
 }
 
-// ConfigureRoutes will use Echo to start listening on the appropriate paths
+// ConfigureRoutes will use Echo to start listening on the appropriate paths.
 func (api APIService) ConfigureRoutes(listenURL string, e *echo.Echo) {
 	// Middleware
 	e.Use(middleware.Logger())

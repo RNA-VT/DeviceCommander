@@ -3,12 +3,12 @@ run:
   modules-download-mode: vendor
   skip-dirs-use-default: true
 linters:
-  disable-all: true
   enable:
   - deadcode
   - errcheck
   - goconst
   - gofumpt
+  - dupl
   - gci
   - revive
   - gosimple
@@ -21,6 +21,16 @@ linters:
   - unused
   - varcheck
   - whitespace
+  - errorlint
+  # - exhaustivestruct
+  - funlen
+  - gocognit
+  - goconst
+  - gocritic
+  - godot
+  # - gomnd
+  - ifshort
+  - misspell
 linters-settings:
   errcheck:
     check-type-assertions: true

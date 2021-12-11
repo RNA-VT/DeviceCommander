@@ -79,8 +79,8 @@ func (d BasicDevice) NewDeviceFromRequestBody(body io.ReadCloser) (model.NewDevi
 	defer body.Close()
 	decoder := json.NewDecoder(body)
 	var dev model.NewDevice
-	err := decoder.Decode(&dev)
-	if err != nil {
+
+	if err := decoder.Decode(&dev); err != nil {
 		return dev, err
 	}
 

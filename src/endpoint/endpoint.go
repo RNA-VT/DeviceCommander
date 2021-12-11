@@ -42,7 +42,7 @@ func FromNewEndpoint(input model.NewEndpoint) (model.Endpoint, error) {
 	return end, nil
 }
 
-// NewDeviceEndpoint generates a DeviceEndpoint
+// NewDeviceEndpoint generates a DeviceEndpoint.
 func NewDeviceEndpoint() *DeviceEndpoint {
 	return &DeviceEndpoint{}
 }

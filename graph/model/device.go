@@ -9,7 +9,7 @@ import (
 // Name - Optional Device Nickname
 // Description - Optional text describing this device
 // Host - Device Api Host
-// Port - Device Api Port. Set to 443 for https
+// Port - Device Api Port. Set to 443 for https.
 type Device struct {
 	ID          uuid.UUID  `json:"ID"`
 	MAC         string     `json:"MAC" gorm:"unique"`

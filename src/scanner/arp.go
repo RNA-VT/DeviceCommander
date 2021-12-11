@@ -87,11 +87,16 @@ func (a *ArpScanner) scan(iface *net.Interface) error {
 	// Sanity-check that the interface has a good address.
 	if addr == nil {
 		return errors.New("no good IP network found")
-	} else if addr.IP[0] == 127 {
+	}
+
+	if addr.IP[0] == 127 {
 		return errors.New("skipping localhost")
-	} else if addr.Mask[0] != 0xff || addr.Mask[1] != 0xff {
+	}
+
+	if addr.Mask[0] != 0xff || addr.Mask[1] != 0xff {
 		return errors.New("mask means network is too large")
 	}
+
 	logger.Info(fmt.Sprintf("Using network range %v for interface %v", addr, iface.Name))
 
 	// Open up a pcap handle for packet reads/writes.

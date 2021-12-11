@@ -22,7 +22,7 @@ type Cluster interface {
 	StopDiscovery()
 }
 
-// Cluster is responsible for maintaing the cluster like state of DeviceCommander.
+// Cluster is responsible for maintaining the cluster like state of DeviceCommander.
 // It does things like probe the current active set for health and collection
 // of new devices.
 type DeviceCluster struct {
@@ -49,7 +49,7 @@ func NewDeviceCluster(
 	}
 }
 
-// PrintClusterInfo will cleanly print out info about the cluster
+// PrintClusterInfo will cleanly print out info about the cluster.
 func (c DeviceCluster) PrintClusterInfo() {
 	devices, err := c.DeviceRepository.GetAll()
 	if err != nil {

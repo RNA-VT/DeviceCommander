@@ -55,7 +55,7 @@ func (r Repository) Initialise() (Repository, error) {
 }
 
 // Create on the DeviceRepository creates a new row in the Device table.
-// Due to the nested nature of Parameters
+// Due to the nested nature of Parameters.
 func (r Repository) Create(newDeviceArgs model.NewDevice) (*model.Device, error) {
 	newDevice := device.FromNewDevice(newDeviceArgs)
 	result := r.DBConnection.Create(&newDevice)
@@ -67,7 +67,7 @@ func (r Repository) Create(newDeviceArgs model.NewDevice) (*model.Device, error)
 	return &newDevice, nil
 }
 
-// Update on the DeviceRepository updates a single Device based off the ID of the UpdateDevice arguement.
+// Update on the DeviceRepository updates a single Device based off the ID of the UpdateDevice argument.
 // It will return an error if no device is updated.
 func (r Repository) Update(input model.UpdateDevice) error {
 	id, err := uuid.Parse(input.ID)

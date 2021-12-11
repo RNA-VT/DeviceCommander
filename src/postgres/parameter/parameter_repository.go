@@ -37,7 +37,7 @@ func NewParameterRepository(config postgres.DBConfig) (Repository, error) {
 	return repository, nil
 }
 
-// Initialise on the ParameterRepository struct opens the postgres connection defined in the ParameterRepository.DBConfig
+// Initialise on the ParameterRepository struct opens the postgres connection defined in the ParameterRepository.DBConfig.
 func (r Repository) Initialise() (Repository, error) {
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Shanghai", r.DbConfig.Host, r.DbConfig.UserName, r.DbConfig.Password, r.DbConfig.Name, r.DbConfig.Port)
 	db, err := gorm.Open(postgresDriver.Open(dsn), &gorm.Config{})

@@ -32,13 +32,13 @@ func GetLocalAddresses() (IPScanResults, error) {
 	}
 	ifaces, err := net.Interfaces()
 	if err != nil {
-		logger.Error(fmt.Errorf("localAddresses: %+v", err.Error()))
+		logger.Error(fmt.Errorf("localAddresses: %w", err))
 		return results, err
 	}
 	for _, i := range ifaces {
 		addrs, err := i.Addrs()
 		if err != nil {
-			logger.Error(fmt.Errorf("localAddresses: %+v", err.Error()))
+			logger.Error(fmt.Errorf("localAddresses: %w", err))
 			continue
 		}
 		for _, a := range addrs {
