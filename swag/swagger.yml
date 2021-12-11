@@ -1,0 +1,37 @@
+swagger: "2.0"
+info:
+  description: A convenient and flexible device platform.
+  title: DeviceCommander
+  version: 0.0.1
+consumes:
+- application/json
+produces:
+- application/json
+schemes:
+- http
+definitions:
+  Device:
+    type: object
+    required:
+    - host
+    - port
+    properties:
+      host: 
+        type: string
+      port:
+        type: integer
+        minimum: 0
+        maximum: 65535
+paths:
+  /devices:
+    get:
+      description: Returns a list of all Devices.
+      produces:
+        - application/json
+      responses:
+        200:
+          description: A list of Devices
+          schema:
+              type: array
+              items: 
+                $ref: '#/definitions/Device'

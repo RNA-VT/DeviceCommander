@@ -22,6 +22,28 @@ func (a APIService) health(c echo.Context) error {
 }
 
 func (a APIService) getClusterInfo(c echo.Context) error {
+	// swagger:route GET /cluster-info clusterInfo
+	//
+	// Get general data about the cluster.
+	//
+	// This will only show surface details. Further information
+	// can be queried via other routes.
+	//
+	//     Consumes:
+	//     - application/json
+	//
+	//     Produces:
+	//     - application/json
+	//
+	//     Schemes: http, https
+	//
+	//     Deprecated: false
+	//
+	//     Responses:
+	//       default: genericError
+	//       200: someResponse
+	//       422: validationError
+
 	devices, err := a.DeviceRepository.GetAll()
 	if err != nil {
 		return err

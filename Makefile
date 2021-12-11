@@ -7,6 +7,9 @@ lint-fix:
 gqlgen:
 	~/go/bin/gqlgen generate --verbose
 
+generate-api-spec:
+	swagger generate spec
+
 mock:
 	rm -rf mocks
 	mockery --dir ./src --all --keeptree --output mocks
