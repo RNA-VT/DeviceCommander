@@ -68,10 +68,11 @@ jobs:
     steps:
       - checkout
       - run:
-          name: build go binary
-          command: |
-            sudo apt-get install libpcap-dev
-            ./scripts/build.sh
+          name: Install dependencies
+          command: sudo apt-get install libpcap-dev
+      - run:
+          name: Build go project
+          command: ./scripts/build.sh
             
   lint:
     docker:
