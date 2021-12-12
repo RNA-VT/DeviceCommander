@@ -35,6 +35,13 @@ func NewHTTPDeviceClient() HTTPDeviceClient {
 	}
 }
 
+func (c HTTPDeviceClient) dangerousHTTPGet(url string) (resp *http.Response, err error) {
+	// look into validating this URL.
+
+	//nolint:gosec
+	return http.Get(url)
+}
+
 func (c HTTPDeviceClient) Info(d Device) (model.NewDevice, error) {
 	panic("function not implemented")
 }
@@ -43,7 +50,7 @@ func (c HTTPDeviceClient) Info(d Device) (model.NewDevice, error) {
 func (c HTTPDeviceClient) Health(d Device) (*http.Response, error) {
 	url := d.URL() + "/health"
 
-	resp, err := http.Get(url)
+	resp, err := c.dangerousHTTPGet(url)
 	if err != nil {
 		c.logger.Warn(fmt.Sprintf("Error checking [%s] %s", url, err.Error()))
 		return &http.Response{}, err
@@ -80,7 +87,7 @@ func (c HTTPDeviceClient) EvaluateHealthCheckResponse(resp *http.Response, d Dev
 func (c HTTPDeviceClient) Specification(d Device) (*http.Response, error) {
 	url := d.URL() + "/specification"
 
-	r, err := http.Get(url)
+	r, err := c.dangerousHTTPGet(url)
 	if err != nil {
 		return &http.Response{}, err
 	}
