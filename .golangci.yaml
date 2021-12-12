@@ -34,6 +34,7 @@ linters:
   - unconvert
   - unparam
   - wastedassign
+  - gosec
 linters-settings:
   errcheck:
     check-type-assertions: true
