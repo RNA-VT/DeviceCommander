@@ -26,7 +26,7 @@ func NewRepository(config postgres.DBConfig) (Repository, error) {
 		Initialized: false,
 		logger:      log.WithFields(log.Fields{"module": "postgres", "repository": "endpoint"}),
 	}
-	repository, err := repository.Initialise()
+	repository, err := repository.Initialize()
 	if err != nil {
 		return repository, err
 	}
@@ -34,9 +34,9 @@ func NewRepository(config postgres.DBConfig) (Repository, error) {
 	return repository, nil
 }
 
-// Initialise on the EndpointRepository struct opens the postgres connection
+// Initialize on the EndpointRepository struct opens the postgres connection
 // defined in the EndpointRepository.DBConfig.
-func (r Repository) Initialise() (Repository, error) {
+func (r Repository) Initialize() (Repository, error) {
 	db, err := postgres.GetDBConnection(r.DbConfig)
 	if err != nil {
 		return r, err

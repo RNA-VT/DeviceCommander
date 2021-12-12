@@ -127,7 +127,7 @@ func (a *ArpScanner) scanNetworkInterface(iface *net.Interface) error {
 
 	a.logger.Info(fmt.Sprintf("Using network range %v for interface %v", ipv4Address, iface.Name))
 
-	// Open up a pcap handle for packet reads/writes.
+	// Open up a PCAP handle for packet reads/writes.
 	handle, err := pcap.OpenLive(iface.Name, a.PCAPPort, true, pcap.BlockForever)
 	if err != nil {
 		return err
@@ -183,7 +183,7 @@ func (a *ArpScanner) readARP(handle *pcap.Handle, iface *net.Interface) {
 				Port: a.DefaultPort,
 			}
 
-			// passs new device across channel
+			// pass new device across channel
 			a.NewDeviceChan <- newDevice
 		}
 	}

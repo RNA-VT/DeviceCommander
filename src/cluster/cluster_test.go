@@ -38,9 +38,9 @@ func (s *ClusterSuite) SetupSuite() {
 }
 
 func (s *ClusterSuite) GenerateDevices(count int) []*model.Device {
-	devs := test.GenerateRandomNewDevices(count)
+	devices := test.GenerateRandomNewDevices(count)
 	collection := []*model.Device{}
-	for _, d := range devs {
+	for _, d := range devices {
 		tmpDev := device.FromNewDevice(d)
 		collection = append(collection, &tmpDev)
 	}

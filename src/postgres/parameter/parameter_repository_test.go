@@ -44,8 +44,8 @@ func (s *PostgresParameterRepositorySuite) SetupSuite() {
 	s.endpointRepository = endpointRepository
 	s.parameterRepository = parameterRepository
 
-	newDevs := test.GenerateRandomNewDevices(1)
-	dev, err := s.deviceRepository.Create(newDevs[0])
+	newDevices := test.GenerateRandomNewDevices(1)
+	dev, err := s.deviceRepository.Create(newDevices[0])
 	assert.Nil(s.T(), err)
 
 	testEndpoint := test.GenerateRandomNewEndpoints(dev.ID.String(), 1)

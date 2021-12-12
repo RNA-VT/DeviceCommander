@@ -26,7 +26,7 @@ func NewRepository(config postgres.DBConfig) (Repository, error) {
 		Initialized: false,
 		logger:      log.WithFields(log.Fields{"module": "postgres", "repository": "device"}),
 	}
-	repository, err := repository.Initialise()
+	repository, err := repository.Initialize()
 	if err != nil {
 		return repository, err
 	}
@@ -34,7 +34,7 @@ func NewRepository(config postgres.DBConfig) (Repository, error) {
 	return repository, nil
 }
 
-func (r Repository) Initialise() (Repository, error) {
+func (r Repository) Initialize() (Repository, error) {
 	db, err := postgres.GetDBConnection(r.DbConfig)
 	if err != nil {
 		return r, err

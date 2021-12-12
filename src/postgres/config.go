@@ -10,7 +10,7 @@ import (
 	"github.com/rna-vt/devicecommander/graph/model"
 )
 
-// DBConfig encapsulates the information rquired for connecting to a database.
+// DBConfig encapsulates the information required for connecting to a database.
 type DBConfig struct {
 	Name     string
 	Host     string

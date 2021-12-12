@@ -15,7 +15,10 @@ func NewMigrateDBCommand() *cobra.Command {
 	command := cobra.Command{
 		Use:   "migrate-db",
 		Short: "Run all migrations on DB.",
-		Long:  "",
+		Long: `Run the GORM postgres AutoMigrations for all tables.
+This command can be used to initialize a database or attempt
+to update an existing database. Eventually a more complex 
+migration tool could be useful.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			dbConfig := postgres.GetDBConfigFromEnv()
 

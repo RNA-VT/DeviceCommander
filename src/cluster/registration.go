@@ -39,6 +39,10 @@ func (c DeviceCluster) DeviceDiscovery(scanDurationSeconds int) {
 	}
 }
 
+// Once a Device is found on the network it needs to get processed into the platform.
+// HandleDiscoveredDevice does this with some additional steps. For example:
+// 1. does the Device already exist in the DB? (MAC address is the unique identifier in this case).
+// 2. immediately check its health.
 func (c DeviceCluster) HandleDiscoveredDevice(newDevice model.NewDevice) error {
 	results, err := c.DeviceRepository.Get(model.Device{
 		MAC: *newDevice.Mac,

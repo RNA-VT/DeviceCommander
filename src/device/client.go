@@ -27,7 +27,7 @@ type HTTPDeviceClient struct {
 	logger *log.Entry
 }
 
-// NewHTTPDeviceClient creates an instantiated HTTPDeviceClientl. This should be the
+// NewHTTPDeviceClient creates an instantiated HTTPDeviceClient. This should be the
 // primary method of generating a HTTPDeviceClient struct.
 func NewHTTPDeviceClient() HTTPDeviceClient {
 	return HTTPDeviceClient{

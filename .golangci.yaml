@@ -2,7 +2,7 @@ run:
   tests: true
   modules-download-mode: vendor
   skip-dirs-use-default: true
-# https://golangci-lint.run/usage/linters/
+# Linter Docs: https://golangci-lint.run/usage/linters/
 linters:
   enable:
   - deadcode

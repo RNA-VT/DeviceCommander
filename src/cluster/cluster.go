@@ -24,7 +24,9 @@ type Cluster interface {
 
 // Cluster is responsible for maintaining the cluster like state of DeviceCommander.
 // It does things like probe the current active set for health and collection
-// of new devices.
+// of new devices. The important differentiation between the Cluster and a repository
+// of Devices is the active nature of the devices tracked in a Cluster. An active
+// device is one that is currently responding to the device-commander protocol.
 type DeviceCluster struct {
 	name             string
 	DeviceRepository device.Repository
@@ -85,7 +87,7 @@ func (c DeviceCluster) StopDiscovery() {
 	c.discoveryStop <- true
 }
 
-// RunDeviceDiscoveryLoop contiuously searches for other responsive devices on the network.
+// RunDeviceDiscoveryLoop continuously searches for other responsive devices on the network.
 func (c DeviceCluster) RunDeviceDiscoveryLoop(discoveryPeriod int) {
 	ticker := time.NewTicker(time.Duration(discoveryPeriod) * time.Second)
 	for range ticker.C {
@@ -110,18 +112,18 @@ func (c DeviceCluster) RunHealthCheckLoop(healthCheckPeriod int) {
 			c.logger.Info("Ticker stopped by healthStop chan")
 			return
 		default:
-			devs, err := c.DeviceRepository.Get(model.Device{
+			devices, err := c.DeviceRepository.Get(model.Device{
 				Active: true,
 			})
 
-			c.logger.Info(fmt.Sprintf("Begin Health Checks for %d devices... ", len(devs)))
+			c.logger.Info(fmt.Sprintf("Begin Health Checks for %d devices... ", len(devices)))
 
 			if err != nil {
 				c.logger.Error(err)
 				return
 			}
 
-			for _, d := range devs {
+			for _, d := range devices {
 				dev := device.NewDeviceWrapper(*d)
 
 				resp, err := c.DeviceClient.Health(dev)

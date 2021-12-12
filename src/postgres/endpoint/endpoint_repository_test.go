@@ -38,8 +38,8 @@ func (s *PostgresEndpointRepositorySuite) SetupSuite() {
 	s.endpointRepository = endpointRepository
 	s.deviceRepository = deviceRepository
 
-	newDevs := test.GenerateRandomNewDevices(1)
-	dev, err := s.deviceRepository.Create(newDevs[0])
+	newDevices := test.GenerateRandomNewDevices(1)
+	dev, err := s.deviceRepository.Create(newDevices[0])
 	s.Require().Nil(err, "creating a test device should not throw an error")
 
 	s.testDevices = append(s.testDevices, *dev)
