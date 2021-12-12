@@ -36,7 +36,7 @@ func NewHTTPDeviceClient() HTTPDeviceClient {
 }
 
 func (c HTTPDeviceClient) dangerousHTTPGet(url string) (resp *http.Response, err error) {
-	// look into validating this URL.
+	// look into validating this URL and the request/response.
 
 	//nolint:gosec
 	return http.Get(url)
