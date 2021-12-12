@@ -51,16 +51,7 @@ func GetDBConnection(config DBConfig) (*gorm.DB, error) {
 
 // RunMigration makes sure each of the important models are fully migrated.
 func RunMigration(db *gorm.DB) error {
-	err := db.AutoMigrate(&model.Device{})
-	if err != nil {
-		return err
-	}
-	err = db.AutoMigrate(&model.Endpoint{})
-	if err != nil {
-		return err
-	}
-	err = db.AutoMigrate(&model.Parameter{})
-	if err != nil {
+	if err := db.AutoMigrate(&model.Device{}, &model.Endpoint{}, &model.Parameter{}); err != nil {
 		return err
 	}
 	return nil
