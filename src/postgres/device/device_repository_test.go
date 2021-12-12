@@ -26,17 +26,18 @@ func (s *PostgresDeviceRepositorySuite) SetupSuite() {
 	utilities.ConfigureEnvironment()
 	dbConfig := postgres.GetDBConfigFromEnv()
 
+	db, err := postgres.GetDBConnection(dbConfig)
+	s.Require().Nil(err, "connecting to the DB should not throw an error")
+
+	err = postgres.RunMigration(db)
+	s.Require().Nil(err, "running a db migration should not throw an error")
+
 	deviceRepository, err := NewRepository(dbConfig)
-	if err != nil {
-		log.Fatal(err)
-	}
+	s.Require().Nil(err, "connecting to the DB should not throw an error")
 
 	s.repository = deviceRepository
 
-	newDevs := test.GenerateRandomNewDevices(1)
-	newDev := newDevs[0]
-
-	dev, err := s.repository.Create(newDev)
+	dev, err := s.repository.Create(test.GenerateRandomNewDevices(1)[0])
 	assert.Nil(s.T(), err)
 
 	// add device to test list for deletion after

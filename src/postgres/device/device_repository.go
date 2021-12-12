@@ -1,11 +1,8 @@
 package device
 
 import (
-	"fmt"
-
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
-	postgresDriver "gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 
@@ -38,18 +35,12 @@ func NewRepository(config postgres.DBConfig) (Repository, error) {
 }
 
 func (r Repository) Initialise() (Repository, error) {
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Shanghai", r.DbConfig.Host, r.DbConfig.UserName, r.DbConfig.Password, r.DbConfig.Name, r.DbConfig.Port)
-	db, err := gorm.Open(postgresDriver.Open(dsn), &gorm.Config{})
+	db, err := postgres.GetDBConnection(r.DbConfig)
 	if err != nil {
 		return r, err
 	}
 
 	r.DBConnection = db
-
-	err = postgres.RunMigration(db)
-	if err != nil {
-		return r, err
-	}
 
 	return r, nil
 }

@@ -1,11 +1,11 @@
 package test
 
 import (
-	"fmt"
 	"math/rand"
 	"time"
 
 	"github.com/bxcodec/faker/v3"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/rna-vt/devicecommander/graph/model"
 )
@@ -15,14 +15,14 @@ func init() {
 }
 
 func GenerateRandomNewDevices(count int) []model.NewDevice {
-	collection := []model.NewDevice{}
-	for i := 0; i < count; i++ {
-		tmpDev := model.NewDevice{}
-		err := faker.FakeData(&tmpDev)
+	collection := make([]model.NewDevice, count)
+	for index := range collection {
+		tmpItem := model.NewDevice{}
+		err := faker.FakeData(&tmpItem)
 		if err != nil {
-			fmt.Println(err)
+			log.Fatal(err)
 		}
-		collection = append(collection, tmpDev)
+		collection[index] = tmpItem
 	}
 	return collection
 }
@@ -33,7 +33,7 @@ func GenerateRandomNewEndpoints(deviceID string, count int) []model.NewEndpoint 
 		tmpEndpoint := model.NewEndpoint{}
 		err := faker.FakeData(&tmpEndpoint)
 		if err != nil {
-			fmt.Println(err)
+			log.Fatal(err)
 		}
 
 		tmpEndpoint.DeviceID = deviceID
@@ -48,7 +48,7 @@ func GenerateRandomNewParameter(count int) []model.NewParameter {
 		tmpParam := model.NewParameter{}
 		err := faker.FakeData(&tmpParam)
 		if err != nil {
-			fmt.Println(err)
+			log.Fatal(err)
 		}
 
 		collection = append(collection, tmpParam)
@@ -62,7 +62,7 @@ func GenerateRandomNewParameterForEndpoint(endpointID string, count int) []model
 		tmpParam := model.NewParameter{}
 		err := faker.FakeData(&tmpParam)
 		if err != nil {
-			fmt.Println(err)
+			log.Fatal(err)
 		}
 		tmpParam.EndpointID = endpointID
 

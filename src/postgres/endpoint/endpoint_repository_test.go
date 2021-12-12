@@ -27,24 +27,25 @@ type PostgresEndpointRepositorySuite struct {
 
 func (s *PostgresEndpointRepositorySuite) SetupSuite() {
 	utilities.ConfigureEnvironment()
-
 	dbConfig := postgres.GetDBConfigFromEnv()
+	db, err := postgres.GetDBConnection(dbConfig)
+	s.Require().Nil(err, "connecting to the DB should not throw an error")
+
+	err = postgres.RunMigration(db)
+	s.Require().Nil(err, "running a db migration should not throw an error")
+
 	endpointRepository, err := NewRepository(dbConfig)
-	if err != nil {
-		log.Fatal(err)
-	}
+	s.Require().Nil(err, "connecting to the DB should not throw an error")
 
 	deviceRepository, err := postgresDevice.NewRepository(dbConfig)
-	if err != nil {
-		log.Fatal(err)
-	}
+	s.Require().Nil(err, "connecting to the DB should not throw an error")
 
 	s.endpointRepository = endpointRepository
 	s.deviceRepository = deviceRepository
 
 	newDevs := test.GenerateRandomNewDevices(1)
 	dev, err := s.deviceRepository.Create(newDevs[0])
-	assert.Nil(s.T(), err)
+	s.Require().Nil(err, "creating a test device should not throw an error")
 
 	s.testDevices = append(s.testDevices, *dev)
 }

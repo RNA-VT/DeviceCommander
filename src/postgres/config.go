@@ -1,7 +1,10 @@
 package postgres
 
 import (
+	"fmt"
+
 	"github.com/spf13/viper"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
 	"github.com/rna-vt/devicecommander/graph/model"
@@ -25,6 +28,23 @@ func GetDBConfigFromEnv() DBConfig {
 		UserName: viper.GetString("POSTGRES_USER"),
 		Password: viper.GetString("POSTGRES_PASSWORD"),
 	}
+}
+
+func GetDBConnection(config DBConfig) (*gorm.DB, error) {
+	dsn := fmt.Sprintf(
+		"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Shanghai",
+		config.Host,
+		config.UserName,
+		config.Password,
+		config.Name,
+		config.Port,
+	)
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		return db, err
+	}
+
+	return db, nil
 }
 
 // RunMigration makes sure each of the important models are fully migrated.
