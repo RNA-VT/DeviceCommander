@@ -37,12 +37,17 @@ jobs:
           name: Waiting for Postgres to be ready
           command: dockerize -wait tcp://localhost:5432 -timeout 1m
       - run:
+          name: Install dependencies
+          command: sudo apt-get install libpcap-dev
+      - run:
+          name: Run DB migrations.
+          command: go run main.go migrate-db
+      - run:
           name: Run unit tests
           environment:
             POSTGRES_HOST: localhost
           # store the results of our tests in the $TEST_RESULTS directory
           command: |
-            sudo apt-get install libpcap-dev
             PACKAGE_NAMES=$(go list ./... | circleci tests split --split-by=timings --timings-type=classname)
             gotestsum --junitfile ${TEST_RESULTS}/gotestsum-report.xml -- $PACKAGE_NAMES      
       - save_cache:

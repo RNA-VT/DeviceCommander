@@ -26,11 +26,11 @@ func (s *PostgresDeviceRepositorySuite) SetupSuite() {
 	utilities.ConfigureEnvironment()
 	dbConfig := postgres.GetDBConfigFromEnv()
 
-	db, err := postgres.GetDBConnection(dbConfig)
-	s.Require().Nil(err, "connecting to the DB should not throw an error")
+	// db, err := postgres.GetDBConnection(dbConfig)
+	// s.Require().Nil(err, "connecting to the DB should not throw an error")
 
-	err = postgres.RunMigration(db)
-	s.Require().Nil(err, "running a db migration should not throw an error")
+	// err = postgres.RunMigration(db)
+	// s.Require().Nil(err, "running a db migration should not throw an error")
 
 	deviceRepository, err := NewRepository(dbConfig)
 	s.Require().Nil(err, "connecting to the DB should not throw an error")

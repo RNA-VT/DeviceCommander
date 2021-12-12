@@ -54,5 +54,6 @@ func RunMigration(db *gorm.DB) error {
 	if err := db.AutoMigrate(&model.Device{}, &model.Endpoint{}, &model.Parameter{}); err != nil {
 		return err
 	}
+
 	return nil
 }
