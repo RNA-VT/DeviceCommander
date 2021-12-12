@@ -39,7 +39,9 @@ func GetDBConnection(config DBConfig) (*gorm.DB, error) {
 		config.Name,
 		config.Port,
 	)
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+		DisableForeignKeyConstraintWhenMigrating: true,
+	})
 	if err != nil {
 		return db, err
 	}
