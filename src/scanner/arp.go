@@ -112,9 +112,9 @@ func (a *ArpScanner) hasIPv4Address(iface *net.Interface) (net.IPNet, error) {
 	return net.IPNet{}, errors.New("the interface does not have any IPv4 addresses")
 }
 
-// scanNetworkInterface scans an individual interface's local network for machines using ARP requests/replies.
-// scanNetworkInterface loops forever, sending packets out regularly.  It returns an error if
-// it's ever unable to write a packet.
+// scanNetworkInterface scans an individual interface's local network for machines using ARP
+// requests/replies. It will loop forever, sending packets out regularly.  It returns an error
+// if it's ever unable to write a packet.
 func (a *ArpScanner) scanNetworkInterface(iface *net.Interface) error {
 	ipv4Address, err := a.hasIPv4Address(iface)
 	if err != nil {
@@ -150,7 +150,7 @@ func (a *ArpScanner) scanNetworkInterface(iface *net.Interface) error {
 }
 
 // readARP watches a handle for incoming ARP responses we might care about, and prints them.
-// readARP loops until 'stop' is closed.
+// It will loop until 'stop' is closed.
 func (a *ArpScanner) readARP(handle *pcap.Handle, iface *net.Interface) {
 	src := gopacket.NewPacketSource(handle, layers.LayerTypeEthernet)
 	in := src.Packets()

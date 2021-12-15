@@ -12,7 +12,7 @@ import (
 	"github.com/rna-vt/devicecommander/graph/model"
 )
 
-// IDeviceClient implements the common http actions when interacting with a device.
+// DeviceClient implements the common http actions when interacting with a device.
 type Client interface {
 	Info(Device) (model.NewDevice, error)
 	Health(Device) (*http.Response, error)

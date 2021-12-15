@@ -12,8 +12,6 @@ import (
 	"github.com/rna-vt/devicecommander/graph/model"
 )
 
-const tlsPort = 443
-
 type Device interface {
 	NewDeviceFromRequestBody(body io.ReadCloser) (model.NewDevice, error)
 	ID() uuid.UUID
