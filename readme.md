@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/RNA-VT/DeviceCommander/tree/master.svg?style=svg)](https://circleci.com/gh/RNA-VT/DeviceCommander/tree/master)
+[![CircleCI](https://circleci.com/gh/RNA-VT/DeviceCommander/tree/master.svg?style=shield)](https://circleci.com/gh/RNA-VT/DeviceCommander/tree/master)
 
 # Device Commander
 
