@@ -32,26 +32,20 @@ func (s *PostgresParameterRepositorySuite) SetupSuite() {
 	dbConfig := postgres.GetDBConfigFromEnv()
 
 	deviceRepository, err := postgresDevice.NewRepository(dbConfig)
-	if err != nil {
-		log.Fatal(err)
-	}
+	s.Require().Nil(err, "connecting to the DB should not throw an error")
 
 	endpointRepository, err := postgresEndpoint.NewRepository(dbConfig)
-	if err != nil {
-		log.Fatal(err)
-	}
+	s.Require().Nil(err, "connecting to the DB should not throw an error")
 
 	parameterRepository, err := NewParameterRepository(dbConfig)
-	if err != nil {
-		log.Fatal(err)
-	}
+	s.Require().Nil(err, "connecting to the DB should not throw an error")
 
 	s.deviceRepository = deviceRepository
 	s.endpointRepository = endpointRepository
 	s.parameterRepository = parameterRepository
 
-	newDevs := test.GenerateRandomNewDevices(1)
-	dev, err := s.deviceRepository.Create(newDevs[0])
+	newDevices := test.GenerateRandomNewDevices(1)
+	dev, err := s.deviceRepository.Create(newDevices[0])
 	assert.Nil(s.T(), err)
 
 	testEndpoint := test.GenerateRandomNewEndpoints(dev.ID.String(), 1)
@@ -140,7 +134,7 @@ func (s *PostgresParameterRepositorySuite) TearDownSuite() {
 }
 
 // In order for 'go test' to run this suite, we need to create
-// a normal test function and pass our suite to suite.Run
+// a normal test function and pass our suite to suite.Run.
 func TestPostgresParameterRepositorySuite(t *testing.T) {
 	suite.Run(t, new(PostgresParameterRepositorySuite))
 }

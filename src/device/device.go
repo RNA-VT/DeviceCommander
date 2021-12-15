@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 
 	"github.com/rna-vt/devicecommander/graph/model"
 )
@@ -22,7 +23,7 @@ type Device interface {
 }
 
 // DeviceFromNewDevice generates a Device from a NewDevice with the correct instantiations.
-// This should be the primary method for creationg model.Device(s).
+// This should be the primary method for creating model.Device(s).
 func FromNewDevice(newDeviceArgs model.NewDevice) model.Device {
 	newDevice := model.Device{
 		ID:        uuid.New(),
@@ -79,8 +80,8 @@ func (d BasicDevice) NewDeviceFromRequestBody(body io.ReadCloser) (model.NewDevi
 	defer body.Close()
 	decoder := json.NewDecoder(body)
 	var dev model.NewDevice
-	err := decoder.Decode(&dev)
-	if err != nil {
+
+	if err := decoder.Decode(&dev); err != nil {
 		return dev, err
 	}
 
@@ -99,7 +100,7 @@ func (d BasicDevice) URL() string {
 // protocol determines the http/https protocol by Port allocation.
 func (d BasicDevice) protocol() string {
 	var protocol string
-	if d.Device.Port == 443 {
+	if d.Device.Port == viper.GetInt("DEFAULT_TLS_PORT") {
 		protocol = "https"
 	} else {
 		protocol = "http"

@@ -6,7 +6,7 @@ lint:
 	golangci-lint run
 
 lint-fix:
-	golangci-lint run --fix
+	golangci-lint run --fix -v
 
 gqlgen:
 	~/go/bin/gqlgen generate --verbose
@@ -20,7 +20,7 @@ test:
 	./scripts/test.sh
 
 run:
-	sudo go run main.go
+	sudo go run main.go server
 
 # help:
 # 	cd src && go run main.go -h

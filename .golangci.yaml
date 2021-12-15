@@ -2,13 +2,14 @@ run:
   tests: true
   modules-download-mode: vendor
   skip-dirs-use-default: true
+# Linter Docs: https://golangci-lint.run/usage/linters/
 linters:
-  disable-all: true
   enable:
   - deadcode
   - errcheck
   - goconst
   - gofumpt
+  - dupl
   - gci
   - revive
   - gosimple
@@ -21,11 +22,36 @@ linters:
   - unused
   - varcheck
   - whitespace
+  - errorlint
+  - funlen
+  - gocognit
+  - gocritic
+  - godot
+  - gomnd
+  - ifshort
+  - misspell
+  - prealloc
+  - unconvert
+  - unparam
+  - wastedassign
+  - gosec
 linters-settings:
   errcheck:
     check-type-assertions: true
     check-blank: true
+  funlen:
+    lines: 40
   govet:
     check-shadowing: true
   gci:
     local-prefixes: github.com/rna-vt/devicecommander
+  gocritic:
+    enabled-checks:
+      - nestingReduce
+      - unnamedresult
+      - ruleguard
+      - truncateCmp
+  gomnd:
+    settings:
+      mnd:
+        ignored-files: config_env.go

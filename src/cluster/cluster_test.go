@@ -38,9 +38,9 @@ func (s *ClusterSuite) SetupSuite() {
 }
 
 func (s *ClusterSuite) GenerateDevices(count int) []*model.Device {
-	devs := test.GenerateRandomNewDevices(count)
+	devices := test.GenerateRandomNewDevices(count)
 	collection := []*model.Device{}
-	for _, d := range devs {
+	for _, d := range devices {
 		tmpDev := device.FromNewDevice(d)
 		collection = append(collection, &tmpDev)
 	}
@@ -75,7 +75,7 @@ func (s *ClusterSuite) TestRunHealthCheckLoop() {
 }
 
 // In order for 'go test' to run this suite, we need to create
-// a normal test function and pass our suite to suite.Run
+// a normal test function and pass our suite to suite.Run.
 func TestClusterSuite(t *testing.T) {
 	suite.Run(t, new(ClusterSuite))
 }

@@ -3,6 +3,7 @@ package device
 import (
 	"testing"
 
+	"github.com/bxcodec/faker/v3"
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
@@ -26,16 +27,11 @@ func (s *PostgresDeviceRepositorySuite) SetupSuite() {
 	dbConfig := postgres.GetDBConfigFromEnv()
 
 	deviceRepository, err := NewRepository(dbConfig)
-	if err != nil {
-		log.Fatal(err)
-	}
+	s.Require().Nil(err, "connecting to the DB should not throw an error")
 
 	s.repository = deviceRepository
 
-	newDevs := test.GenerateRandomNewDevices(1)
-	newDev := newDevs[0]
-
-	dev, err := s.repository.Create(newDev)
+	dev, err := s.repository.Create(test.GenerateRandomNewDevices(1)[0])
 	assert.Nil(s.T(), err)
 
 	// add device to test list for deletion after
@@ -96,7 +92,7 @@ func (s *PostgresDeviceRepositorySuite) TestDelete() {
 func (s *PostgresDeviceRepositorySuite) TestUpdate() {
 	testDevice := s.CreateTestDevice()
 
-	tmpMAC := test.GenerateRandomMacAddress()
+	tmpMAC := faker.MacAddress()
 	err := s.repository.Update(model.UpdateDevice{
 		ID:  testDevice.ID.String(),
 		Mac: &tmpMAC,
@@ -112,7 +108,7 @@ func (s *PostgresDeviceRepositorySuite) TestUpdate() {
 }
 
 func (s *PostgresDeviceRepositorySuite) TestUpdateNonExistent() {
-	tmpMAC := test.GenerateRandomMacAddress()
+	tmpMAC := faker.MacAddress()
 	tmpUUID := uuid.New()
 	err := s.repository.Update(model.UpdateDevice{
 		ID:  tmpUUID.String(),
@@ -136,7 +132,7 @@ func (s *PostgresDeviceRepositorySuite) AfterTest(_, _ string) {
 }
 
 // In order for 'go test' to run this suite, we need to create
-// a normal test function and pass our suite to suite.Run
+// a normal test function and pass our suite to suite.Run.
 func TestPostgresDeviceRepositorySuite(t *testing.T) {
 	suite.Run(t, new(PostgresDeviceRepositorySuite))
 }

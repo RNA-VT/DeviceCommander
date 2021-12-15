@@ -23,14 +23,38 @@ import (
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
 	"github.com/google/gopacket/pcap"
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 
 	"github.com/rna-vt/devicecommander/graph/model"
 )
 
+const (
+	localHostPrefix        = 127
+	arpHardwareAddressSize = 6
+	protAddressSize        = 4
+)
+
 type ArpScanner struct {
-	LoopDelay     int
-	NewDeviceChan chan model.NewDevice
-	Stop          chan struct{}
+	LoopDelay                    int
+	NewDeviceChan                chan model.NewDevice
+	Stop                         chan struct{}
+	PCAPPort                     int32
+	BroadcastResponseWaitSeconds int
+	DefaultPort                  int
+	logger                       *logrus.Entry
+}
+
+func NewArpScanner(newDeviceChan chan model.NewDevice, stopChan chan struct{}) ArpScanner {
+	return ArpScanner{
+		LoopDelay:                    viper.GetInt("ARP_SCANNER_LOOP_DELAY"),
+		NewDeviceChan:                newDeviceChan,
+		Stop:                         stopChan,
+		PCAPPort:                     viper.GetInt32("ARP_SCANNER_PCAP_PORT"),
+		BroadcastResponseWaitSeconds: viper.GetInt("ARP_SCANNER_BROADCAST_RESPONSE_WAIT_SECONDS"),
+		DefaultPort:                  viper.GetInt("ARP_SCANNER_DEFAULT_DEVICE_PORT"),
+		logger:                       getScannerLogger(),
+	}
 }
 
 // Start is the entrypoint for the ArpScanner. It will run two concurrent
@@ -38,7 +62,6 @@ type ArpScanner struct {
 // by closing the Stop chan.
 // NewDevices will be returned via the NewDeviceChan.
 func (a *ArpScanner) Start() {
-	logger := getScannerLogger()
 	// Get a list of all interfaces.
 	ifaces, err := net.Interfaces()
 	if err != nil {
@@ -48,54 +71,64 @@ func (a *ArpScanner) Start() {
 	var wg sync.WaitGroup
 	for _, iface := range ifaces {
 		wg.Add(1)
-		// Start up a scan on each interface.
 		go func(iface net.Interface) {
 			defer wg.Done()
-			if err := a.scan(&iface); err != nil {
-				logger.Trace(fmt.Sprintf("interface %v: %v", iface.Name, err))
+			if err := a.scanNetworkInterface(&iface); err != nil {
+				a.logger.Trace(fmt.Sprintf("interface %v: %v", iface.Name, err))
 			}
 		}(iface)
 	}
-	// Wait for all interfaces' scans to complete.  They'll try to run
-	// forever, but will stop on an error, so if we get past this Wait
-	// it means all attempts to write have failed.
+
 	wg.Wait()
 }
 
-// scan scans an individual interface's local network for machines using ARP requests/replies.
-// scan loops forever, sending packets out regularly.  It returns an error if
-// it's ever unable to write a packet.
-func (a *ArpScanner) scan(iface *net.Interface) error {
-	// We just look for IPv4 addresses, so try to find if the interface has one.
-	logger := getScannerLogger()
-	var addr *net.IPNet
+func (a *ArpScanner) validateIPAddress(ipAddress net.IPNet) error {
+	if ipAddress.IP[0] == localHostPrefix {
+		return errors.New("skipping localhost")
+	}
+
+	if ipAddress.Mask[0] != 0xff || ipAddress.Mask[1] != 0xff {
+		return errors.New("mask means network is too large")
+	}
+
+	return nil
+}
+
+func (a *ArpScanner) hasIPv4Address(iface *net.Interface) (net.IPNet, error) {
 	addrs, err := iface.Addrs()
 	if err != nil {
-		return err
+		return net.IPNet{}, err
 	}
 	for _, ad := range addrs {
 		if ipnet, ok := ad.(*net.IPNet); ok {
 			if ip4 := ipnet.IP.To4(); ip4 != nil {
-				addr = &net.IPNet{
+				return net.IPNet{
 					IP:   ip4,
 					Mask: ipnet.Mask[len(ipnet.Mask)-4:],
-				}
-				break
+				}, nil
 			}
 		}
 	}
-	// Sanity-check that the interface has a good address.
-	if addr == nil {
-		return errors.New("no good IP network found")
-	} else if addr.IP[0] == 127 {
-		return errors.New("skipping localhost")
-	} else if addr.Mask[0] != 0xff || addr.Mask[1] != 0xff {
-		return errors.New("mask means network is too large")
-	}
-	logger.Info(fmt.Sprintf("Using network range %v for interface %v", addr, iface.Name))
+	return net.IPNet{}, errors.New("the interface does not have any IPv4 addresses")
+}
 
-	// Open up a pcap handle for packet reads/writes.
-	handle, err := pcap.OpenLive(iface.Name, 65536, true, pcap.BlockForever)
+// scanNetworkInterface scans an individual interface's local network for machines using ARP
+// requests/replies. It will loop forever, sending packets out regularly.  It returns an error
+// if it's ever unable to write a packet.
+func (a *ArpScanner) scanNetworkInterface(iface *net.Interface) error {
+	ipv4Address, err := a.hasIPv4Address(iface)
+	if err != nil {
+		return err
+	}
+
+	if err = a.validateIPAddress(ipv4Address); err != nil {
+		return err
+	}
+
+	a.logger.Info(fmt.Sprintf("Using network range %v for interface %v", ipv4Address, iface.Name))
+
+	// Open up a PCAP handle for packet reads/writes.
+	handle, err := pcap.OpenLive(iface.Name, a.PCAPPort, true, pcap.BlockForever)
 	if err != nil {
 		return err
 	}
@@ -105,28 +138,27 @@ func (a *ArpScanner) scan(iface *net.Interface) error {
 	// defer close(a.Stop)
 	for {
 		// Write our scan packets out to the handle.
-		if err := a.writeARP(handle, iface, addr); err != nil {
-			logger.Error(fmt.Sprintf("error writing packets on %v: %v", iface.Name, err))
+		if err := a.writeARP(handle, iface, &ipv4Address); err != nil {
+			a.logger.Error(fmt.Sprintf("error writing packets on %v: %v", iface.Name, err))
 			return err
 		}
 		// We don't know exactly how long it'll take for packets to be
 		// sent back to us, but 10 seconds should be more than enough
 		// time ;)
-		time.Sleep(60 * time.Second)
+		time.Sleep(time.Duration(a.BroadcastResponseWaitSeconds) * time.Second)
 	}
 }
 
 // readARP watches a handle for incoming ARP responses we might care about, and prints them.
-// readARP loops until 'stop' is closed.
+// It will loop until 'stop' is closed.
 func (a *ArpScanner) readARP(handle *pcap.Handle, iface *net.Interface) {
-	logger := getScannerLogger()
 	src := gopacket.NewPacketSource(handle, layers.LayerTypeEthernet)
 	in := src.Packets()
 	for {
 		var packet gopacket.Packet
 		select {
 		case <-a.Stop:
-			logger.Info("Exited readARP loop due to Stop chan closing")
+			a.logger.Info("Exited readARP loop due to Stop chan closing")
 			return
 		case packet = <-in:
 			arpLayer := packet.Layer(layers.LayerTypeARP)
@@ -135,25 +167,23 @@ func (a *ArpScanner) readARP(handle *pcap.Handle, iface *net.Interface) {
 			}
 			arp, err := arpLayer.(*layers.ARP)
 			if err {
-				logger.Trace(fmt.Errorf("error constructing arp obj"))
+				a.logger.Trace(fmt.Errorf("error constructing arp obj"))
 			}
 			if arp.Operation != layers.ARPReply || bytes.Equal([]byte(iface.HardwareAddr), arp.SourceHwAddress) {
 				// This is a packet I sent.
 				continue
 			}
-			// Note:  we might get some packets here that aren't responses to ones we've sent,
-			// if for example someone else sends US an ARP request.  Doesn't much matter, though...
-			// all information is good information :)
-			logger.Debug(fmt.Sprintf("IP %v is at %v", net.IP(arp.SourceProtAddress), net.HardwareAddr(arp.SourceHwAddress)))
+
+			a.logger.Debugf("ARP Packet received for [MAC: %v] [IP: %v]", net.HardwareAddr(arp.SourceHwAddress), net.IP(arp.SourceProtAddress))
 			tmpMacAddress := net.HardwareAddr(arp.SourceHwAddress).String()
 
 			newDevice := model.NewDevice{
 				Mac:  &tmpMacAddress,
 				Host: net.IP(arp.SourceProtAddress).String(),
-				Port: 420,
+				Port: a.DefaultPort,
 			}
 
-			// passs new device across channel
+			// pass new device across channel
 			a.NewDeviceChan <- newDevice
 		}
 	}
@@ -171,8 +201,8 @@ func (a *ArpScanner) writeARP(handle *pcap.Handle, iface *net.Interface, addr *n
 	arp := layers.ARP{
 		AddrType:          layers.LinkTypeEthernet,
 		Protocol:          layers.EthernetTypeIPv4,
-		HwAddressSize:     6,
-		ProtAddressSize:   4,
+		HwAddressSize:     arpHardwareAddressSize,
+		ProtAddressSize:   protAddressSize,
 		Operation:         layers.ARPRequest,
 		SourceHwAddress:   []byte(iface.HardwareAddr),
 		SourceProtAddress: []byte(addr.IP),

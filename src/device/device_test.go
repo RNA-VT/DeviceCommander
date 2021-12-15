@@ -20,6 +20,31 @@ import (
 	"github.com/rna-vt/devicecommander/src/utilities"
 )
 
+const testDeviceResponse = `{
+	"Name":"something or other",
+	"Endpoints": [
+		{
+			"Method": "attack",
+			"Parameters": [
+				{
+					"Name": "weapon"
+				},
+				{
+					"Name": "inTheNameOf"
+				}
+			]
+		},
+		{
+			"Method": "defend",
+			"Parameters": [
+				{
+					"Name": "bodyPart"
+				}
+			]
+		}
+	]
+}`
+
 type DeviceServiceSuite struct {
 	suite.Suite
 }
@@ -71,36 +96,10 @@ func isJSON(s string) bool {
 }
 
 func (s *DeviceServiceSuite) TestEvaluateSpecificationResponse() {
-	body := `
-		{
-			"Name":"something or other",
-			"Endpoints": [
-				{
-					"Method": "attack",
-					"Parameters": [
-						{
-							"Name": "weapon"
-						},
-						{
-							"Name": "inTheNameOf"
-						}
-					]
-				},
-				{
-					"Method": "defend",
-					"Parameters": [
-						{
-							"Name": "bodyPart"
-						}
-					]
-				}
-			]
-		}
-	`
-	assert.Equal(s.T(), true, isJSON(body), "the test json should be valid json")
+	assert.Equal(s.T(), true, isJSON(testDeviceResponse), "the test json should be valid json")
 
 	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, body)
+		fmt.Fprint(w, testDeviceResponse)
 	}))
 	mockServerURL, err := url.Parse(mockServer.URL)
 	assert.Nil(s.T(), err, "the mock server should have a valid URL")
@@ -151,7 +150,7 @@ func (s *DeviceServiceSuite) TestDeviceURL() {
 }
 
 // In order for 'go test' to run this suite, we need to create
-// a normal test function and pass our suite to suite.Run
+// a normal test function and pass our suite to suite.Run.
 func TestDeviceServiceSuite(t *testing.T) {
 	suite.Run(t, new(DeviceServiceSuite))
 }

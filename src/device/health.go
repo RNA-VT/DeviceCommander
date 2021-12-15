@@ -5,7 +5,7 @@ import (
 )
 
 // CheckHealth probes the health endpoint of the device in question. The health
-// endpoint is currently at Device.URL()/health
+// endpoint is currently at Device.URL()/health.
 func (d BasicDevice) RunHealthCheck(client Client) error {
 	resp, err := client.Health(d)
 	if err != nil {
