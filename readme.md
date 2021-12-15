@@ -1,8 +1,8 @@
-[![<RNA-VT>](https://circleci.com/github/RNA-VT/DeviceCommander.svg?style=svg)](https://github.com/RNA-VT/DeviceCommander)
+[![CircleCI](https://circleci.com/gh/RNA-VT/DeviceCommander/tree/master.svg?style=svg)](https://circleci.com/gh/RNA-VT/DeviceCommander/tree/master)
 
 # Device Commander
 
-Device Commander is the beginings of an IOT platform. It will provide a useful layer for managing
+Device Commander is the beginnings of an IOT platform. It will provide a useful layer for managing
 a large collection of compliant devices.
 
 ## Getting Started
