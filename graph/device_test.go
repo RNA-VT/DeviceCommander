@@ -88,7 +88,7 @@ func (s *DeviceGraphQLSuite) TestUpdateDevice() {
 }
 
 // In order for 'go test' to run this suite, we need to create
-// a normal test function and pass our suite to suite.Run
+// a normal test function and pass our suite to suite.Run.
 func TestDeviceGraphQLTestSuite(t *testing.T) {
 	suite.Run(t, new(DeviceGraphQLSuite))
 }

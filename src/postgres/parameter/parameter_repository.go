@@ -5,7 +5,6 @@ import (
 
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
-	postgresDriver "gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 
@@ -29,7 +28,7 @@ func NewParameterRepository(config postgres.DBConfig) (Repository, error) {
 		Initialized: false,
 		logger:      log.WithFields(log.Fields{"module": "postgres", "repository": "parameter"}),
 	}
-	repository, err := repository.Initialise()
+	repository, err := repository.Initialize()
 	if err != nil {
 		return repository, err
 	}
@@ -37,20 +36,14 @@ func NewParameterRepository(config postgres.DBConfig) (Repository, error) {
 	return repository, nil
 }
 
-// Initialise on the ParameterRepository struct opens the postgres connection defined in the ParameterRepository.DBConfig
-func (r Repository) Initialise() (Repository, error) {
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Shanghai", r.DbConfig.Host, r.DbConfig.UserName, r.DbConfig.Password, r.DbConfig.Name, r.DbConfig.Port)
-	db, err := gorm.Open(postgresDriver.Open(dsn), &gorm.Config{})
+// Initialize on the ParameterRepository struct opens the postgres connection defined in the ParameterRepository.DBConfig.
+func (r Repository) Initialize() (Repository, error) {
+	db, err := postgres.GetDBConnection(r.DbConfig)
 	if err != nil {
 		return r, err
 	}
 
 	r.DBConnection = db
-
-	err = postgres.RunMigration(db)
-	if err != nil {
-		return r, err
-	}
 
 	return r, nil
 }

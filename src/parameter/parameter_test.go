@@ -37,11 +37,11 @@ func (s *ParameterSuite) TestNewParameterInvalid() {
 	testNewParameter.EndpointID = ""
 
 	_, err := FromNewParameter(testNewParameter)
-	assert.NotNil(s.T(), err, "creating a new Parameter with a NewParameter with an invalid EnpointID should thow an error")
+	assert.NotNil(s.T(), err, "creating a new Parameter with a NewParameter with an invalid EndpointID should throw an error")
 }
 
 // In order for 'go test' to run this suite, we need to create
-// a normal test function and pass our suite to suite.Run
+// a normal test function and pass our suite to suite.Run.
 func TestParameterSuite(t *testing.T) {
 	suite.Run(t, new(ParameterSuite))
 }

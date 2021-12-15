@@ -1,11 +1,8 @@
 package device
 
 import (
-	"fmt"
-
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
-	postgresDriver "gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 
@@ -29,7 +26,7 @@ func NewRepository(config postgres.DBConfig) (Repository, error) {
 		Initialized: false,
 		logger:      log.WithFields(log.Fields{"module": "postgres", "repository": "device"}),
 	}
-	repository, err := repository.Initialise()
+	repository, err := repository.Initialize()
 	if err != nil {
 		return repository, err
 	}
@@ -37,25 +34,19 @@ func NewRepository(config postgres.DBConfig) (Repository, error) {
 	return repository, nil
 }
 
-func (r Repository) Initialise() (Repository, error) {
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Shanghai", r.DbConfig.Host, r.DbConfig.UserName, r.DbConfig.Password, r.DbConfig.Name, r.DbConfig.Port)
-	db, err := gorm.Open(postgresDriver.Open(dsn), &gorm.Config{})
+func (r Repository) Initialize() (Repository, error) {
+	db, err := postgres.GetDBConnection(r.DbConfig)
 	if err != nil {
 		return r, err
 	}
 
 	r.DBConnection = db
 
-	err = postgres.RunMigration(db)
-	if err != nil {
-		return r, err
-	}
-
 	return r, nil
 }
 
 // Create on the DeviceRepository creates a new row in the Device table.
-// Due to the nested nature of Parameters
+// Due to the nested nature of Parameters.
 func (r Repository) Create(newDeviceArgs model.NewDevice) (*model.Device, error) {
 	newDevice := device.FromNewDevice(newDeviceArgs)
 	result := r.DBConnection.Create(&newDevice)
@@ -67,7 +58,7 @@ func (r Repository) Create(newDeviceArgs model.NewDevice) (*model.Device, error)
 	return &newDevice, nil
 }
 
-// Update on the DeviceRepository updates a single Device based off the ID of the UpdateDevice arguement.
+// Update on the DeviceRepository updates a single Device based off the ID of the UpdateDevice argument.
 // It will return an error if no device is updated.
 func (r Repository) Update(input model.UpdateDevice) error {
 	id, err := uuid.Parse(input.ID)

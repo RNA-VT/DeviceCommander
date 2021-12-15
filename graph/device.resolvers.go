@@ -6,7 +6,7 @@ package graph
 import (
 	"context"
 
-	"github.com/rna-vt/devicecommander/graph/generated"
+	generated1 "github.com/rna-vt/devicecommander/graph/generated"
 	"github.com/rna-vt/devicecommander/graph/model"
 )
 
@@ -48,14 +48,14 @@ func (r *queryResolver) Devices(ctx context.Context) ([]*model.Device, error) {
 	return devices, nil
 }
 
-// Device returns generated.DeviceResolver implementation.
-func (r *Resolver) Device() generated.DeviceResolver { return &deviceResolver{r} }
+// Device returns generated1.DeviceResolver implementation.
+func (r *Resolver) Device() generated1.DeviceResolver { return &deviceResolver{r} }
 
-// Mutation returns generated.MutationResolver implementation.
-func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
+// Mutation returns generated1.MutationResolver implementation.
+func (r *Resolver) Mutation() generated1.MutationResolver { return &mutationResolver{r} }
 
-// Query returns generated.QueryResolver implementation.
-func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
+// Query returns generated1.QueryResolver implementation.
+func (r *Resolver) Query() generated1.QueryResolver { return &queryResolver{r} }
 
 type (
 	deviceResolver   struct{ *Resolver }

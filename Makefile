@@ -1,8 +1,12 @@
+.PHONY: build
+build:
+	./scripts/build.sh
+
 lint:
 	golangci-lint run
 
 lint-fix:
-	golangci-lint run --fix
+	golangci-lint run --fix -v
 
 gqlgen:
 	~/go/bin/gqlgen generate --verbose
@@ -12,14 +16,14 @@ generate-api-spec:
 
 mock:
 	rm -rf mocks
-	mockery --dir ./src --all --keeptree --output mocks
+	./scripts/mock.sh
 
 .PHONY: test
 test:
-	grc go test --cover ./...
+	./scripts/test.sh
 
 run:
-	sudo go run main.go
+	sudo go run main.go server
 
 # help:
 # 	cd src && go run main.go -h

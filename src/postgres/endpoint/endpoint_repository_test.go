@@ -27,24 +27,20 @@ type PostgresEndpointRepositorySuite struct {
 
 func (s *PostgresEndpointRepositorySuite) SetupSuite() {
 	utilities.ConfigureEnvironment()
-
 	dbConfig := postgres.GetDBConfigFromEnv()
+
 	endpointRepository, err := NewRepository(dbConfig)
-	if err != nil {
-		log.Fatal(err)
-	}
+	s.Require().Nil(err, "connecting to the DB should not throw an error")
 
 	deviceRepository, err := postgresDevice.NewRepository(dbConfig)
-	if err != nil {
-		log.Fatal(err)
-	}
+	s.Require().Nil(err, "connecting to the DB should not throw an error")
 
 	s.endpointRepository = endpointRepository
 	s.deviceRepository = deviceRepository
 
-	newDevs := test.GenerateRandomNewDevices(1)
-	dev, err := s.deviceRepository.Create(newDevs[0])
-	assert.Nil(s.T(), err)
+	newDevices := test.GenerateRandomNewDevices(1)
+	dev, err := s.deviceRepository.Create(newDevices[0])
+	s.Require().Nil(err, "creating a test device should not throw an error")
 
 	s.testDevices = append(s.testDevices, *dev)
 }
@@ -144,7 +140,7 @@ func (s *PostgresEndpointRepositorySuite) TearDownSuite() {
 }
 
 // In order for 'go test' to run this suite, we need to create
-// a normal test function and pass our suite to suite.Run
+// a normal test function and pass our suite to suite.Run.
 func TestPostgresEndpointRepositorySuite(t *testing.T) {
 	suite.Run(t, new(PostgresEndpointRepositorySuite))
 }

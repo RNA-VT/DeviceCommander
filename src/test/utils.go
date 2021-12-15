@@ -1,58 +1,28 @@
 package test
 
 import (
-	"fmt"
 	"math/rand"
 	"time"
 
+	"github.com/bxcodec/faker/v3"
+	log "github.com/sirupsen/logrus"
+
 	"github.com/rna-vt/devicecommander/graph/model"
 )
-
-func GenerateRandomMacAddress() string {
-	buf := make([]byte, 6)
-	_, err := rand.Read(buf)
-	if err != nil {
-		fmt.Println("error:", err)
-		return ""
-	}
-	// Set the local bit
-	buf[0] |= 2
-	return fmt.Sprintf("%02x:%02x:%02x:%02x:%02x:%02x", buf[0], buf[1], buf[2], buf[3], buf[4], buf[5])
-}
-
-var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ 124567890")
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
-func GenerateRandomString(length int) string {
-	b := make([]rune, length)
-	for i := range b {
-		b[i] = letterRunes[rand.Intn(len(letterRunes))]
-	}
-	return string(b)
-}
-
-func GenerateRandomBoolean() bool {
-	return rand.Intn(1) > 0
-}
-
 func GenerateRandomNewDevices(count int) []model.NewDevice {
-	collection := []model.NewDevice{}
-	for i := 0; i < count; i++ {
-		tmpName := GenerateRandomString(10)
-		tmpDesc := GenerateRandomString(100)
-		tmpMac := GenerateRandomMacAddress()
-
-		tmpDev := model.NewDevice{
-			Name:        &tmpName,
-			Description: &tmpDesc,
-			Mac:         &tmpMac,
-			Host:        "127.0.0.1",
-			Port:        9100,
+	collection := make([]model.NewDevice, count)
+	for index := range collection {
+		tmpItem := model.NewDevice{}
+		err := faker.FakeData(&tmpItem)
+		if err != nil {
+			log.Fatal(err)
 		}
-		collection = append(collection, tmpDev)
+		collection[index] = tmpItem
 	}
 	return collection
 }
@@ -60,13 +30,13 @@ func GenerateRandomNewDevices(count int) []model.NewDevice {
 func GenerateRandomNewEndpoints(deviceID string, count int) []model.NewEndpoint {
 	collection := []model.NewEndpoint{}
 	for i := 0; i < count; i++ {
-		tmpDesc := GenerateRandomString(100)
-		tmpEndpoint := model.NewEndpoint{
-			DeviceID:    deviceID,
-			Method:      "dmx-config",
-			Type:        "SET",
-			Description: &tmpDesc,
+		tmpEndpoint := model.NewEndpoint{}
+		err := faker.FakeData(&tmpEndpoint)
+		if err != nil {
+			log.Fatal(err)
 		}
+
+		tmpEndpoint.DeviceID = deviceID
 		collection = append(collection, tmpEndpoint)
 	}
 	return collection
@@ -75,11 +45,10 @@ func GenerateRandomNewEndpoints(deviceID string, count int) []model.NewEndpoint 
 func GenerateRandomNewParameter(count int) []model.NewParameter {
 	collection := []model.NewParameter{}
 	for i := 0; i < count; i++ {
-		tmpDesc := GenerateRandomString(100)
-		tmpParam := model.NewParameter{
-			Name:        GenerateRandomString(5),
-			Description: &tmpDesc,
-			Type:        "SET",
+		tmpParam := model.NewParameter{}
+		err := faker.FakeData(&tmpParam)
+		if err != nil {
+			log.Fatal(err)
 		}
 
 		collection = append(collection, tmpParam)
@@ -90,13 +59,12 @@ func GenerateRandomNewParameter(count int) []model.NewParameter {
 func GenerateRandomNewParameterForEndpoint(endpointID string, count int) []model.NewParameter {
 	collection := []model.NewParameter{}
 	for i := 0; i < count; i++ {
-		tmpDesc := GenerateRandomString(100)
-		tmpParam := model.NewParameter{
-			EndpointID:  endpointID,
-			Name:        "foobar",
-			Description: &tmpDesc,
-			Type:        "SET",
+		tmpParam := model.NewParameter{}
+		err := faker.FakeData(&tmpParam)
+		if err != nil {
+			log.Fatal(err)
 		}
+		tmpParam.EndpointID = endpointID
 
 		collection = append(collection, tmpParam)
 	}

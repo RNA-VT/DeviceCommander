@@ -12,7 +12,7 @@ import (
 	"github.com/rna-vt/devicecommander/graph/model"
 )
 
-// IDeviceClient implements the common http actions when interacting with a device
+// DeviceClient implements the common http actions when interacting with a device.
 type Client interface {
 	Info(Device) (model.NewDevice, error)
 	Health(Device) (*http.Response, error)
@@ -27,12 +27,19 @@ type HTTPDeviceClient struct {
 	logger *log.Entry
 }
 
-// NewHTTPDeviceClient creates an instantiated HTTPDeviceClientl. This should be the
+// NewHTTPDeviceClient creates an instantiated HTTPDeviceClient. This should be the
 // primary method of generating a HTTPDeviceClient struct.
 func NewHTTPDeviceClient() HTTPDeviceClient {
 	return HTTPDeviceClient{
 		log.WithFields(log.Fields{"module": "device-client"}),
 	}
+}
+
+func (c HTTPDeviceClient) dangerousHTTPGet(url string) (resp *http.Response, err error) {
+	// look into validating this URL and the request/response.
+
+	//nolint:gosec
+	return http.Get(url)
 }
 
 func (c HTTPDeviceClient) Info(d Device) (model.NewDevice, error) {
@@ -43,7 +50,7 @@ func (c HTTPDeviceClient) Info(d Device) (model.NewDevice, error) {
 func (c HTTPDeviceClient) Health(d Device) (*http.Response, error) {
 	url := d.URL() + "/health"
 
-	resp, err := http.Get(url)
+	resp, err := c.dangerousHTTPGet(url)
 	if err != nil {
 		c.logger.Warn(fmt.Sprintf("Error checking [%s] %s", url, err.Error()))
 		return &http.Response{}, err
@@ -62,11 +69,12 @@ func (c HTTPDeviceClient) EvaluateHealthCheckResponse(resp *http.Response, d Dev
 		return false
 	}
 	healthy := false
+
 	switch resp.StatusCode {
-	case 200:
+	case http.StatusOK:
 		c.logger.WithFields(log.Fields{"event": "isHealthy"}).Info(d.ID())
 		healthy = true
-	case 404:
+	case http.StatusNotFound:
 		c.logger.Error("Registered Device Not Found: " + d.ID().String())
 	default:
 		c.logger.Error("Unexpected Result: " + d.ID().String())
@@ -79,7 +87,7 @@ func (c HTTPDeviceClient) EvaluateHealthCheckResponse(resp *http.Response, d Dev
 func (c HTTPDeviceClient) Specification(d Device) (*http.Response, error) {
 	url := d.URL() + "/specification"
 
-	r, err := http.Get(url)
+	r, err := c.dangerousHTTPGet(url)
 	if err != nil {
 		return &http.Response{}, err
 	}

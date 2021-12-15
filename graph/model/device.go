@@ -6,7 +6,7 @@ import (
 
 // Device represents a compliant physical component & its web address.
 //
-// ID -- the serial nummber of the connecting device
+// ID -- the serial number of the connecting device
 // Name - Optional Device Nickname
 // Description - Optional text describing this device
 // Host - Device Api Host
@@ -17,11 +17,11 @@ type Device struct {
 	// the UUID for the device.
 	//
 	// required: true
-	ID uuid.UUID `json:"ID"`
+	ID uuid.UUID `json:"ID" faker:"uuid_hyphenated"`
 
 	// the MAC address for this device.
 	// required: true
-	MAC string `json:"MAC" gorm:"unique"`
+	MAC string `json:"MAC" gorm:"unique" faker:"mac_address"`
 
 	// the human readable name of the device.
 	// required: false
@@ -33,15 +33,15 @@ type Device struct {
 
 	// the host address of the device.
 	// required: true
-	Host string `json:"Host"`
+	Host string `json:"Host" faker:"ipv4"`
 
 	// the active port of the device.
 	// required: true
-	Port int `json:"Port"`
+	Port int `json:"Port" faker:"boundary_start=49152, boundary_end=65535"`
 
 	// the count of failed actions by the device.
 	// required: false
-	Failures int `json:"Failures"`
+	Failures int `json:"Failures" faker:"boundary_start=0, boundary_end=5"`
 
 	// a flag representing the responsiveness of the device.
 	// required: false
@@ -49,5 +49,5 @@ type Device struct {
 
 	// a list of endpoints available for quering on a device.
 	// required: false
-	Endpoints []Endpoint `json:"Endpoints"`
+	Endpoints []Endpoint `json:"Endpoints" faker:"-"`
 }
