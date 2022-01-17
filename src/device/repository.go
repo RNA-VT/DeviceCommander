@@ -8,7 +8,6 @@ type Repository interface {
 	Create(model.NewDevice) (*model.Device, error)
 	Update(model.UpdateDevice) error
 	Delete(string) (*model.Device, error)
-
 	Get(model.Device) ([]*model.Device, error)
 	GetAll() ([]*model.Device, error)
 }
