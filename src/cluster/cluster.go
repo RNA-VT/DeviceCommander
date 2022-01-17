@@ -17,7 +17,6 @@ type Cluster interface {
 	Start()
 	DeviceDiscovery(int)
 	RunHealthCheckLoop(int)
-
 	StopHealth()
 	StopDiscovery()
 }

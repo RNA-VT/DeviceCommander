@@ -50,17 +50,15 @@ func (c DeviceCluster) HandleDiscoveredDevice(newDevice model.NewDevice) error {
 		MAC: *newDevice.Mac,
 	})
 	if err != nil {
-		c.logger.Print(err)
 		return err
 	}
 
 	var discoveredDevice *model.Device
 	switch len(results) {
 	case 0:
-		//New Device
+		// New Device
 		discoveredDevice, err = c.DeviceRepository.Create(newDevice)
 		if err != nil {
-			c.logger.Error(err)
 			return err
 		}
 	case 1:
@@ -79,14 +77,17 @@ func (c DeviceCluster) HandleDiscoveredDevice(newDevice model.NewDevice) error {
 			Port:        &newDevice.Port,
 			Active:      &discoveredDevice.Active,
 		}
-		c.DeviceRepository.Update(m)
+		err = c.DeviceRepository.Update(m)
+		if err != nil {
+			return err
+		}
 	default:
 		return errors.New("multiple results returned for 1 mac address")
 	}
 
 	c.logger.Debug(fmt.Sprintf("registered mac address [%s] with id [%s] at [%s]:[%s]", discoveredDevice.MAC, discoveredDevice.ID, newDevice.Host, strconv.Itoa(newDevice.Port)))
 
-	// Immediatly run health check
+	// `Immediately` run health check
 	if err := device.NewDeviceWrapper(*discoveredDevice).RunHealthCheck(c.DeviceClient); err != nil {
 		return err
 	}
