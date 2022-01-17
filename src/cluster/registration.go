@@ -62,6 +62,7 @@ func (c DeviceCluster) HandleDiscoveredDevice(newDevice model.NewDevice) error {
 		}
 	case 1:
 		discoveredDevice = updateDeviceWithDiscoveredData(results[0], newDevice)
+		discoveredDevice.Active = true
 		err := c.DeviceRepository.Update(updateDeviceFromDevice(discoveredDevice))
 		if err != nil {
 			return err
@@ -86,7 +87,6 @@ func updateDeviceWithDiscoveredData(dev *model.Device, discovered model.NewDevic
 	updated.Description = *discovered.Description
 	updated.Host = discovered.Host
 	updated.Port = discovered.Port
-	updated.Active = true
 	return updated
 }
 
