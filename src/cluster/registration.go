@@ -56,28 +56,13 @@ func (c DeviceCluster) HandleDiscoveredDevice(newDevice model.NewDevice) error {
 	var discoveredDevice *model.Device
 	switch len(results) {
 	case 0:
-		// New Device
 		discoveredDevice, err = c.DeviceRepository.Create(newDevice)
 		if err != nil {
 			return err
 		}
 	case 1:
-		// Known Device
-		discoveredDevice = results[0]
-
-		// Activate
-		discoveredDevice.Active = true
-
-		// Update device
-		var m model.UpdateDevice = model.UpdateDevice{
-			Mac:         &discoveredDevice.MAC,
-			Name:        newDevice.Name,
-			Description: newDevice.Description,
-			Host:        &newDevice.Host,
-			Port:        &newDevice.Port,
-			Active:      &discoveredDevice.Active,
-		}
-		err = c.DeviceRepository.Update(m)
+		discoveredDevice = updateDeviceWithDiscoveredData(results[0], newDevice)
+		err := c.DeviceRepository.Update(updateDeviceFromDevice(discoveredDevice))
 		if err != nil {
 			return err
 		}
@@ -93,4 +78,25 @@ func (c DeviceCluster) HandleDiscoveredDevice(newDevice model.NewDevice) error {
 	}
 
 	return nil
+}
+
+func updateDeviceWithDiscoveredData(dev *model.Device, discovered model.NewDevice) *model.Device {
+	updated := dev
+	updated.Name = *discovered.Name
+	updated.Description = *discovered.Description
+	updated.Host = discovered.Host
+	updated.Port = discovered.Port
+	updated.Active = true
+	return updated
+}
+
+func updateDeviceFromDevice(d *model.Device) model.UpdateDevice {
+	return model.UpdateDevice{
+		Mac:         &d.MAC,
+		Name:        &d.Name,
+		Description: &d.Description,
+		Host:        &d.Host,
+		Port:        &d.Port,
+		Active:      &d.Active,
+	}
 }
