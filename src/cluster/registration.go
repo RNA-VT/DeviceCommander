@@ -81,7 +81,7 @@ func (c DeviceCluster) HandleDiscoveredDevice(newDevice model.NewDevice) error {
 	return nil
 }
 
-// updateDeviceWithDiscoveredData updates fields in a device that may change between discoveries
+// updateDeviceWithDiscoveredData updates fields in a device that may change between discoveries.
 func updateDeviceWithDiscoveredData(dev *model.Device, discovered model.NewDevice) *model.Device {
 	updated := dev
 	updated.Name = *discovered.Name
@@ -91,7 +91,7 @@ func updateDeviceWithDiscoveredData(dev *model.Device, discovered model.NewDevic
 	return updated
 }
 
-// updateDeviceFromDevice builds a model.UpdateDevice from a model.Device
+// updateDeviceFromDevice builds a model.UpdateDevice from a model.Device.
 func updateDeviceFromDevice(d *model.Device) model.UpdateDevice {
 	return model.UpdateDevice{
 		Mac:         &d.MAC,
