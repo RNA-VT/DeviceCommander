@@ -1,7 +1,9 @@
 package cluster
 
 import (
+	"errors"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/rna-vt/devicecommander/graph/model"
@@ -48,23 +50,44 @@ func (c DeviceCluster) HandleDiscoveredDevice(newDevice model.NewDevice) error {
 		MAC: *newDevice.Mac,
 	})
 	if err != nil {
+		c.logger.Print(err)
 		return err
 	}
 
-	if len(results) > 0 {
-		return nil
+	var discoveredDevice *model.Device
+	switch len(results) {
+	case 0:
+		//New Device
+		discoveredDevice, err = c.DeviceRepository.Create(newDevice)
+		if err != nil {
+			c.logger.Error(err)
+			return err
+		}
+	case 1:
+		// Known Device
+		discoveredDevice = results[0]
+
+		// Activate
+		discoveredDevice.Active = true
+
+		// Update device
+		var m model.UpdateDevice = model.UpdateDevice{
+			Mac:         &discoveredDevice.MAC,
+			Name:        newDevice.Name,
+			Description: newDevice.Description,
+			Host:        &newDevice.Host,
+			Port:        &newDevice.Port,
+			Active:      &discoveredDevice.Active,
+		}
+		c.DeviceRepository.Update(m)
+	default:
+		return errors.New("multiple results returned for 1 mac address")
 	}
 
-	completeDevice, err := c.DeviceRepository.Create(newDevice)
-	if err != nil {
-		return err
-	}
+	c.logger.Debug(fmt.Sprintf("registered mac address [%s] with id [%s] at [%s]:[%s]", discoveredDevice.MAC, discoveredDevice.ID, newDevice.Host, strconv.Itoa(newDevice.Port)))
 
-	c.logger.Debug(fmt.Sprintf("registered mac address [%s] with id [%s]", completeDevice.MAC, completeDevice.ID))
-
-	deviceWrapper := device.NewDeviceWrapper(*completeDevice)
-	err = deviceWrapper.RunHealthCheck(c.DeviceClient)
-	if err != nil {
+	// Immediatly run health check
+	if err := device.NewDeviceWrapper(*discoveredDevice).RunHealthCheck(c.DeviceClient); err != nil {
 		return err
 	}
 
