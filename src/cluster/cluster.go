@@ -19,6 +19,7 @@ type Cluster interface {
 	RunHealthCheckLoop(int)
 	StopHealth()
 	StopDiscovery()
+	HandleDiscoveredDevice(model.NewDevice) error
 }
 
 // Cluster is responsible for maintaining the cluster like state of DeviceCommander.
