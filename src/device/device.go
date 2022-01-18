@@ -24,12 +24,15 @@ type Device interface {
 
 // DeviceFromNewDevice generates a Device from a NewDevice with the correct instantiations.
 // This should be the primary method for creating model.Device(s).
+// func FromNewDevice(newDeviceArgs model.NewDevice) model.Device {
 func FromNewDevice(newDeviceArgs model.NewDevice) model.Device {
 	newDevice := model.Device{
-		ID:        uuid.New(),
-		Host:      newDeviceArgs.Host,
-		Port:      newDeviceArgs.Port,
-		Endpoints: []model.Endpoint{},
+		ID:          uuid.New(),
+		Name:        *newDeviceArgs.Name,
+		Description: *newDeviceArgs.Description,
+		Host:        newDeviceArgs.Host,
+		Port:        newDeviceArgs.Port,
+		Endpoints:   []model.Endpoint{},
 	}
 
 	if newDeviceArgs.Mac != nil {
@@ -45,6 +48,18 @@ func FromNewDevice(newDeviceArgs model.NewDevice) model.Device {
 	}
 
 	return newDevice
+}
+
+// updateDeviceFromDevice builds a model.UpdateDevice from a model.Device.
+func UpdateDeviceFromDevice(d *model.Device) model.UpdateDevice {
+	return model.UpdateDevice{
+		Mac:         &d.MAC,
+		Name:        &d.Name,
+		Description: &d.Description,
+		Host:        &d.Host,
+		Port:        &d.Port,
+		Active:      &d.Active,
+	}
 }
 
 // Device is a wrapper for the Device model. It aims to provide a helpful

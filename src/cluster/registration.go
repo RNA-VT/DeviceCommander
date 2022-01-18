@@ -53,7 +53,7 @@ func (c DeviceCluster) HandleDiscoveredDevice(newDevice model.NewDevice) error {
 		return err
 	}
 
-	var discoveredDevice *model.Device
+	discoveredDevice := new(model.Device)
 	switch len(results) {
 	case 0:
 		discoveredDevice, err = c.DeviceRepository.Create(newDevice)
@@ -61,9 +61,9 @@ func (c DeviceCluster) HandleDiscoveredDevice(newDevice model.NewDevice) error {
 			return err
 		}
 	case 1:
-		discoveredDevice = updateDeviceWithDiscoveredData(results[0], newDevice)
+		discoveredDevice := device.FromNewDevice(newDevice)
 		discoveredDevice.Active = true
-		err := c.DeviceRepository.Update(updateDeviceFromDevice(discoveredDevice))
+		err := c.DeviceRepository.Update(device.UpdateDeviceFromDevice(&discoveredDevice))
 		if err != nil {
 			return err
 		}
@@ -71,34 +71,17 @@ func (c DeviceCluster) HandleDiscoveredDevice(newDevice model.NewDevice) error {
 		return errors.New("multiple results returned for 1 mac address")
 	}
 
-	c.logger.Debug(fmt.Sprintf("registered mac address [%s] with id [%s] at [%s]:[%s]", discoveredDevice.MAC, discoveredDevice.ID, newDevice.Host, strconv.Itoa(newDevice.Port)))
+	c.logger.Debug(
+		fmt.Sprintf("registered mac address [%s] with id [%s] at [%s]:[%s]",
+			discoveredDevice.MAC,
+			discoveredDevice.ID,
+			newDevice.Host,
+			strconv.Itoa(newDevice.Port)))
 
-	// `Immediately` run health check
+	// Immediately run health check
 	if err := device.NewDeviceWrapper(*discoveredDevice).RunHealthCheck(c.DeviceClient); err != nil {
 		return err
 	}
 
 	return nil
-}
-
-// updateDeviceWithDiscoveredData updates fields in a device that may change between discoveries.
-func updateDeviceWithDiscoveredData(dev *model.Device, discovered model.NewDevice) *model.Device {
-	updated := dev
-	updated.Name = *discovered.Name
-	updated.Description = *discovered.Description
-	updated.Host = discovered.Host
-	updated.Port = discovered.Port
-	return updated
-}
-
-// updateDeviceFromDevice builds a model.UpdateDevice from a model.Device.
-func updateDeviceFromDevice(d *model.Device) model.UpdateDevice {
-	return model.UpdateDevice{
-		Mac:         &d.MAC,
-		Name:        &d.Name,
-		Description: &d.Description,
-		Host:        &d.Host,
-		Port:        &d.Port,
-		Active:      &d.Active,
-	}
 }
