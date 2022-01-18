@@ -123,7 +123,7 @@ const Layout = ({ children }: { children: any }) => {
                         <MenuIcon />
                     </IconButton>
                     <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
-                        GoFire
+                        Device Commander
           </Typography>
                     <IconButton color="inherit">
                         <Badge badgeContent={0} color="secondary">

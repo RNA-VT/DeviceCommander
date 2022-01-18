@@ -1,24 +1,9 @@
-# version: "3"
-# services:
-#   gofire:
-#     build: ../src
-#     command: ["./firecontroller"]
-#     volumes:
-#       - .:/go/src/GoFire
-#     ports:
-#       - "8000:8000"
-#     restart: unless-stopped
-#     environment:
-#       - GOFIRE_MASTER=TRUE
-#       - GOFIRE_MASTER_HOST=host.docker.internal
-
-
 version: '3.5'
 services:
   # device-commander:
   #   container_name: device_commander
   #   image: rnavt/devicecommander:latest
-  #   command: ["device-commander"]
+  #   command: ["device-commander", "server"]
   #   ports:
   #     - "8001:8001"
   #   networks:
