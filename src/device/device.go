@@ -24,7 +24,7 @@ type Device interface {
 
 // DeviceFromNewDevice generates a Device from a NewDevice with the correct instantiations.
 // This should be the primary method for creating model.Device(s).
-// func FromNewDevice(newDeviceArgs model.NewDevice) model.Device {
+// func FromNewDevice(newDeviceArgs model.NewDevice) model.Device {.
 func FromNewDevice(newDeviceArgs model.NewDevice) model.Device {
 	newDevice := model.Device{
 		ID:          uuid.New(),
