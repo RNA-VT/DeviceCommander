@@ -3,8 +3,9 @@ package cluster
 import (
 	"net/http"
 
-	"github.com/rna-vt/devicecommander/graph/model"
 	"github.com/stretchr/testify/mock"
+
+	"github.com/rna-vt/devicecommander/graph/model"
 )
 
 func (s *ClusterSuite) TestHandleDiscoveredDevice() {
@@ -29,7 +30,7 @@ func (s *ClusterSuite) TestHandleDiscoveredDevice() {
 	err := s.cluster.HandleDiscoveredDevice(newDevices[0])
 	s.Assertions.Equal(err, nil)
 
-	//Update Device
+	// Update Device
 	update := newDevices[1]
 	update.Mac = original.Mac
 	updatedDevice := devices[0]
@@ -38,5 +39,4 @@ func (s *ClusterSuite) TestHandleDiscoveredDevice() {
 	s.mockDeviceRepository.On("Update", mock.AnythingOfType("model.UpdateDevice")).Return(nil)
 	err = s.cluster.HandleDiscoveredDevice(newDevices[1])
 	s.Assertions.Equal(err, nil)
-
 }
