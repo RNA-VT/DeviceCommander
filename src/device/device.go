@@ -26,24 +26,14 @@ type Device interface {
 // This should be the primary method for creating model.Device(s).
 func FromNewDevice(newDeviceArgs model.NewDevice) model.Device {
 	newDevice := model.Device{
-		ID:          uuid.New(),
-		Name:        *newDeviceArgs.Name,
-		Description: *newDeviceArgs.Description,
-		Host:        newDeviceArgs.Host,
-		Port:        newDeviceArgs.Port,
-		Endpoints:   []model.Endpoint{},
+		ID:        uuid.New(),
+		Host:      newDeviceArgs.Host,
+		Port:      newDeviceArgs.Port,
+		Endpoints: []model.Endpoint{},
 	}
 
 	if newDeviceArgs.Mac != nil {
 		newDevice.MAC = *newDeviceArgs.Mac
-	}
-
-	if newDeviceArgs.Name != nil {
-		newDevice.Name = *newDeviceArgs.Name
-	}
-
-	if newDeviceArgs.Description != nil {
-		newDevice.Description = *newDeviceArgs.Description
 	}
 
 	return newDevice

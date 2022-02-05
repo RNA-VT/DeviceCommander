@@ -13,11 +13,9 @@ func (s *ClusterSuite) TestHandleDiscoveredDevice() {
 	newDevices := make([]model.NewDevice, len(devices))
 	for i, d := range devices {
 		newDevices[i] = model.NewDevice{
-			Mac:         &d.MAC,
-			Name:        &d.Name,
-			Description: &d.Description,
-			Host:        d.Host,
-			Port:        d.Port,
+			Mac:  &d.MAC,
+			Host: d.Host,
+			Port: d.Port,
 		}
 	}
 
