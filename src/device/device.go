@@ -49,18 +49,6 @@ func FromNewDevice(newDeviceArgs model.NewDevice) model.Device {
 	return newDevice
 }
 
-// updateDeviceFromDevice builds a model.UpdateDevice from a model.Device.
-func UpdateDeviceFromDevice(d *model.Device) model.UpdateDevice {
-	return model.UpdateDevice{
-		Mac:         &d.MAC,
-		Name:        &d.Name,
-		Description: &d.Description,
-		Host:        &d.Host,
-		Port:        &d.Port,
-		Active:      &d.Active,
-	}
-}
-
 // Device is a wrapper for the Device model. It aims to provide a helpful
 // layer of abstraction away from the gqlgen/postgres models.
 type BasicDevice struct {

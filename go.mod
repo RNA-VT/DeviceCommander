@@ -7,6 +7,7 @@ require (
 	github.com/agnivade/levenshtein v1.1.1 // indirect
 	github.com/bxcodec/faker/v3 v3.6.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
+	github.com/geraldo-labs/merge-struct v1.0.0
 	github.com/google/gopacket v1.1.19
 	github.com/google/uuid v1.3.0
 	github.com/jackc/pgx/v4 v4.14.1 // indirect

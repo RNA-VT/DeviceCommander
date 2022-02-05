@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"time"
 
+	patch "github.com/geraldo-labs/merge-struct"
 	"github.com/rna-vt/devicecommander/graph/model"
 	"github.com/rna-vt/devicecommander/src/device"
 	"github.com/rna-vt/devicecommander/src/scanner"
@@ -70,12 +71,16 @@ func (c DeviceCluster) HandleDiscoveredDevice(newDevice model.NewDevice) (model.
 	case 1:
 		discoveredDevice := device.FromNewDevice(newDevice)
 		discoveredDevice.Active = true
-		err := c.DeviceRepository.Update(device.UpdateDeviceFromDevice(&discoveredDevice))
+		updateDevice, err := updateDeviceFromDevice(&discoveredDevice)
 		if err != nil {
 			return model.Device{}, err
 		}
+
+		if err := c.DeviceRepository.Update(updateDevice); err != nil {
+			return model.Device{}, err
+		}
 	default:
-		return errors.New("multiple results returned for 1 mac address")
+		return model.Device{}, errors.New("multiple results returned for 1 mac address")
 	}
 
 	c.logger.Debugf("registered mac address [%s] with id [%s] at [%s]:[%s]",
@@ -85,4 +90,11 @@ func (c DeviceCluster) HandleDiscoveredDevice(newDevice model.NewDevice) (model.
 		strconv.Itoa(newDevice.Port))
 
 	return model.Device{}, nil
+}
+
+// updateDeviceFromDevice builds a model.UpdateDevice from a model.Device.
+func updateDeviceFromDevice(d *model.Device) (model.UpdateDevice, error) {
+	var updateDevie model.UpdateDevice
+	_, err := patch.Struct(&updateDevie, d)
+	return updateDevie, err
 }
