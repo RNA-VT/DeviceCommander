@@ -4,7 +4,7 @@ import (
 	"github.com/google/uuid"
 )
 
-// Device represents a compliant physical component & its web address.
+// Device -- a compliant physical component.
 //
 // ID -- the serial number of the connecting device
 // Name - Optional Device Nickname
@@ -17,6 +17,7 @@ type Device struct {
 	// the UUID for the device.
 	//
 	// required: true
+	// example: 705e4dcb-3ecd-24f3-3a35-3e926e4bded5
 	ID uuid.UUID `json:"ID" faker:"uuid_hyphenated"`
 
 	// the MAC address for this device.

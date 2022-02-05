@@ -1,0 +1,167 @@
+basePath: /
+consumes:
+- application/json
+definitions:
+  Device:
+    description: |-
+      ID -- the serial number of the connecting device
+      Name - Optional Device Nickname
+      Description - Optional text describing this device
+      Host - Device Api Host
+      Port - Device Api Port. Set to 443 for https
+    properties:
+      Active:
+        description: a flag representing the responsiveness of the device.
+        type: boolean
+      Description:
+        description: the description of the device.
+        type: string
+      Endpoints:
+        description: a list of endpoints available for quering on a device.
+        items:
+          $ref: '#/definitions/Endpoint'
+        type: array
+      Failures:
+        description: the count of failed actions by the device.
+        format: int64
+        type: integer
+      Host:
+        description: the host address of the device.
+        type: string
+      ID:
+        $ref: '#/definitions/UUID'
+      MAC:
+        description: the MAC address for this device.
+        type: string
+      Name:
+        description: the human readable name of the device.
+        type: string
+      Port:
+        description: the active port of the device.
+        format: int64
+        type: integer
+    required:
+    - ID
+    - MAC
+    - Host
+    - Port
+    title: Device represents a compliant physical component & its web address.
+    type: object
+    x-go-package: github.com/rna-vt/devicecommander/graph/model
+  Endpoint:
+    properties:
+      Description:
+        type: string
+      DeviceID:
+        $ref: '#/definitions/UUID'
+      ID:
+        $ref: '#/definitions/UUID'
+      Method:
+        type: string
+      Parameters:
+        items:
+          $ref: '#/definitions/Parameter'
+        type: array
+      Path:
+        type: string
+      Type:
+        type: string
+    type: object
+    x-go-package: github.com/rna-vt/devicecommander/graph/model
+  GetDevicePayload:
+    properties:
+      id:
+        example: 1
+        format: int64
+        type: integer
+        x-go-name: ID
+      jsonrpc:
+        example: "1.0"
+        type: string
+        x-go-name: Version
+      method:
+        example: getDevice
+        type: string
+        x-go-name: Method
+      params:
+        example: 705e4dcb-3ecd-24f3-3a35-3e926e4bded5
+        type: string
+        x-go-name: Params
+    type: object
+    x-go-package: github.com/rna-vt/devicecommander/src/rpc/method
+  Parameter:
+    properties:
+      Description:
+        type: string
+      EndpointID:
+        $ref: '#/definitions/UUID'
+      ID:
+        $ref: '#/definitions/UUID'
+      Name:
+        type: string
+      Type:
+        type: string
+    type: object
+    x-go-package: github.com/rna-vt/devicecommander/graph/model
+  UUID:
+    description: |-
+      A UUID is a 128 bit (16 byte) Universal Unique IDentifier as defined in RFC
+      4122.
+    items:
+      format: uint8
+      type: integer
+    type: array
+    x-go-package: github.com/google/uuid
+host: device-commander.rna-vt.com
+info:
+  description: DeviceCommander API documentation.
+  title: awesome.
+  version: 1.0.0
+paths:
+  /cluster-info:
+    get:
+      consumes:
+      - application/json
+      description: |-
+        This will only show surface details. Further information
+        can be queried via other routes.
+      operationId: clusterInfo
+      produces:
+      - application/json
+      responses:
+        "200":
+          $ref: '#/responses/someResponse'
+        "422":
+          $ref: '#/responses/validationError'
+        default:
+          $ref: '#/responses/genericError'
+      schemes:
+      - http
+      - https
+      summary: Get general data about the cluster.
+  /device:
+    post:
+      operationId: idOfDevice
+      parameters:
+      - description: This text will appear as description of your request body.
+        in: body
+        name: Body
+        schema:
+          $ref: '#/definitions/GetDevicePayload'
+      responses:
+        "200":
+          $ref: '#/responses/deviceResponse'
+      summary: Get information about a single device.
+produces:
+- application/json
+responses:
+  deviceResponse:
+    description: This text will appear as description of your response body.
+    schema:
+      $ref: '#/definitions/Device'
+schemes:
+- http
+securityDefinitions:
+  basic:
+    type: basic
+swagger: "2.0"
