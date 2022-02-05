@@ -9,7 +9,7 @@ lint-fix:
 	golangci-lint run --fix -v
 
 gqlgen:
-	~/go/bin/gqlgen generate --verbose
+	gqlgen generate --verbose
 
 mock:
 	rm -rf mocks

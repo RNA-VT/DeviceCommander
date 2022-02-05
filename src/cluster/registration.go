@@ -1,7 +1,9 @@
 package cluster
 
 import (
+	"errors"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/rna-vt/devicecommander/graph/model"
@@ -32,7 +34,14 @@ func (c DeviceCluster) DeviceDiscovery(scanDurationSeconds int) {
 			c.logger.Debug("Exit NewDevice stream watch")
 			return
 		case tmpNewDevice := <-newDevices:
-			if err := c.HandleDiscoveredDevice(tmpNewDevice); err != nil {
+			d, err := c.HandleDiscoveredDevice(tmpNewDevice)
+			if err != nil {
+				c.logger.Error(err)
+			}
+
+			err = device.NewDeviceWrapper(d).RunHealthCheck(c.DeviceClient)
+			// Immediately run health check
+			if err != nil {
 				c.logger.Error(err)
 			}
 		}
@@ -43,30 +52,48 @@ func (c DeviceCluster) DeviceDiscovery(scanDurationSeconds int) {
 // HandleDiscoveredDevice does this with some additional steps. For example:
 // 1. does the Device already exist in the DB? (MAC address is the unique identifier in this case).
 // 2. immediately check its health.
-func (c DeviceCluster) HandleDiscoveredDevice(newDevice model.NewDevice) error {
+func (c DeviceCluster) HandleDiscoveredDevice(newDevice model.NewDevice) (model.Device, error) {
 	results, err := c.DeviceRepository.Get(model.Device{
 		MAC: *newDevice.Mac,
 	})
 	if err != nil {
-		return err
+		return model.Device{}, err
 	}
 
-	if len(results) > 0 {
-		return nil
+	discoveredDevice := new(model.Device)
+	switch len(results) {
+	case 0:
+		discoveredDevice, err = c.DeviceRepository.Create(newDevice)
+		if err != nil {
+			return model.Device{}, err
+		}
+	case 1:
+		discoveredDevice := device.FromNewDevice(newDevice)
+		discoveredDevice.Active = true
+
+		if err := c.DeviceRepository.Update(updateDeviceFromDevice(&discoveredDevice)); err != nil {
+			return model.Device{}, err
+		}
+	default:
+		return model.Device{}, errors.New("multiple results returned for 1 mac address")
 	}
 
-	completeDevice, err := c.DeviceRepository.Create(newDevice)
-	if err != nil {
-		return err
+	c.logger.Debugf("registered mac address [%s] with id [%s] at [%s]:[%s]",
+		discoveredDevice.MAC,
+		discoveredDevice.ID,
+		newDevice.Host,
+		strconv.Itoa(newDevice.Port))
+
+	return *discoveredDevice, nil
+}
+
+// updateDeviceFromDevice builds a model.UpdateDevice from a model.Device.
+func updateDeviceFromDevice(d *model.Device) model.UpdateDevice {
+	var updateDevie model.UpdateDevice = model.UpdateDevice{
+		Mac:  &d.MAC,
+		Host: &d.Host,
+		Port: &d.Port,
 	}
 
-	c.logger.Debug(fmt.Sprintf("registered mac address [%s] with id [%s]", completeDevice.MAC, completeDevice.ID))
-
-	deviceWrapper := device.NewDeviceWrapper(*completeDevice)
-	err = deviceWrapper.RunHealthCheck(c.DeviceClient)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return updateDevie
 }

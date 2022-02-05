@@ -7,8 +7,19 @@ a large collection of compliant devices.
 
 ## Getting Started
 
-
-
-## Lineage
-
-DeviceCommander was originally forked from  [GoFire](https://githubcom/RNA-VT/GoFire)
+1. Build
+```
+  make build
+```
+2. Start Postgres
+```
+  docker-compose up
+``` 
+3. Run Migrations
+```
+  device-commander migrate-db
+```
+4. Start Device Commander
+```
+  device-commander server
+```

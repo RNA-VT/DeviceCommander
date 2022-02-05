@@ -29,10 +29,11 @@ func (s *DeviceGraphQLSuite) SetupSuite() {
 
 func (s *DeviceGraphQLSuite) TestCreateDevice() {
 	mutator := s.resolver.Mutation()
-
+	host := "0.0.0.0"
+	port := 0o000
 	newDevice := model.NewDevice{
-		Host: "0.0.0.0",
-		Port: 0o000,
+		Host: host,
+		Port: port,
 	}
 
 	s.mockDeviceRepository.On("Create", newDevice).Return(&model.Device{}, nil)
