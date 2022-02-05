@@ -89,11 +89,11 @@ func (c DeviceCluster) HandleDiscoveredDevice(newDevice model.NewDevice) (model.
 
 // updateDeviceFromDevice builds a model.UpdateDevice from a model.Device.
 func updateDeviceFromDevice(d *model.Device) model.UpdateDevice {
-	var updateDevie model.UpdateDevice = model.UpdateDevice{
+	var updateDevice model.UpdateDevice = model.UpdateDevice{
 		Mac:  &d.MAC,
 		Host: &d.Host,
 		Port: &d.Port,
 	}
 
-	return updateDevie
+	return updateDevice
 }
