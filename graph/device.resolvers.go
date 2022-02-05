@@ -57,6 +57,8 @@ func (r *Resolver) Mutation() generated1.MutationResolver { return &mutationReso
 // Query returns generated1.QueryResolver implementation.
 func (r *Resolver) Query() generated1.QueryResolver { return &queryResolver{r} }
 
-type deviceResolver struct{ *Resolver }
-type mutationResolver struct{ *Resolver }
-type queryResolver struct{ *Resolver }
+type (
+	deviceResolver   struct{ *Resolver }
+	mutationResolver struct{ *Resolver }
+	queryResolver    struct{ *Resolver }
+)

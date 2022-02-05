@@ -35,6 +35,13 @@ linters:
   - unparam
   - wastedassign
   - gosec
+issues:
+  exclude-rules:
+    # Exclude some linters from running on tests files.
+    - path: src/docs/*
+      linters:
+        - deadcode
+        - unused
 linters-settings:
   errcheck:
     check-type-assertions: true
