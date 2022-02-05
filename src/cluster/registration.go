@@ -34,7 +34,14 @@ func (c DeviceCluster) DeviceDiscovery(scanDurationSeconds int) {
 			c.logger.Debug("Exit NewDevice stream watch")
 			return
 		case tmpNewDevice := <-newDevices:
-			if err := c.HandleDiscoveredDevice(tmpNewDevice); err != nil {
+			d, err := c.HandleDiscoveredDevice(tmpNewDevice)
+			if err != nil {
+				c.logger.Error(err)
+			}
+
+			err = device.NewDeviceWrapper(d).RunHealthCheck(c.DeviceClient)
+			// Immediately run health check
+			if err != nil {
 				c.logger.Error(err)
 			}
 		}
@@ -45,12 +52,12 @@ func (c DeviceCluster) DeviceDiscovery(scanDurationSeconds int) {
 // HandleDiscoveredDevice does this with some additional steps. For example:
 // 1. does the Device already exist in the DB? (MAC address is the unique identifier in this case).
 // 2. immediately check its health.
-func (c DeviceCluster) HandleDiscoveredDevice(newDevice model.NewDevice) error {
+func (c DeviceCluster) HandleDiscoveredDevice(newDevice model.NewDevice) (model.Device, error) {
 	results, err := c.DeviceRepository.Get(model.Device{
 		MAC: *newDevice.Mac,
 	})
 	if err != nil {
-		return err
+		return model.Device{}, err
 	}
 
 	discoveredDevice := new(model.Device)
@@ -58,14 +65,14 @@ func (c DeviceCluster) HandleDiscoveredDevice(newDevice model.NewDevice) error {
 	case 0:
 		discoveredDevice, err = c.DeviceRepository.Create(newDevice)
 		if err != nil {
-			return err
+			return model.Device{}, err
 		}
 	case 1:
 		discoveredDevice := device.FromNewDevice(newDevice)
 		discoveredDevice.Active = true
 		err := c.DeviceRepository.Update(device.UpdateDeviceFromDevice(&discoveredDevice))
 		if err != nil {
-			return err
+			return model.Device{}, err
 		}
 	default:
 		return errors.New("multiple results returned for 1 mac address")
@@ -77,10 +84,5 @@ func (c DeviceCluster) HandleDiscoveredDevice(newDevice model.NewDevice) error {
 		newDevice.Host,
 		strconv.Itoa(newDevice.Port))
 
-	// Immediately run health check
-	if err := device.NewDeviceWrapper(*discoveredDevice).RunHealthCheck(c.DeviceClient); err != nil {
-		return err
-	}
-
-	return nil
+	return model.Device{}, nil
 }
