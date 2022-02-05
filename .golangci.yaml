@@ -37,7 +37,6 @@ linters:
   - gosec
 issues:
   exclude-rules:
-    # Exclude some linters from running on tests files.
     - path: src/docs/*
       linters:
         - deadcode

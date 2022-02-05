@@ -45,7 +45,7 @@ definitions:
     - MAC
     - Host
     - Port
-    title: Device represents a compliant physical component & its web address.
+    title: Device -- a compliant physical component.
     type: object
     x-go-package: github.com/rna-vt/devicecommander/graph/model
   Endpoint:
@@ -118,27 +118,6 @@ info:
   title: awesome.
   version: 1.0.0
 paths:
-  /cluster-info:
-    get:
-      consumes:
-      - application/json
-      description: |-
-        This will only show surface details. Further information
-        can be queried via other routes.
-      operationId: clusterInfo
-      produces:
-      - application/json
-      responses:
-        "200":
-          $ref: '#/responses/someResponse'
-        "422":
-          $ref: '#/responses/validationError'
-        default:
-          $ref: '#/responses/genericError'
-      schemes:
-      - http
-      - https
-      summary: Get general data about the cluster.
   /device:
     post:
       operationId: idOfDevice
