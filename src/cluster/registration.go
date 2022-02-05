@@ -40,7 +40,6 @@ func (c DeviceCluster) DeviceDiscovery(scanDurationSeconds int) {
 			}
 
 			err = device.NewDeviceWrapper(d).RunHealthCheck(c.DeviceClient)
-			// Immediately run health check
 			if err != nil {
 				c.logger.Error(err)
 			}
