@@ -3,7 +3,7 @@ import Wrapper from '../components/shared/PageWrapper'
 
 const Home = () => (
   <Wrapper>
-    <h1>Welcome to GoFire</h1>
+    <h1>Welcome to Device Commander</h1>
   </Wrapper>
 )
 
