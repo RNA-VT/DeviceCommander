@@ -71,12 +71,11 @@ func (c DeviceCluster) HandleDiscoveredDevice(newDevice model.NewDevice) error {
 		return errors.New("multiple results returned for 1 mac address")
 	}
 
-	c.logger.Debug(
-		fmt.Sprintf("registered mac address [%s] with id [%s] at [%s]:[%s]",
-			discoveredDevice.MAC,
-			discoveredDevice.ID,
-			newDevice.Host,
-			strconv.Itoa(newDevice.Port)))
+	c.logger.Debugf("registered mac address [%s] with id [%s] at [%s]:[%s]",
+		discoveredDevice.MAC,
+		discoveredDevice.ID,
+		newDevice.Host,
+		strconv.Itoa(newDevice.Port))
 
 	// Immediately run health check
 	if err := device.NewDeviceWrapper(*discoveredDevice).RunHealthCheck(c.DeviceClient); err != nil {
