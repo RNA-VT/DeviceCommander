@@ -7,6 +7,6 @@ type JSONRPC struct {
 	// example: 1
 	ID int `json:"id"`
 
-	// example: 1
+	// example: doMethod
 	Method string `json:"method"`
 }
