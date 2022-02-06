@@ -11,7 +11,7 @@
   "swagger": "2.0",
   "info": {
     "description": "DeviceCommander API documentation.",
-    "title": "awesome.",
+    "title": "DeviceCommander.",
     "version": "1.0.0"
   },
   "host": "device-commander.rna-vt.com",
