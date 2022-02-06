@@ -1,4 +1,4 @@
-// Package classification awesome.
+// Package classification DeviceCommander.
 //
 // DeviceCommander API documentation.
 //
