@@ -60,7 +60,6 @@ func (s *DeviceServiceSuite) TestDeviceFromNewDeviceWith() {
 
 	assert.Equal(s.T(), newDeviceResult.MAC, *testNewDevice.Mac, "the MAC address is properly assigned")
 
-
 	assert.NotNil(s.T(), newDeviceResult.Endpoints, "the Endpoints array is initialized")
 }
 
