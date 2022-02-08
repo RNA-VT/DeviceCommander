@@ -25,8 +25,8 @@ func (s *ClusterSuite) TestHandleDiscoveredDevice() {
 	s.mockDeviceClient.On("Health", mock.AnythingOfType("device.BasicDevice")).Return(nil, nil)
 	s.mockDeviceClient.On("EvaluateHealthCheckResponse", (*http.Response)(nil), mock.AnythingOfType("device.BasicDevice")).Return(true)
 	d, err := s.cluster.HandleDiscoveredDevice(newDevices[0])
-	s.Assertions.Equal(err, nil)
-	s.Assertions.Equal(newDevices[0].Host, d.Host)
-	s.Assertions.Equal(*newDevices[0].Mac, d.MAC)
-	s.Assertions.Equal(newDevices[0].Port, d.Port)
+	s.Equal(err, nil)
+	s.Equal(newDevices[0].Host, d.Host)
+	s.Equal(*newDevices[0].Mac, d.MAC)
+	s.Equal(newDevices[0].Port, d.Port)
 }

@@ -10,6 +10,7 @@ import (
 
 	"github.com/rna-vt/devicecommander/graph/model"
 	mocks "github.com/rna-vt/devicecommander/mocks/device"
+	"github.com/rna-vt/devicecommander/src/test"
 )
 
 type DeviceGraphQLSuite struct {
@@ -29,18 +30,13 @@ func (s *DeviceGraphQLSuite) SetupSuite() {
 
 func (s *DeviceGraphQLSuite) TestCreateDevice() {
 	mutator := s.resolver.Mutation()
-	host := "0.0.0.0"
-	port := 0o000
-	newDevice := model.NewDevice{
-		Host: host,
-		Port: port,
-	}
+	newDevices := test.GenerateRandomNewDevices(1)
 
-	s.mockDeviceRepository.On("Create", newDevice).Return(&model.Device{}, nil)
-	_, err := mutator.CreateDevice(s.ctx, newDevice)
+	s.mockDeviceRepository.On("Create", newDevices[0]).Return(&model.Device{}, nil)
+	_, err := mutator.CreateDevice(s.ctx, newDevices[0])
 	assert.Nil(s.T(), err)
 
-	s.mockDeviceRepository.AssertCalled(s.T(), "Create", newDevice)
+	s.mockDeviceRepository.AssertCalled(s.T(), "Create", newDevices[0])
 
 	s.mockDeviceRepository.AssertExpectations(s.T())
 }
