@@ -35,6 +35,12 @@ linters:
   - unparam
   - wastedassign
   - gosec
+issues:
+  exclude-rules:
+    - path: src/docs/*
+      linters:
+        - deadcode
+        - unused
 linters-settings:
   errcheck:
     check-type-assertions: true

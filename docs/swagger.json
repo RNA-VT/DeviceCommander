@@ -1,0 +1,198 @@
+{
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "schemes": [
+    "http"
+  ],
+  "swagger": "2.0",
+  "info": {
+    "description": "DeviceCommander API documentation.",
+    "title": "DeviceCommander.",
+    "version": "1.0.0"
+  },
+  "host": "device-commander.rna-vt.com",
+  "basePath": "/",
+  "paths": {
+    "/device": {
+      "post": {
+        "summary": "Get information about a single device.",
+        "operationId": "idOfDevice",
+        "parameters": [
+          {
+            "description": "This text will appear as description of your request body.",
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/GetDevicePayload"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/deviceResponse"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Device": {
+      "description": "ID -- the serial number of the connecting device\nName - Optional Device Nickname\nDescription - Optional text describing this device\nHost - Device Api Host\nPort - Device Api Port. Set to 443 for https",
+      "type": "object",
+      "title": "Device -- a compliant physical component.",
+      "required": [
+        "ID",
+        "MAC",
+        "Host",
+        "Port"
+      ],
+      "properties": {
+        "Active": {
+          "description": "a flag representing the responsiveness of the device.",
+          "type": "boolean"
+        },
+        "Description": {
+          "description": "the description of the device.",
+          "type": "string"
+        },
+        "Endpoints": {
+          "description": "a list of endpoints available for quering on a device.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Endpoint"
+          }
+        },
+        "Failures": {
+          "description": "the count of failed actions by the device.",
+          "type": "integer",
+          "format": "int64"
+        },
+        "Host": {
+          "description": "the host address of the device.",
+          "type": "string"
+        },
+        "ID": {
+          "$ref": "#/definitions/UUID"
+        },
+        "MAC": {
+          "description": "the MAC address for this device.",
+          "type": "string"
+        },
+        "Name": {
+          "description": "the human readable name of the device.",
+          "type": "string"
+        },
+        "Port": {
+          "description": "the active port of the device.",
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "x-go-package": "github.com/rna-vt/devicecommander/graph/model"
+    },
+    "Endpoint": {
+      "type": "object",
+      "properties": {
+        "Description": {
+          "type": "string"
+        },
+        "DeviceID": {
+          "$ref": "#/definitions/UUID"
+        },
+        "ID": {
+          "$ref": "#/definitions/UUID"
+        },
+        "Method": {
+          "type": "string"
+        },
+        "Parameters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Parameter"
+          }
+        },
+        "Path": {
+          "type": "string"
+        },
+        "Type": {
+          "type": "string"
+        }
+      },
+      "x-go-package": "github.com/rna-vt/devicecommander/graph/model"
+    },
+    "GetDevicePayload": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "ID",
+          "example": 1
+        },
+        "jsonrpc": {
+          "type": "string",
+          "x-go-name": "Version",
+          "example": "1.0"
+        },
+        "method": {
+          "type": "string",
+          "x-go-name": "Method",
+          "example": "getDevice"
+        },
+        "params": {
+          "type": "string",
+          "x-go-name": "Params",
+          "example": "705e4dcb-3ecd-24f3-3a35-3e926e4bded5"
+        }
+      },
+      "x-go-package": "github.com/rna-vt/devicecommander/src/rpc/method"
+    },
+    "Parameter": {
+      "type": "object",
+      "properties": {
+        "Description": {
+          "type": "string"
+        },
+        "EndpointID": {
+          "$ref": "#/definitions/UUID"
+        },
+        "ID": {
+          "$ref": "#/definitions/UUID"
+        },
+        "Name": {
+          "type": "string"
+        },
+        "Type": {
+          "type": "string"
+        }
+      },
+      "x-go-package": "github.com/rna-vt/devicecommander/graph/model"
+    },
+    "UUID": {
+      "description": "A UUID is a 128 bit (16 byte) Universal Unique IDentifier as defined in RFC\n4122.",
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "format": "uint8"
+      },
+      "x-go-package": "github.com/google/uuid"
+    }
+  },
+  "responses": {
+    "deviceResponse": {
+      "description": "This text will appear as description of your response body.",
+      "schema": {
+        "$ref": "#/definitions/Device"
+      }
+    }
+  },
+  "securityDefinitions": {
+    "basic": {
+      "type": "basic"
+    }
+  }
+}
