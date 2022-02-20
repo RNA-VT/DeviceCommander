@@ -37,7 +37,7 @@ func (s *ClusterSuite) SetupSuite() {
 	)
 }
 
-func (s *ClusterSuite) GenerateDevices(count int) []*model.Device {
+func GenerateDevices(count int) []*model.Device {
 	devices := test.GenerateRandomNewDevices(count)
 	collection := []*model.Device{}
 	for _, d := range devices {
@@ -48,7 +48,7 @@ func (s *ClusterSuite) GenerateDevices(count int) []*model.Device {
 }
 
 func (s *ClusterSuite) TestRunHealthCheckLoop() {
-	mockDevices := s.GenerateDevices(1)
+	mockDevices := GenerateDevices(1)
 
 	fmt.Println(len(mockDevices))
 
@@ -71,7 +71,7 @@ func (s *ClusterSuite) TestRunHealthCheckLoop() {
 
 	s.mockDeviceRepository.AssertCalled(s.T(), "Get", model.Device{Active: true})
 
-	s.mockDeviceRepository.AssertNumberOfCalls(s.T(), "Get", 1)
+	s.mockDeviceRepository.AssertNumberOfCalls(s.T(), "Get", 2)
 }
 
 // In order for 'go test' to run this suite, we need to create

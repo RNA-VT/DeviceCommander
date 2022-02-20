@@ -176,10 +176,11 @@ func (a *ArpScanner) readARP(handle *pcap.Handle, iface *net.Interface) {
 
 			a.logger.Debugf("ARP Packet received for [MAC: %v] [IP: %v]", net.HardwareAddr(arp.SourceHwAddress), net.IP(arp.SourceProtAddress))
 			tmpMacAddress := net.HardwareAddr(arp.SourceHwAddress).String()
+			ip := net.IP(arp.SourceProtAddress).String()
 
 			newDevice := model.NewDevice{
 				Mac:  &tmpMacAddress,
-				Host: net.IP(arp.SourceProtAddress).String(),
+				Host: ip,
 				Port: a.DefaultPort,
 			}
 
