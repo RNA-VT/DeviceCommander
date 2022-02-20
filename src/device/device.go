@@ -36,14 +36,6 @@ func FromNewDevice(newDeviceArgs model.NewDevice) model.Device {
 		newDevice.MAC = *newDeviceArgs.Mac
 	}
 
-	if newDeviceArgs.Name != nil {
-		newDevice.Name = *newDeviceArgs.Name
-	}
-
-	if newDeviceArgs.Description != nil {
-		newDevice.Description = *newDeviceArgs.Description
-	}
-
 	return newDevice
 }
 
