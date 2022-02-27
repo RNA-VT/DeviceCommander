@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo"
 	"github.com/labstack/gommon/log"
+
 	"github.com/rna-vt/devicecommander/graph/model"
 	"github.com/rna-vt/devicecommander/src/device"
 	"github.com/rna-vt/devicecommander/src/postgres"

@@ -2,6 +2,7 @@ package routes
 
 import (
 	"github.com/labstack/echo"
+
 	"github.com/rna-vt/devicecommander/src/rest/controllers"
 )
 

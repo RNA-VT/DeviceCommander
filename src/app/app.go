@@ -2,13 +2,12 @@ package app
 
 import (
 	"github.com/labstack/echo"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/rna-vt/devicecommander/src/cluster"
 	"github.com/rna-vt/devicecommander/src/device"
 	"github.com/rna-vt/devicecommander/src/endpoint"
-
 	"github.com/rna-vt/devicecommander/src/rest/routes"
-	log "github.com/sirupsen/logrus"
 )
 
 // The Application encapsulates the required state for the running software.
