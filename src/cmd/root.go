@@ -11,7 +11,7 @@ func init() {
 }
 
 var RootCmd = &cobra.Command{
-	Use:   "solana-tools",
+	Use:   "device-commander",
 	Short: "A tool for running and managaing a device-commander network.",
 	Long: `device-commander is the primary jumpoff point for running a network of devices.
 This tool will provide several helpful tools for managing and running a 
