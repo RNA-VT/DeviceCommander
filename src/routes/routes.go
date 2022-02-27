@@ -1,8 +1,6 @@
 package routes
 
 import (
-	"net/http"
-
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	log "github.com/sirupsen/logrus"
@@ -52,10 +50,7 @@ func (api APIService) ConfigureRoutes(listenURL string, e *echo.Echo) {
 	// Routes
 	e.Static("/static", frontendRoot+"static")
 	e.File("/*", frontendRoot+"index.html")
-	e.GET("/v1", api.defaultGet)
 
-	api.addRegistrationRoutes(e)
-	api.addInfoRoutes(e)
 	api.addGraphQLRoutes(e, api.DeviceRepository, api.EndpointRepository)
 
 	api.logger.Info("Configured routes listening on " + listenURL)
@@ -66,9 +61,4 @@ func (api APIService) ConfigureRoutes(listenURL string, e *echo.Echo) {
 
 	// Start server
 	e.Logger.Fatal(e.Start(listenURL))
-}
-
-func (api APIService) defaultGet(c echo.Context) error {
-	log.Println("Someone is touching me", api.Cluster)
-	return c.String(http.StatusOK, "Help Me! I'm trapped in the Server! You're the only one receiving this message.")
 }

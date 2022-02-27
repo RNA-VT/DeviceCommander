@@ -6,7 +6,9 @@ import (
 	"github.com/rna-vt/devicecommander/src/cluster"
 	"github.com/rna-vt/devicecommander/src/device"
 	"github.com/rna-vt/devicecommander/src/endpoint"
-	"github.com/rna-vt/devicecommander/src/routes"
+
+	"github.com/rna-vt/devicecommander/src/rest/routes"
+	log "github.com/sirupsen/logrus"
 )
 
 // The Application encapsulates the required state for the running software.
@@ -24,9 +26,22 @@ func (a *Application) SystemInfo() string {
 }
 
 func (a *Application) Start() {
-	api := routes.NewAPIService(&a.Cluster, a.DeviceRepository, a.EndpointRepository)
+	a.startListening()
+	a.startMaintainingCluster()
+}
 
+func (a *Application) startListening() {
+	routes.BaseRouter{}.RegisterRoutes(a.Echo)
+	log.Info("Configured routes listening on " + a.Hostname)
+
+	log.Println("*****************************************************")
+	log.Println("~Rejoice~ The Device Commander Lives Again! ~Rejoice~")
+	log.Println("*****************************************************")
+
+	// Start server
+	a.Echo.Logger.Fatal(a.Echo.Start(a.Hostname))
+}
+
+func (a *Application) startMaintainingCluster() {
 	a.Cluster.Start()
-
-	api.ConfigureRoutes(a.Hostname, a.Echo)
 }
