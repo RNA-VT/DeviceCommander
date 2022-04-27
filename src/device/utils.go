@@ -1,23 +1,15 @@
-package test
+package device
 
 import (
-	"math/rand"
-	"time"
+	"log"
 
 	"github.com/bxcodec/faker/v3"
-	log "github.com/sirupsen/logrus"
-
-	"github.com/rna-vt/devicecommander/graph/model"
 )
 
-func init() {
-	rand.Seed(time.Now().UnixNano())
-}
-
-func GenerateRandomNewDevices(count int) []model.NewDevice {
-	collection := make([]model.NewDevice, count)
+func GenerateRandomNewDeviceParams(count int) []NewDeviceParams {
+	collection := make([]NewDeviceParams, count)
 	for index := range collection {
-		tmpItem := model.NewDevice{}
+		tmpItem := NewDeviceParams{}
 		err := faker.FakeData(&tmpItem)
 		if err != nil {
 			log.Fatal(err)
@@ -27,10 +19,10 @@ func GenerateRandomNewDevices(count int) []model.NewDevice {
 	return collection
 }
 
-func GenerateRandomNewEndpoints(deviceID string, count int) []model.NewEndpoint {
-	collection := []model.NewEndpoint{}
+func GenerateRandomNewEndpointParams(deviceID string, count int) []NewEndpointParams {
+	collection := []NewEndpointParams{}
 	for i := 0; i < count; i++ {
-		tmpEndpoint := model.NewEndpoint{}
+		tmpEndpoint := NewEndpointParams{}
 		err := faker.FakeData(&tmpEndpoint)
 		if err != nil {
 			log.Fatal(err)
@@ -42,10 +34,10 @@ func GenerateRandomNewEndpoints(deviceID string, count int) []model.NewEndpoint 
 	return collection
 }
 
-func GenerateRandomNewParameter(count int) []model.NewParameter {
-	collection := []model.NewParameter{}
+func GenerateRandomNewParameter(count int) []NewParameterParams {
+	collection := []NewParameterParams{}
 	for i := 0; i < count; i++ {
-		tmpParam := model.NewParameter{}
+		tmpParam := NewParameterParams{}
 		err := faker.FakeData(&tmpParam)
 		if err != nil {
 			log.Fatal(err)
@@ -56,10 +48,10 @@ func GenerateRandomNewParameter(count int) []model.NewParameter {
 	return collection
 }
 
-func GenerateRandomNewParameterForEndpoint(endpointID string, count int) []model.NewParameter {
-	collection := []model.NewParameter{}
+func GenerateRandomNewParameterForEndpoint(endpointID string, count int) []NewParameterParams {
+	collection := []NewParameterParams{}
 	for i := 0; i < count; i++ {
-		tmpParam := model.NewParameter{}
+		tmpParam := NewParameterParams{}
 		err := faker.FakeData(&tmpParam)
 		if err != nil {
 			log.Fatal(err)

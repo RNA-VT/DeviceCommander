@@ -1,4 +1,4 @@
-package endpoint
+package device
 
 import (
 	"testing"
@@ -7,8 +7,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/rna-vt/devicecommander/graph/model"
-	"github.com/rna-vt/devicecommander/src/test"
 	"github.com/rna-vt/devicecommander/src/utilities"
 )
 
@@ -20,8 +18,8 @@ func (s *EndpointSuite) SetupSuite() {
 	utilities.ConfigureEnvironment()
 }
 
-func (s *EndpointSuite) CreateTestNewEndpoint() model.NewEndpoint {
-	return test.GenerateRandomNewEndpoints(uuid.New().String(), 1)[0]
+func (s *EndpointSuite) CreateTestNewEndpoint() NewEndpointParams {
+	return GenerateRandomNewEndpointParams(uuid.New().String(), 1)[0]
 }
 
 func (s *EndpointSuite) TestNewEndpoint() {
@@ -34,6 +32,18 @@ func (s *EndpointSuite) TestNewEndpoint() {
 	assert.NotNil(s.T(), testEndpoint.ID, "the endpoint ID should be initialized")
 
 	assert.Equal(s.T(), testNewEndpoint.Description, testEndpoint.Description, "the description should carry through to the NewEndpoint")
+}
+
+func (s *EndpointSuite) TestGenerateRandomNewEndpoints() {
+	testLength := 3
+	tmpDeviceID := uuid.New().String()
+	testNewEndpoints := GenerateRandomNewEndpointParams(tmpDeviceID, testLength)
+
+	s.Equal(len(testNewEndpoints), testLength, "there should be the correct number of endpoints")
+
+	testNewEndpoint := testNewEndpoints[0]
+
+	s.Equal(testNewEndpoint.DeviceID, tmpDeviceID, "the NewEndpoint should have the correct DeviceID")
 }
 
 // In order for 'go test' to run this suite, we need to create

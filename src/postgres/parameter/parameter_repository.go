@@ -8,8 +8,7 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 
-	"github.com/rna-vt/devicecommander/graph/model"
-	"github.com/rna-vt/devicecommander/src/parameter"
+	"github.com/rna-vt/devicecommander/src/device"
 	"github.com/rna-vt/devicecommander/src/postgres"
 )
 
@@ -49,8 +48,8 @@ func (r Repository) Initialize() (Repository, error) {
 }
 
 // Create on the ParameterRepository creates a new row in the Parameter table in the postgres database.
-func (r Repository) Create(newParameterArgs model.NewParameter) (*model.Parameter, error) {
-	newParameter, err := parameter.FromNewParameter(newParameterArgs)
+func (r Repository) Create(newParameterArgs device.NewParameterParams) (*device.Parameter, error) {
+	newParameter, err := device.FromNewParameter(newParameterArgs)
 	if err != nil {
 		return &newParameter, err
 	}
@@ -65,13 +64,13 @@ func (r Repository) Create(newParameterArgs model.NewParameter) (*model.Paramete
 }
 
 // Update on the ParameterRepository updates a new single row in the Parameter table according to the specified UpdateParameter.ID.
-func (r Repository) Update(input model.UpdateParameter) error {
+func (r Repository) Update(input device.UpdateParameterParams) error {
 	parameterID, err := uuid.Parse(input.ID)
 	if err != nil {
 		return err
 	}
 
-	end := model.Parameter{ID: parameterID}
+	end := device.Parameter{ID: parameterID}
 
 	result := r.DBConnection.Session(&gorm.Session{FullSaveAssociations: true}).Model(end).Updates(input)
 	if result.Error != nil {
@@ -83,8 +82,8 @@ func (r Repository) Update(input model.UpdateParameter) error {
 }
 
 // Delete on the ParameterRepository removes a single row from the Parameter table by the specific ID.
-func (r Repository) Delete(id string) (*model.Parameter, error) {
-	var toBeDeleted model.Parameter
+func (r Repository) Delete(id string) (*device.Parameter, error) {
+	var toBeDeleted device.Parameter
 
 	parameterID, err := uuid.Parse(id)
 	if err != nil {
@@ -104,7 +103,7 @@ func (r Repository) Delete(id string) (*model.Parameter, error) {
 	toBeDeleted = *results[0]
 
 	// TODO: Implement soft deletes
-	r.DBConnection.Delete(model.Parameter{}, toBeDeleted)
+	r.DBConnection.Delete(device.Parameter{}, toBeDeleted)
 
 	r.logger.Trace("Deleted Parameter " + id)
 	return &toBeDeleted, nil
@@ -112,8 +111,8 @@ func (r Repository) Delete(id string) (*model.Parameter, error) {
 
 // Get on the ParameterRepository will retrieve all of the rows that match the query. The
 // associated object (endpoint) will be preloaded for convenience.
-func (r Repository) Get(query model.Parameter) ([]*model.Parameter, error) {
-	Parameters := []*model.Parameter{}
+func (r Repository) Get(query device.Parameter) ([]*device.Parameter, error) {
+	Parameters := []*device.Parameter{}
 	result := r.DBConnection.Preload(clause.Associations).Where(query).Find(&Parameters)
 	if result.Error != nil {
 		return Parameters, result.Error
@@ -124,8 +123,8 @@ func (r Repository) Get(query model.Parameter) ([]*model.Parameter, error) {
 
 // GetAll on the ParameterRepository will retrieve all of the rows in the Parameter table. The
 // associated objects (endpoints) will be preloaded for convenience.
-func (r Repository) GetAll() ([]*model.Parameter, error) {
-	Parameters := []*model.Parameter{}
+func (r Repository) GetAll() ([]*device.Parameter, error) {
+	Parameters := []*device.Parameter{}
 	result := r.DBConnection.Find(&Parameters)
 	if result.Error != nil {
 		return Parameters, result.Error

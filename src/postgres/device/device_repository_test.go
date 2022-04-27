@@ -9,16 +9,14 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/rna-vt/devicecommander/graph/model"
 	"github.com/rna-vt/devicecommander/src/device"
 	"github.com/rna-vt/devicecommander/src/postgres"
-	"github.com/rna-vt/devicecommander/src/test"
 	"github.com/rna-vt/devicecommander/src/utilities"
 )
 
 type PostgresDeviceRepositorySuite struct {
 	suite.Suite
-	testDevices []model.Device
+	testDevices []device.Device
 	repository  device.Repository
 }
 
@@ -31,15 +29,15 @@ func (s *PostgresDeviceRepositorySuite) SetupSuite() {
 
 	s.repository = deviceRepository
 
-	dev, err := s.repository.Create(test.GenerateRandomNewDevices(1)[0])
+	dev, err := s.repository.Create(device.GenerateRandomNewDeviceParams(1)[0])
 	assert.Nil(s.T(), err)
 
 	// add device to test list for deletion after
 	s.testDevices = append(s.testDevices, *dev)
 }
 
-func (s *PostgresDeviceRepositorySuite) CreateTestDevice() model.Device {
-	testDevices := test.GenerateRandomNewDevices(1)
+func (s *PostgresDeviceRepositorySuite) CreateTestDevice() device.Device {
+	testDevices := device.GenerateRandomNewDeviceParams(1)
 	testDevice := testDevices[0]
 
 	newDevice, err := s.repository.Create(testDevice)
@@ -50,18 +48,10 @@ func (s *PostgresDeviceRepositorySuite) CreateTestDevice() model.Device {
 	return *newDevice
 }
 
-func (s *PostgresDeviceRepositorySuite) TestDeviceRepositoryImplementsCRUDInterface() {
-	// val := MyType("hello")
-	// testDevice := s.CreateTestDevice()
-	// _, ok := interface{}(testDevice).(DeviceCRUDRepository)
-
-	// assert.Equal(s.T(), true, ok, "the device repository must implement the DeviceCRUDRepository interface")
-}
-
 func (s *PostgresDeviceRepositorySuite) TestGet() {
 	testDevice := s.CreateTestDevice()
 
-	results, err := s.repository.Get(model.Device{
+	results, err := s.repository.Get(device.Device{
 		ID: testDevice.ID,
 	})
 	assert.Nil(s.T(), err)
@@ -81,7 +71,7 @@ func (s *PostgresDeviceRepositorySuite) TestDelete() {
 
 	assert.Equal(s.T(), deleteResult.ID, testDevice.ID, "the return from a delete should contain the deleted object")
 
-	getResults, err := s.repository.Get(model.Device{
+	getResults, err := s.repository.Get(device.Device{
 		ID: testDevice.ID,
 	})
 	assert.Nil(s.T(), err)
@@ -93,13 +83,13 @@ func (s *PostgresDeviceRepositorySuite) TestUpdate() {
 	testDevice := s.CreateTestDevice()
 
 	tmpMAC := faker.MacAddress()
-	err := s.repository.Update(model.UpdateDevice{
+	err := s.repository.Update(device.UpdateDeviceParams{
 		ID:  testDevice.ID.String(),
 		Mac: &tmpMAC,
 	})
 	assert.Nil(s.T(), err)
 
-	getResults, err := s.repository.Get(model.Device{
+	getResults, err := s.repository.Get(device.Device{
 		ID: testDevice.ID,
 	})
 	assert.Nil(s.T(), err)
@@ -110,7 +100,7 @@ func (s *PostgresDeviceRepositorySuite) TestUpdate() {
 func (s *PostgresDeviceRepositorySuite) TestUpdateNonExistent() {
 	tmpMAC := faker.MacAddress()
 	tmpUUID := uuid.New()
-	err := s.repository.Update(model.UpdateDevice{
+	err := s.repository.Update(device.UpdateDeviceParams{
 		ID:  tmpUUID.String(),
 		Mac: &tmpMAC,
 	})
@@ -126,7 +116,7 @@ func (s *PostgresDeviceRepositorySuite) AfterTest(_, _ string) {
 		}
 	}
 
-	s.testDevices = []model.Device{}
+	s.testDevices = []device.Device{}
 
 	// require.NoError(s.T(), s.mock.ExpectationsWereMet())
 }

@@ -6,7 +6,6 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 
-	"github.com/rna-vt/devicecommander/graph/model"
 	"github.com/rna-vt/devicecommander/src/device"
 	"github.com/rna-vt/devicecommander/src/postgres"
 )
@@ -47,7 +46,7 @@ func (r Repository) Initialize() (Repository, error) {
 
 // Create on the DeviceRepository creates a new row in the Device table.
 // Due to the nested nature of Parameters.
-func (r Repository) Create(newDeviceArgs model.NewDevice) (*model.Device, error) {
+func (r Repository) Create(newDeviceArgs device.NewDeviceParams) (*device.Device, error) {
 	newDevice := device.FromNewDevice(newDeviceArgs)
 	result := r.DBConnection.Create(&newDevice)
 	if result.Error != nil {
@@ -60,12 +59,12 @@ func (r Repository) Create(newDeviceArgs model.NewDevice) (*model.Device, error)
 
 // Update on the DeviceRepository updates a single Device based off the ID of the UpdateDevice argument.
 // It will return an error if no device is updated.
-func (r Repository) Update(input model.UpdateDevice) error {
+func (r Repository) Update(input device.UpdateDeviceParams) error {
 	id, err := uuid.Parse(input.ID)
 	if err != nil {
 		return err
 	}
-	device := model.Device{ID: id}
+	device := device.Device{ID: id}
 	result := r.DBConnection.Model(device).Updates(input)
 	if result.Error != nil {
 		return result.Error
@@ -79,13 +78,13 @@ func (r Repository) Update(input model.UpdateDevice) error {
 	return nil
 }
 
-func (r Repository) Delete(id string) (*model.Device, error) {
+func (r Repository) Delete(id string) (*device.Device, error) {
 	uid, err := uuid.Parse(id)
 	if err != nil {
-		return &model.Device{}, err
+		return &device.Device{}, err
 	}
 
-	toBeDeleted := model.Device{
+	toBeDeleted := device.Device{
 		ID: uid,
 	}
 
@@ -99,24 +98,24 @@ func (r Repository) Delete(id string) (*model.Device, error) {
 	}
 
 	for _, e := range results[0].Endpoints {
-		r.DBConnection.Delete(model.Parameter{}, model.Parameter{
+		r.DBConnection.Delete(device.Parameter{}, device.Parameter{
 			EndpointID: e.ID,
 		})
 	}
 
-	r.DBConnection.Delete(model.Endpoint{}, model.Endpoint{
+	r.DBConnection.Delete(device.Endpoint{}, device.Endpoint{
 		DeviceID: uid,
 	})
 
 	// TODO: Implement soft deletes
-	r.DBConnection.Select("Endpoints").Delete(model.Device{}, toBeDeleted)
+	r.DBConnection.Select("Endpoints").Delete(device.Device{}, toBeDeleted)
 
 	r.logger.Trace("Deleted device " + id)
 	return &toBeDeleted, nil
 }
 
-func (r Repository) Get(devQuery model.Device) ([]*model.Device, error) {
-	devices := []*model.Device{}
+func (r Repository) Get(devQuery device.Device) ([]*device.Device, error) {
+	devices := []*device.Device{}
 	result := r.DBConnection.Preload(clause.Associations).Where(devQuery).Find(&devices)
 	if result.Error != nil {
 		return devices, result.Error
@@ -125,8 +124,8 @@ func (r Repository) Get(devQuery model.Device) ([]*model.Device, error) {
 	return devices, nil
 }
 
-func (r Repository) GetAll() ([]*model.Device, error) {
-	devices := []*model.Device{}
+func (r Repository) GetAll() ([]*device.Device, error) {
+	devices := []*device.Device{}
 	result := r.DBConnection.Preload(clause.Associations).Find(&devices)
 	if result.Error != nil {
 		return devices, result.Error

@@ -1,23 +1,25 @@
-package parameter
+package device
 
 import (
 	"github.com/google/uuid"
-
-	"github.com/rna-vt/devicecommander/graph/model"
 )
 
 type Parameter struct {
-	model.Parameter
+	ID          uuid.UUID `json:"ID" faker:"uuid_hyphenated"`
+	EndpointID  uuid.UUID `json:"EndpointID" faker:"uuid_hyphenated"`
+	Name        string    `json:"Name"`
+	Description *string   `json:"Description"`
+	Type        string    `json:"Type" faker:"oneof: string, int, bool"`
 }
 
 // FromNewParameter generates a Parameter{} from a NewParameter with the correctly
 // instantiated fields. This should be the primary way in which a Parameter is generated.
-func FromNewParameter(input model.NewParameter) (model.Parameter, error) {
+func FromNewParameter(input NewParameterParams) (Parameter, error) {
 	endpointID, err := uuid.Parse(input.EndpointID)
 	if err != nil {
-		return model.Parameter{}, err
+		return Parameter{}, err
 	}
-	param := model.Parameter{
+	param := Parameter{
 		ID:         uuid.New(),
 		EndpointID: endpointID,
 		Name:       input.Name,

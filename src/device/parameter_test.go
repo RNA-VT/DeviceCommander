@@ -1,4 +1,4 @@
-package parameter
+package device
 
 import (
 	"testing"
@@ -7,7 +7,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/rna-vt/devicecommander/src/test"
 	"github.com/rna-vt/devicecommander/src/utilities"
 )
 
@@ -21,7 +20,7 @@ func (s *ParameterSuite) SetupSuite() {
 
 func (s *ParameterSuite) TestNewParameter() {
 	tmpUUID := uuid.New()
-	testNewParameter := test.GenerateRandomNewParameterForEndpoint(tmpUUID.String(), 1)[0]
+	testNewParameter := GenerateRandomNewParameterForEndpoint(tmpUUID.String(), 1)[0]
 	newParameter, err := FromNewParameter(testNewParameter)
 
 	assert.Nil(s.T(), err, "creating a new parameter from a NewParameter should not throw an error")
@@ -33,11 +32,34 @@ func (s *ParameterSuite) TestNewParameter() {
 
 func (s *ParameterSuite) TestNewParameterInvalid() {
 	tmpUUID := uuid.New()
-	testNewParameter := test.GenerateRandomNewParameterForEndpoint(tmpUUID.String(), 1)[0]
+	testNewParameter := GenerateRandomNewParameterForEndpoint(tmpUUID.String(), 1)[0]
 	testNewParameter.EndpointID = ""
 
 	_, err := FromNewParameter(testNewParameter)
 	assert.NotNil(s.T(), err, "creating a new Parameter with a NewParameter with an invalid EndpointID should throw an error")
+}
+
+func (s *ParameterSuite) GenerateRandomNewParameter() {
+	testLength := 3
+	testNewParameters := GenerateRandomNewParameter(testLength)
+
+	s.Equal(len(testNewParameters), testLength, "there should be the correct number of parameters")
+
+	testNewParameter := testNewParameters[0]
+
+	s.Nil(testNewParameter.EndpointID, "the NewParameter's EndpointID should not be initialized")
+}
+
+func (s *ParameterSuite) GenerateRandomNewParameterForEndpoint() {
+	testLength := 3
+	tmpEndpointID := uuid.New().String()
+	testNewParameters := GenerateRandomNewParameterForEndpoint(tmpEndpointID, testLength)
+
+	s.Equal(len(testNewParameters), testLength, "there should be the correct number of parameters")
+
+	testNewParameter := testNewParameters[0]
+
+	s.Equal(testNewParameter.EndpointID, tmpEndpointID, "the NewParameter should have the correct EndpointID")
 }
 
 // In order for 'go test' to run this suite, we need to create

@@ -7,7 +7,6 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 
-	"github.com/rna-vt/devicecommander/graph/model"
 	"github.com/rna-vt/devicecommander/src/device"
 )
 
@@ -19,7 +18,7 @@ type Cluster interface {
 	RunHealthCheckLoop(int)
 	StopHealth()
 	StopDiscovery()
-	HandleDiscoveredDevice(model.NewDevice) (model.Device, error)
+	HandleDiscoveredDevice(device.NewDeviceParams) (device.Device, error)
 }
 
 // Cluster is responsible for maintaining the cluster like state of DeviceCommander.
@@ -112,7 +111,7 @@ func (c DeviceCluster) RunHealthCheckLoop(healthCheckPeriod int) {
 			c.logger.Info("Ticker stopped by healthStop chan")
 			return
 		default:
-			devices, err := c.DeviceRepository.Get(model.Device{
+			devices, err := c.DeviceRepository.Get(device.Device{
 				Active: true,
 			})
 
@@ -123,18 +122,18 @@ func (c DeviceCluster) RunHealthCheckLoop(healthCheckPeriod int) {
 				return
 			}
 
-			for _, d := range devices {
-				dev := device.NewDeviceWrapper(*d)
+			for _, dev := range devices {
+				// dev := device.NewDeviceWrapper(*d)
 
-				resp, err := c.DeviceClient.Health(dev)
+				resp, err := c.DeviceClient.Health(*dev)
 				if err != nil {
-					c.logger.Warn(fmt.Sprintf("error checking health for device [%s] %s", d.ID.String(), err))
+					c.logger.Warn(fmt.Sprintf("error checking health for device [%s] %s", dev.ID.String(), err))
 				} else {
-					result := c.DeviceClient.EvaluateHealthCheckResponse(resp, dev)
+					result := c.DeviceClient.EvaluateHealthCheckResponse(resp, *dev)
 					if result {
-						c.logger.Trace(fmt.Sprintf("device [%s] is healthy", d.ID.String()))
+						c.logger.Trace(fmt.Sprintf("device [%s] is healthy", dev.ID.String()))
 					} else {
-						c.logger.Trace(fmt.Sprintf("device [%s] is not healthy", d.ID.String()))
+						c.logger.Trace(fmt.Sprintf("device [%s] is not healthy", dev.ID.String()))
 					}
 				}
 			}

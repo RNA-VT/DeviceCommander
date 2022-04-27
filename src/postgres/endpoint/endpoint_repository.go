@@ -6,8 +6,7 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 
-	"github.com/rna-vt/devicecommander/graph/model"
-	"github.com/rna-vt/devicecommander/src/endpoint"
+	"github.com/rna-vt/devicecommander/src/device"
 	"github.com/rna-vt/devicecommander/src/postgres"
 )
 
@@ -47,8 +46,8 @@ func (r Repository) Initialize() (Repository, error) {
 	return r, nil
 }
 
-func (r Repository) Create(newDeviceArgs model.NewEndpoint) (*model.Endpoint, error) {
-	newEndpoint, err := endpoint.FromNewEndpoint(newDeviceArgs)
+func (r Repository) Create(newDeviceArgs device.NewEndpointParams) (*device.Endpoint, error) {
+	newEndpoint, err := device.FromNewEndpoint(newDeviceArgs)
 	if err != nil {
 		return &newEndpoint, err
 	}
@@ -62,13 +61,13 @@ func (r Repository) Create(newDeviceArgs model.NewEndpoint) (*model.Endpoint, er
 	return &newEndpoint, nil
 }
 
-func (r Repository) Update(input model.UpdateEndpoint) error {
+func (r Repository) Update(input device.UpdateEndpointParams) error {
 	id, err := uuid.Parse(input.ID)
 	if err != nil {
 		return err
 	}
 
-	end := model.Endpoint{ID: id}
+	end := device.Endpoint{ID: id}
 
 	result := r.DBConnection.Model(end).Updates(input)
 	if result.Error != nil {
@@ -85,19 +84,19 @@ func (r Repository) Update(input model.UpdateEndpoint) error {
 
 // Delete on the EndpointRepository removes a single row from the Endpoint table by the
 // specific ID AND all of the Parameters associated with the EndpointID.
-func (r Repository) Delete(id string) (*model.Endpoint, error) {
-	var toBeDeleted model.Endpoint
+func (r Repository) Delete(id string) (*device.Endpoint, error) {
+	var toBeDeleted device.Endpoint
 	endUUID, err := uuid.Parse(id)
 	if err != nil {
 		return &toBeDeleted, err
 	}
 	toBeDeleted.ID = endUUID
 
-	r.DBConnection.Delete(model.Parameter{}, model.Parameter{
+	r.DBConnection.Delete(device.Parameter{}, device.Parameter{
 		EndpointID: endUUID,
 	})
 
-	r.DBConnection.Delete(model.Endpoint{}, toBeDeleted)
+	r.DBConnection.Delete(device.Endpoint{}, toBeDeleted)
 
 	r.logger.Debug("Deleted endpoint " + id)
 	return &toBeDeleted, nil
@@ -105,8 +104,8 @@ func (r Repository) Delete(id string) (*model.Endpoint, error) {
 
 // Get on the EndpointRepository will retrieve all of the rows that match the query. The
 // associated objects (parameters) will be preloaded for convenience.
-func (r Repository) Get(query model.Endpoint) ([]*model.Endpoint, error) {
-	endpoints := []*model.Endpoint{}
+func (r Repository) Get(query device.Endpoint) ([]*device.Endpoint, error) {
+	endpoints := []*device.Endpoint{}
 	result := r.DBConnection.Preload(clause.Associations).Where(query).Find(&endpoints)
 	if result.Error != nil {
 		return endpoints, result.Error
@@ -115,8 +114,8 @@ func (r Repository) Get(query model.Endpoint) ([]*model.Endpoint, error) {
 	return endpoints, nil
 }
 
-func (r Repository) GetAll() ([]*model.Endpoint, error) {
-	endpoints := []*model.Endpoint{}
+func (r Repository) GetAll() ([]*device.Endpoint, error) {
+	endpoints := []*device.Endpoint{}
 	result := r.DBConnection.Preload(clause.Associations).Find(&endpoints)
 	if result.Error != nil {
 		return endpoints, result.Error

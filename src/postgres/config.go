@@ -3,11 +3,10 @@ package postgres
 import (
 	"fmt"
 
+	"github.com/rna-vt/devicecommander/src/device"
 	"github.com/spf13/viper"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-
-	"github.com/rna-vt/devicecommander/graph/model"
 )
 
 // DBConfig encapsulates the information required for connecting to a database.
@@ -51,7 +50,7 @@ func GetDBConnection(config DBConfig) (*gorm.DB, error) {
 
 // RunMigration makes sure each of the important models are fully migrated.
 func RunMigration(db *gorm.DB) error {
-	if err := db.AutoMigrate(&model.Device{}, &model.Endpoint{}, &model.Parameter{}); err != nil {
+	if err := db.AutoMigrate(&device.Device{}, &device.Endpoint{}, &device.Parameter{}); err != nil {
 		return err
 	}
 

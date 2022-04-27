@@ -11,10 +11,8 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/rna-vt/devicecommander/graph/model"
 	mockdevice "github.com/rna-vt/devicecommander/mocks/device"
 	"github.com/rna-vt/devicecommander/src/device"
-	"github.com/rna-vt/devicecommander/src/test"
 	"github.com/rna-vt/devicecommander/src/utilities"
 )
 
@@ -37,9 +35,9 @@ func (s *ClusterSuite) SetupSuite() {
 	)
 }
 
-func GenerateDevices(count int) []*model.Device {
-	devices := test.GenerateRandomNewDevices(count)
-	collection := []*model.Device{}
+func GenerateDevices(count int) []*device.Device {
+	devices := device.GenerateRandomNewDeviceParams(count)
+	collection := []*device.Device{}
 	for _, d := range devices {
 		tmpDev := device.FromNewDevice(d)
 		collection = append(collection, &tmpDev)
@@ -52,16 +50,16 @@ func (s *ClusterSuite) TestRunHealthCheckLoop() {
 
 	fmt.Println(len(mockDevices))
 
-	s.mockDeviceRepository.On("Get", mock.AnythingOfType("model.Device")).Return(mockDevices, nil)
+	s.mockDeviceRepository.On("Get", mock.AnythingOfType("device.Device")).Return(mockDevices, nil)
 
 	tmpResponse := http.Response{
 		Status: "200",
 		Body:   io.NopCloser(strings.NewReader("healthy")),
 	}
 
-	s.mockDeviceClient.On("Health", mock.AnythingOfType("device.BasicDevice")).Return(&tmpResponse, nil)
+	s.mockDeviceClient.On("Health", mock.AnythingOfType("device.Device")).Return(&tmpResponse, nil)
 
-	s.mockDeviceClient.On("EvaluateHealthCheckResponse", mock.AnythingOfType("*http.Response"), mock.AnythingOfType("device.BasicDevice")).Return(true)
+	s.mockDeviceClient.On("EvaluateHealthCheckResponse", mock.AnythingOfType("*http.Response"), mock.AnythingOfType("device.Device")).Return(true)
 
 	go s.cluster.RunHealthCheckLoop(1)
 
@@ -69,7 +67,7 @@ func (s *ClusterSuite) TestRunHealthCheckLoop() {
 
 	s.cluster.StopHealth()
 
-	s.mockDeviceRepository.AssertCalled(s.T(), "Get", model.Device{Active: true})
+	s.mockDeviceRepository.AssertCalled(s.T(), "Get", device.Device{Active: true})
 
 	s.mockDeviceRepository.AssertNumberOfCalls(s.T(), "Get", 2)
 }

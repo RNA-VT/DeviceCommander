@@ -1,7 +1,7 @@
 package docs
 
 import (
-	"github.com/rna-vt/devicecommander/graph/model"
+	"github.com/rna-vt/devicecommander/src/device"
 	"github.com/rna-vt/devicecommander/src/rpc/method"
 )
 
@@ -14,7 +14,7 @@ import (
 // swagger:response deviceResponse
 type deviceResponseWrapper struct {
 	// in:body
-	Body model.Device
+	Body device.Device
 }
 
 // swagger:parameters idOfDevice

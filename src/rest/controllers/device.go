@@ -5,9 +5,8 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo"
-	"github.com/labstack/gommon/log"
+	log "github.com/sirupsen/logrus"
 
-	"github.com/rna-vt/devicecommander/graph/model"
 	"github.com/rna-vt/devicecommander/src/device"
 	"github.com/rna-vt/devicecommander/src/postgres"
 	postgresDevice "github.com/rna-vt/devicecommander/src/postgres/device"
@@ -31,7 +30,7 @@ func NewDeviceController() (DeviceController, error) {
 }
 
 func (controller DeviceController) Create(c echo.Context) error {
-	dev, err := device.BasicDevice{}.NewDeviceFromRequestBody(c.Request().Body)
+	dev, err := device.NewDeviceFromRequestBody(c.Request().Body)
 	if err != nil {
 		return err
 	}
@@ -59,11 +58,34 @@ func (controller DeviceController) GetDevice(c echo.Context) error {
 		return err
 	}
 
-	tmpDev := model.Device{ID: id}
+	tmpDev := device.Device{ID: id}
 	device, err := controller.Repository.Get(tmpDev)
 	if err != nil {
 		return err
 	}
 
 	return c.JSON(http.StatusOK, &device)
+}
+
+func (controller DeviceController) Update(c echo.Context) error {
+	updateParams := new(device.UpdateDeviceParams)
+	if err := c.Bind(updateParams); err != nil {
+		return err
+	}
+
+	err := controller.Repository.Update(*updateParams)
+	if err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, true)
+}
+
+func (controller DeviceController) Delete(c echo.Context) error {
+	log.Info("DEVICE_ID", c.Param("deviceID"))
+	toDelete, err := controller.Repository.Delete(c.Param("deviceID"))
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusOK, &toDelete)
 }

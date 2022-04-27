@@ -7,24 +7,22 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/rna-vt/devicecommander/graph/model"
-	"github.com/rna-vt/devicecommander/src/endpoint"
-	"github.com/rna-vt/devicecommander/src/parameter"
+	"github.com/rna-vt/devicecommander/src/device"
 	"github.com/rna-vt/devicecommander/src/postgres"
 	postgresDevice "github.com/rna-vt/devicecommander/src/postgres/device"
+	"github.com/rna-vt/devicecommander/src/postgres/endpoint"
 	postgresEndpoint "github.com/rna-vt/devicecommander/src/postgres/endpoint"
-	"github.com/rna-vt/devicecommander/src/test"
 	"github.com/rna-vt/devicecommander/src/utilities"
 )
 
 type PostgresParameterRepositorySuite struct {
 	suite.Suite
-	testDevices         []model.Device
-	testEndpoints       []model.Endpoint
-	testParameters      []model.Parameter
+	testDevices         []device.Device
+	testEndpoints       []device.Endpoint
+	testParameters      []device.Parameter
 	deviceRepository    postgresDevice.Repository
 	endpointRepository  endpoint.Repository
-	parameterRepository parameter.Repository
+	parameterRepository device.ParameterRepository
 }
 
 func (s *PostgresParameterRepositorySuite) SetupSuite() {
@@ -44,11 +42,11 @@ func (s *PostgresParameterRepositorySuite) SetupSuite() {
 	s.endpointRepository = endpointRepository
 	s.parameterRepository = parameterRepository
 
-	newDevices := test.GenerateRandomNewDevices(1)
+	newDevices := device.GenerateRandomNewDeviceParams(1)
 	dev, err := s.deviceRepository.Create(newDevices[0])
 	assert.Nil(s.T(), err)
 
-	testEndpoint := test.GenerateRandomNewEndpoints(dev.ID.String(), 1)
+	testEndpoint := device.GenerateRandomNewEndpointParams(dev.ID.String(), 1)
 
 	end, err := s.endpointRepository.Create(testEndpoint[0])
 	assert.Nil(s.T(), err)
@@ -57,9 +55,9 @@ func (s *PostgresParameterRepositorySuite) SetupSuite() {
 	s.testEndpoints = append(s.testEndpoints, *end)
 }
 
-func (s *PostgresParameterRepositorySuite) CreateTestParameter() model.Parameter {
+func (s *PostgresParameterRepositorySuite) CreateTestParameter() device.Parameter {
 	currentTestEndpoint := s.testEndpoints[0]
-	testParameters := test.GenerateRandomNewParameterForEndpoint(currentTestEndpoint.ID.String(), 1)
+	testParameters := device.GenerateRandomNewParameterForEndpoint(currentTestEndpoint.ID.String(), 1)
 
 	param, err := s.parameterRepository.Create(testParameters[0])
 	assert.Nil(s.T(), err, "creating a test parameter should not throw an error")
@@ -72,7 +70,7 @@ func (s *PostgresParameterRepositorySuite) CreateTestParameter() model.Parameter
 func (s *PostgresParameterRepositorySuite) TestGet() {
 	testParameter := s.CreateTestParameter()
 
-	results, err := s.parameterRepository.Get(model.Parameter{
+	results, err := s.parameterRepository.Get(device.Parameter{
 		ID: testParameter.ID,
 	})
 	assert.Nil(s.T(), err)
@@ -90,7 +88,7 @@ func (s *PostgresParameterRepositorySuite) TestDelete() {
 
 	assert.Equal(s.T(), deleteResult.ID, testParameter.ID, "the return from a delete should contain the deleted object")
 
-	getResults, err := s.parameterRepository.Get(model.Parameter{
+	getResults, err := s.parameterRepository.Get(device.Parameter{
 		ID: testParameter.ID,
 	})
 	assert.Nil(s.T(), err)
@@ -102,13 +100,13 @@ func (s *PostgresParameterRepositorySuite) TestUpdate() {
 	testParameter := s.CreateTestParameter()
 
 	tmpDesc := "Radom test update"
-	err := s.parameterRepository.Update(model.UpdateParameter{
+	err := s.parameterRepository.Update(device.UpdateParameterParams{
 		ID:          testParameter.ID.String(),
 		Description: &tmpDesc,
 	})
 	assert.Nil(s.T(), err)
 
-	getResults, err := s.parameterRepository.Get(model.Parameter{
+	getResults, err := s.parameterRepository.Get(device.Parameter{
 		ID: testParameter.ID,
 	})
 	assert.Nil(s.T(), err)

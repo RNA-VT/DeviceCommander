@@ -10,13 +10,12 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"github.com/rna-vt/devicecommander/graph/model"
 	"github.com/rna-vt/devicecommander/src/device"
 )
 
 type DeviceResponse struct {
 	Success bool
-	Device  model.NewDevice
+	Device  device.NewDeviceParams
 }
 
 type IPScanResults struct {
@@ -59,9 +58,9 @@ func GetLocalAddresses() (IPScanResults, error) {
 	return results, nil
 }
 
-func ScanIPs(ipSet []net.IP, timeoutSeconds int) ([]model.NewDevice, error) {
+func ScanIPs(ipSet []net.IP, timeoutSeconds int) ([]device.NewDeviceParams, error) {
 	logger := getScannerLogger()
-	deviceList := []model.NewDevice{}
+	deviceList := []device.NewDeviceParams{}
 
 	logger.Info("Scan IPs: ", ipSet)
 
@@ -95,7 +94,7 @@ func ProbeHostConcurrent(host string, ch chan<- DeviceResponse, timeoutSeconds i
 	}
 }
 
-func ProbeHost(host string, timeoutSeconds int) (model.NewDevice, error) {
+func ProbeHost(host string, timeoutSeconds int) (device.NewDeviceParams, error) {
 	logger := getScannerLogger()
 	url := "http://" + host + "/registration"
 	logger.Trace("Probing ", host)
@@ -105,7 +104,7 @@ func ProbeHost(host string, timeoutSeconds int) (model.NewDevice, error) {
 	}
 	resp, err := client.Get(url)
 	if err != nil {
-		return model.NewDevice{}, err
+		return device.NewDeviceParams{}, err
 	}
 
 	switch resp.StatusCode {
@@ -113,7 +112,7 @@ func ProbeHost(host string, timeoutSeconds int) (model.NewDevice, error) {
 		successLogger := logger.WithFields(log.Fields{
 			"event": "success",
 		})
-		dev, err := device.BasicDevice{}.NewDeviceFromRequestBody(resp.Body)
+		dev, err := device.NewDeviceFromRequestBody(resp.Body)
 		if err != nil {
 			return dev, err
 		}
@@ -123,9 +122,9 @@ func ProbeHost(host string, timeoutSeconds int) (model.NewDevice, error) {
 		return dev, nil
 	case http.StatusNotFound:
 		logger.Debug("Host Not Found: " + host)
-		return model.NewDevice{}, errors.New("host not found " + host)
+		return device.NewDeviceParams{}, errors.New("host not found " + host)
 	default:
 		logger.Debug("Attempt to register " + host + " resulted in an unexpected response:" + strconv.Itoa(resp.StatusCode))
-		return model.NewDevice{}, fmt.Errorf("attempt to register %s resulted in an unexpected response: %d", host, resp.StatusCode)
+		return device.NewDeviceParams{}, fmt.Errorf("attempt to register %s resulted in an unexpected response: %d", host, resp.StatusCode)
 	}
 }
