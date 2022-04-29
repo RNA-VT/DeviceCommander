@@ -6,9 +6,10 @@ import (
 	"io"
 
 	"github.com/google/uuid"
-	"github.com/rna-vt/devicecommander/src/device/endpoint"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+
+	"github.com/rna-vt/devicecommander/src/device/endpoint"
 )
 
 type BasicDevice interface {
