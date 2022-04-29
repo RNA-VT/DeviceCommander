@@ -2,13 +2,14 @@ package device
 
 import (
 	"github.com/google/uuid"
-	"github.com/rna-vt/devicecommander/src/device/parameter"
 	log "github.com/sirupsen/logrus"
+
+	"github.com/rna-vt/devicecommander/src/device/parameter"
 )
 
-type DeviceEndpoint interface {
-	Execute(map[string]interface{}) error
-}
+// type DeviceEndpoint interface {
+// 	Execute(map[string]interface{}) error
+// }
 
 // DeviceEndpoint implements the Endpoint interface. It provides a functional
 // layer for interacting with a specific Device's endpoint.

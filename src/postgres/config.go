@@ -3,11 +3,12 @@ package postgres
 import (
 	"fmt"
 
-	"github.com/rna-vt/devicecommander/src/device"
-	"github.com/rna-vt/devicecommander/src/device/parameter"
 	"github.com/spf13/viper"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+
+	"github.com/rna-vt/devicecommander/src/device"
+	"github.com/rna-vt/devicecommander/src/device/parameter"
 )
 
 // DBConfig encapsulates the information required for connecting to a database.

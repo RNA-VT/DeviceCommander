@@ -10,8 +10,6 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo"
-	"github.com/sirupsen/logrus"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 
 	mocks "github.com/rna-vt/devicecommander/mocks/device"
@@ -33,20 +31,24 @@ func (s *DeviceControllerSuite) SetupSuite() {
 	s.ctx = context.Background()
 }
 
-func NewEchoContext(method, path string, data interface{}) echo.Context {
-	requestByte, _ := json.Marshal(data)
+func NewEchoContext(method, path string, data interface{}) (echo.Context, error) {
+	requestByte, err := json.Marshal(data)
+	if err != nil {
+		return nil, err
+	}
+
 	requestReader := bytes.NewReader(requestByte)
 
 	req, err := http.NewRequest(method, path, requestReader)
 	if err != nil {
-		logrus.Error(err)
+		return nil, err
 	}
 
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 
 	e := echo.New()
 	res := httptest.NewRecorder()
-	return e.NewContext(req, res)
+	return e.NewContext(req, res), nil
 }
 
 func (s *DeviceControllerSuite) TestCreateDevice() {
@@ -54,28 +56,32 @@ func (s *DeviceControllerSuite) TestCreateDevice() {
 
 	s.mockDeviceRepository.On("Create", newDevices[0]).Return(&device.Device{}, nil)
 
-	err := s.controller.Create(NewEchoContext("POST", "/v1/device", newDevices[0]))
-	assert.Nil(s.T(), err)
+	ctx, err := NewEchoContext("POST", "/v1/device", newDevices[0])
+	s.Nil(err)
+	err = s.controller.Create(ctx)
+	s.Nil(err)
 }
 
 func (s *DeviceControllerSuite) TestGetDevices() {
-
 	s.mockDeviceRepository.On("GetAll").Return([]*device.Device{}, nil)
-	err := s.controller.GetAll(NewEchoContext("GET", "/v1/device", nil))
-	assert.Nil(s.T(), err)
+	ctx, err := NewEchoContext("GET", "/v1/device", nil)
+	s.Nil(err)
+	err = s.controller.GetAll(ctx)
+	s.Nil(err)
 }
 
 func (s *DeviceControllerSuite) TestDeleteDevice() {
 	randomUUID := uuid.New().String()
 
-	ctx := NewEchoContext("DELETE", "/v1/device/:id", nil)
+	ctx, err := NewEchoContext("DELETE", "/v1/device/:id", nil)
+	s.Nil(err)
 
 	ctx.SetParamNames("id")
 	ctx.SetParamValues(randomUUID)
 
 	s.mockDeviceRepository.On("Delete", randomUUID).Return(&device.Device{}, nil)
-	err := s.controller.Delete(ctx)
-	assert.Nil(s.T(), err)
+	err = s.controller.Delete(ctx)
+	s.Nil(err)
 }
 
 func (s *DeviceControllerSuite) TestUpdateDevice() {
@@ -84,11 +90,12 @@ func (s *DeviceControllerSuite) TestUpdateDevice() {
 		ID:   "uuid.string",
 		Name: &tmpName,
 	}
-	ctx := NewEchoContext("POST", "/v1/device", updateInput)
+	ctx, err := NewEchoContext("POST", "/v1/device", updateInput)
+	s.Nil(err)
 
 	s.mockDeviceRepository.On("Update", updateInput).Return(nil)
-	err := s.controller.Update(ctx)
-	assert.Nil(s.T(), err)
+	err = s.controller.Update(ctx)
+	s.Nil(err)
 }
 
 // In order for 'go test' to run this suite, we need to create

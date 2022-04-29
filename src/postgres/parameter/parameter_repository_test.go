@@ -11,7 +11,6 @@ import (
 	"github.com/rna-vt/devicecommander/src/device/parameter"
 	"github.com/rna-vt/devicecommander/src/postgres"
 	postgresDevice "github.com/rna-vt/devicecommander/src/postgres/device"
-	"github.com/rna-vt/devicecommander/src/postgres/endpoint"
 	postgresEndpoint "github.com/rna-vt/devicecommander/src/postgres/endpoint"
 	"github.com/rna-vt/devicecommander/src/utilities"
 )
@@ -22,8 +21,8 @@ type PostgresParameterRepositorySuite struct {
 	testEndpoints       []device.Endpoint
 	testParameters      []parameter.Parameter
 	deviceRepository    postgresDevice.Repository
-	endpointRepository  endpoint.Repository
-	parameterRepository parameter.ParameterRepository
+	endpointRepository  device.EndpointRepository
+	parameterRepository parameter.Repository
 }
 
 func (s *PostgresParameterRepositorySuite) SetupSuite() {

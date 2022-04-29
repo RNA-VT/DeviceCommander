@@ -20,7 +20,7 @@ func (d Device) RunHealthCheck(client Client) error {
 		d.logger.Trace(fmt.Sprintf("device [%s] is not healthy", d.ID.String()))
 	}
 
-	d.Failures = d.ProcessHealthCheckResult(result)
+	_ = d.ProcessHealthCheckResult(result)
 
 	// TODO: need to cleanup unresponsive nodes somewhere
 	// if d.Unresponsive() {

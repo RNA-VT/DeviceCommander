@@ -81,7 +81,6 @@ func (controller DeviceController) Update(c echo.Context) error {
 }
 
 func (controller DeviceController) Delete(c echo.Context) error {
-
 	deviceID := c.Param("id")
 	log.Infof("DEVICE_ID='%s'", deviceID)
 	toDelete, err := controller.Repository.Delete(deviceID)
