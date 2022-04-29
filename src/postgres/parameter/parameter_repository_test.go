@@ -8,7 +8,8 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	"github.com/rna-vt/devicecommander/src/device"
-	"github.com/rna-vt/devicecommander/src/device/parameter"
+	"github.com/rna-vt/devicecommander/src/device/endpoint"
+	"github.com/rna-vt/devicecommander/src/device/endpoint/parameter"
 	"github.com/rna-vt/devicecommander/src/postgres"
 	postgresDevice "github.com/rna-vt/devicecommander/src/postgres/device"
 	postgresEndpoint "github.com/rna-vt/devicecommander/src/postgres/endpoint"
@@ -18,10 +19,10 @@ import (
 type PostgresParameterRepositorySuite struct {
 	suite.Suite
 	testDevices         []device.Device
-	testEndpoints       []device.Endpoint
+	testEndpoints       []endpoint.Endpoint
 	testParameters      []parameter.Parameter
 	deviceRepository    postgresDevice.Repository
-	endpointRepository  device.EndpointRepository
+	endpointRepository  endpoint.Repository
 	parameterRepository parameter.Repository
 }
 
@@ -46,7 +47,7 @@ func (s *PostgresParameterRepositorySuite) SetupSuite() {
 	dev, err := s.deviceRepository.Create(newDevices[0])
 	assert.Nil(s.T(), err)
 
-	testEndpoint := device.GenerateRandomNewEndpointParams(dev.ID.String(), 1)
+	testEndpoint := endpoint.GenerateRandomNewEndpointParams(dev.ID.String(), 1)
 
 	end, err := s.endpointRepository.Create(testEndpoint[0])
 	assert.Nil(s.T(), err)

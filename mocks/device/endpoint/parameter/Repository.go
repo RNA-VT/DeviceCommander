@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	parameter "github.com/rna-vt/devicecommander/src/device/parameter"
+	parameter "github.com/rna-vt/devicecommander/src/device/endpoint/parameter"
 	mock "github.com/stretchr/testify/mock"
 )
 

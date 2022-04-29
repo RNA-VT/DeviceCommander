@@ -1,8 +1,8 @@
-package device
+package endpoint
 
 // Repository prototypes the required interfaces for CRUD
 // management of a collection of Endpoints.
-type EndpointRepository interface {
+type Repository interface {
 	Create(NewEndpointParams) (*Endpoint, error)
 	Update(UpdateEndpointParams) error
 	Delete(string) (*Endpoint, error)

@@ -6,6 +6,7 @@ import (
 	"io"
 
 	"github.com/google/uuid"
+	"github.com/rna-vt/devicecommander/src/device/endpoint"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
@@ -38,7 +39,7 @@ func FromNewDevice(newDeviceArgs NewDeviceParams) Device {
 		ID:        uuid.New(),
 		Host:      newDeviceArgs.Host,
 		Port:      newDeviceArgs.Port,
-		Endpoints: []Endpoint{},
+		Endpoints: []endpoint.Endpoint{},
 	}
 
 	if newDeviceArgs.Mac != nil {
@@ -88,7 +89,7 @@ type Device struct {
 
 	// a list of endpoints available for quering on a device.
 	// required: false
-	Endpoints []Endpoint `json:"Endpoints" faker:"-"`
+	Endpoints []endpoint.Endpoint `json:"Endpoints" faker:"-"`
 
 	logger *log.Entry
 }

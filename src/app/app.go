@@ -6,6 +6,7 @@ import (
 
 	"github.com/rna-vt/devicecommander/src/cluster"
 	"github.com/rna-vt/devicecommander/src/device"
+	"github.com/rna-vt/devicecommander/src/device/endpoint"
 	"github.com/rna-vt/devicecommander/src/rest/routes"
 )
 
@@ -15,7 +16,7 @@ type Application struct {
 	Echo               *echo.Echo
 	Hostname           string
 	DeviceRepository   device.Repository
-	EndpointRepository device.EndpointRepository
+	EndpointRepository endpoint.Repository
 }
 
 // SystemInfo returns a stringified version of this api.

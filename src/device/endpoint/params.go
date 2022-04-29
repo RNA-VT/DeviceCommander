@@ -1,4 +1,4 @@
-package device
+package endpoint
 
 type NewEndpointParams struct {
 	DeviceID    string  `json:"DeviceID" faker:"uuid_hyphenated"`

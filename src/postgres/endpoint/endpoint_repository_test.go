@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	"github.com/rna-vt/devicecommander/src/device"
+	"github.com/rna-vt/devicecommander/src/device/endpoint"
 	"github.com/rna-vt/devicecommander/src/postgres"
 	postgresDevice "github.com/rna-vt/devicecommander/src/postgres/device"
 	"github.com/rna-vt/devicecommander/src/utilities"
@@ -17,8 +18,8 @@ import (
 type PostgresEndpointRepositorySuite struct {
 	suite.Suite
 	testDevices        []device.Device
-	testEndpoints      []device.Endpoint
-	endpointRepository device.EndpointRepository
+	testEndpoints      []endpoint.Endpoint
+	endpointRepository endpoint.Repository
 	deviceRepository   device.Repository
 }
 
@@ -42,14 +43,13 @@ func (s *PostgresEndpointRepositorySuite) SetupSuite() {
 	s.testDevices = append(s.testDevices, *dev)
 }
 
-func (s *PostgresEndpointRepositorySuite) CreateTestEndpoint() device.Endpoint {
-	testEndpoints := device.GenerateRandomNewEndpointParams(s.testDevices[0].ID.String(), 1)
+func (s *PostgresEndpointRepositorySuite) CreateTestEndpoint() endpoint.Endpoint {
+	testEndpoints := endpoint.GenerateRandomNewEndpointParams(s.testDevices[0].ID.String(), 1)
 	testEndpoint := testEndpoints[0]
 
 	end, err := s.endpointRepository.Create(testEndpoint)
 	assert.Nil(s.T(), err)
 	s.testDevices[0].Endpoints = nil
-	end.Device = s.testDevices[0]
 
 	s.testEndpoints = append(s.testEndpoints, *end)
 
@@ -59,7 +59,7 @@ func (s *PostgresEndpointRepositorySuite) CreateTestEndpoint() device.Endpoint {
 func (s *PostgresEndpointRepositorySuite) TestGet() {
 	testEndpoint := s.CreateTestEndpoint()
 
-	results, err := s.endpointRepository.Get(device.Endpoint{
+	results, err := s.endpointRepository.Get(endpoint.Endpoint{
 		ID: testEndpoint.ID,
 	})
 	assert.Nil(s.T(), err)
@@ -82,7 +82,7 @@ func (s *PostgresEndpointRepositorySuite) TestDelete() {
 
 	assert.Equal(s.T(), deleteResult.ID, testEndpoint.ID, "the return from a delete should contain the deleted object")
 
-	getResults, err := s.endpointRepository.Get(device.Endpoint{
+	getResults, err := s.endpointRepository.Get(endpoint.Endpoint{
 		ID: testEndpoint.ID,
 	})
 	assert.Nil(s.T(), err)
@@ -96,13 +96,13 @@ func (s *PostgresEndpointRepositorySuite) TestUpdate() {
 	testEndpoint := s.CreateTestEndpoint()
 
 	tmpDesc := "update random test"
-	err := s.endpointRepository.Update(device.UpdateEndpointParams{
+	err := s.endpointRepository.Update(endpoint.UpdateEndpointParams{
 		ID:          testEndpoint.ID.String(),
 		Description: &tmpDesc,
 	})
 	assert.Nil(s.T(), err)
 
-	getResults, err := s.endpointRepository.Get(device.Endpoint{
+	getResults, err := s.endpointRepository.Get(endpoint.Endpoint{
 		ID: testEndpoint.ID,
 	})
 	assert.Nil(s.T(), err)
@@ -115,7 +115,7 @@ func (s *PostgresEndpointRepositorySuite) TestUpdate() {
 func (s *PostgresEndpointRepositorySuite) TestUpdateNonExistent() {
 	tmpDesc := "non existent random test"
 	tmpUUID := uuid.New()
-	err := s.endpointRepository.Update(device.UpdateEndpointParams{
+	err := s.endpointRepository.Update(endpoint.UpdateEndpointParams{
 		ID:          tmpUUID.String(),
 		Description: &tmpDesc,
 	})

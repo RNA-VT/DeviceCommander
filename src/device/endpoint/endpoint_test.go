@@ -1,4 +1,4 @@
-package device
+package endpoint
 
 import (
 	"testing"

@@ -8,7 +8,7 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 
-	"github.com/rna-vt/devicecommander/src/device/parameter"
+	"github.com/rna-vt/devicecommander/src/device/endpoint/parameter"
 	"github.com/rna-vt/devicecommander/src/postgres"
 )
 

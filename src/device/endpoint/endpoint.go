@@ -1,10 +1,10 @@
-package device
+package endpoint
 
 import (
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/rna-vt/devicecommander/src/device/parameter"
+	"github.com/rna-vt/devicecommander/src/device/endpoint/parameter"
 )
 
 // type DeviceEndpoint interface {
@@ -22,7 +22,6 @@ type Endpoint struct {
 	Description *string               `json:"Description"`
 	Path        *string               `json:"Path"`
 	Parameters  []parameter.Parameter `json:"Parameters,omitempty"`
-	Device      Device
 }
 
 // FromNewEndpoint generates an Endpoint from a NewEndpoint with the correctly
@@ -51,12 +50,4 @@ func FromNewEndpoint(input NewEndpointParams) (Endpoint, error) {
 // NewDeviceEndpoint generates a DeviceEndpoint.
 func NewDeviceEndpoint() *Endpoint {
 	return &Endpoint{}
-}
-
-// Execute carries out the action associated with the Device's endpoint
-// by communicating with the device.
-func (e Endpoint) Execute(map[string]interface{}) error {
-	log.Println(e.Method)
-	log.Println(e.Device.URL())
-	return nil
 }
