@@ -1,4 +1,4 @@
-package device
+package parameter
 
 // Repository prototypes the required interfaces for
 // CRUD actions on a collection of Parameters.

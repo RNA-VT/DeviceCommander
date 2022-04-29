@@ -1,4 +1,4 @@
-package device
+package parameter
 
 import (
 	"github.com/google/uuid"

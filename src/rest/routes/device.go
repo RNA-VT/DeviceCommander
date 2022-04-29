@@ -15,5 +15,5 @@ func (r DeviceRouter) RegisterRoutes(e *echo.Echo) {
 	api.POST("/", r.DeviceController.Create)
 	api.GET("/", r.DeviceController.GetAll)
 	api.GET("/:id", r.DeviceController.GetDevice)
-	api.DELETE("/:deviceID", r.DeviceController.GetDevice)
+	api.DELETE("/:id", r.DeviceController.Delete)
 }

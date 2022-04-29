@@ -15,7 +15,7 @@ type Application struct {
 	Echo               *echo.Echo
 	Hostname           string
 	DeviceRepository   device.Repository
-	EndpointRepository endpoint.EndpointRepository
+	EndpointRepository device.EndpointRepository
 }
 
 // SystemInfo returns a stringified version of this api.

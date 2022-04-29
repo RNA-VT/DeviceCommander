@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/rna-vt/devicecommander/src/device"
+	"github.com/rna-vt/devicecommander/src/device/parameter"
 	"github.com/spf13/viper"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -50,7 +51,7 @@ func GetDBConnection(config DBConfig) (*gorm.DB, error) {
 
 // RunMigration makes sure each of the important models are fully migrated.
 func RunMigration(db *gorm.DB) error {
-	if err := db.AutoMigrate(&device.Device{}, &device.Endpoint{}, &device.Parameter{}); err != nil {
+	if err := db.AutoMigrate(&device.Device{}, &device.Endpoint{}, &parameter.Parameter{}); err != nil {
 		return err
 	}
 

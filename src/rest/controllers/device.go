@@ -68,12 +68,12 @@ func (controller DeviceController) GetDevice(c echo.Context) error {
 }
 
 func (controller DeviceController) Update(c echo.Context) error {
-	updateParams := new(device.UpdateDeviceParams)
-	if err := c.Bind(updateParams); err != nil {
+	updateParams := device.UpdateDeviceParams{}
+	if err := c.Bind(&updateParams); err != nil {
 		return err
 	}
 
-	err := controller.Repository.Update(*updateParams)
+	err := controller.Repository.Update(updateParams)
 	if err != nil {
 		return err
 	}
@@ -81,8 +81,10 @@ func (controller DeviceController) Update(c echo.Context) error {
 }
 
 func (controller DeviceController) Delete(c echo.Context) error {
-	log.Info("DEVICE_ID", c.Param("deviceID"))
-	toDelete, err := controller.Repository.Delete(c.Param("deviceID"))
+
+	deviceID := c.Param("id")
+	log.Infof("DEVICE_ID='%s'", deviceID)
+	toDelete, err := controller.Repository.Delete(deviceID)
 	if err != nil {
 		return err
 	}

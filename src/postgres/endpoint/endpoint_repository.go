@@ -7,6 +7,7 @@ import (
 	"gorm.io/gorm/clause"
 
 	"github.com/rna-vt/devicecommander/src/device"
+	"github.com/rna-vt/devicecommander/src/device/parameter"
 	"github.com/rna-vt/devicecommander/src/postgres"
 )
 
@@ -92,7 +93,7 @@ func (r Repository) Delete(id string) (*device.Endpoint, error) {
 	}
 	toBeDeleted.ID = endUUID
 
-	r.DBConnection.Delete(device.Parameter{}, device.Parameter{
+	r.DBConnection.Delete(parameter.Parameter{}, parameter.Parameter{
 		EndpointID: endUUID,
 	})
 

@@ -37,10 +37,12 @@ func NewEchoContext(method, path string, data interface{}) echo.Context {
 	requestByte, _ := json.Marshal(data)
 	requestReader := bytes.NewReader(requestByte)
 
-	req, err := http.NewRequest("POST", "/v1/device", requestReader)
+	req, err := http.NewRequest(method, path, requestReader)
 	if err != nil {
 		logrus.Error(err)
 	}
+
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 
 	e := echo.New()
 	res := httptest.NewRecorder()
@@ -54,10 +56,6 @@ func (s *DeviceControllerSuite) TestCreateDevice() {
 
 	err := s.controller.Create(NewEchoContext("POST", "/v1/device", newDevices[0]))
 	assert.Nil(s.T(), err)
-
-	s.mockDeviceRepository.AssertCalled(s.T(), "Create", newDevices[0])
-
-	s.mockDeviceRepository.AssertExpectations(s.T())
 }
 
 func (s *DeviceControllerSuite) TestGetDevices() {
@@ -65,23 +63,19 @@ func (s *DeviceControllerSuite) TestGetDevices() {
 	s.mockDeviceRepository.On("GetAll").Return([]*device.Device{}, nil)
 	err := s.controller.GetAll(NewEchoContext("GET", "/v1/device", nil))
 	assert.Nil(s.T(), err)
-
-	s.mockDeviceRepository.AssertCalled(s.T(), "GetAll")
-
-	s.mockDeviceRepository.AssertExpectations(s.T())
 }
 
 func (s *DeviceControllerSuite) TestDeleteDevice() {
 	randomUUID := uuid.New().String()
-	ctx := NewEchoContext("DELETE", "/v1/device/"+randomUUID, nil)
 
-	s.mockDeviceRepository.On("Delete", randomUUID).Return(&device.Device{}, randomUUID)
+	ctx := NewEchoContext("DELETE", "/v1/device/:id", nil)
+
+	ctx.SetParamNames("id")
+	ctx.SetParamValues(randomUUID)
+
+	s.mockDeviceRepository.On("Delete", randomUUID).Return(&device.Device{}, nil)
 	err := s.controller.Delete(ctx)
 	assert.Nil(s.T(), err)
-
-	s.mockDeviceRepository.AssertCalled(s.T(), "Delete", randomUUID)
-
-	s.mockDeviceRepository.AssertExpectations(s.T())
 }
 
 func (s *DeviceControllerSuite) TestUpdateDevice() {
@@ -95,14 +89,10 @@ func (s *DeviceControllerSuite) TestUpdateDevice() {
 	s.mockDeviceRepository.On("Update", updateInput).Return(nil)
 	err := s.controller.Update(ctx)
 	assert.Nil(s.T(), err)
-
-	s.mockDeviceRepository.AssertCalled(s.T(), "Update", updateInput)
-
-	// s.mockDeviceRepository.AssertExpectations(s.T())
 }
 
 // In order for 'go test' to run this suite, we need to create
 // a normal test function and pass our suite to suite.Run.
-func TestDeviceControllerTestSuite(t *testing.T) {
+func TestDeviceRESTControllerTestSuite(t *testing.T) {
 	suite.Run(t, new(DeviceControllerSuite))
 }

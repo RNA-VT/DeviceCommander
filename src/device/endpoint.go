@@ -2,6 +2,7 @@ package device
 
 import (
 	"github.com/google/uuid"
+	"github.com/rna-vt/devicecommander/src/device/parameter"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -13,13 +14,13 @@ type DeviceEndpoint interface {
 // layer for interacting with a specific Device's endpoint.
 type Endpoint struct {
 	// model.Endpoint
-	ID          uuid.UUID   `json:"ID" faker:"uuid_hyphenated"`
-	DeviceID    uuid.UUID   `json:"DeviceID" faker:"uuid_hyphenated"`
-	Method      string      `json:"Method"`
-	Type        string      `json:"Type" faker:"oneof: get, set"`
-	Description *string     `json:"Description"`
-	Path        *string     `json:"Path"`
-	Parameters  []Parameter `json:"Parameters,omitempty"`
+	ID          uuid.UUID             `json:"ID" faker:"uuid_hyphenated"`
+	DeviceID    uuid.UUID             `json:"DeviceID" faker:"uuid_hyphenated"`
+	Method      string                `json:"Method"`
+	Type        string                `json:"Type" faker:"oneof: get, set"`
+	Description *string               `json:"Description"`
+	Path        *string               `json:"Path"`
+	Parameters  []parameter.Parameter `json:"Parameters,omitempty"`
 	Device      Device
 }
 
@@ -36,7 +37,7 @@ func FromNewEndpoint(input NewEndpointParams) (Endpoint, error) {
 		DeviceID:   deviceUUID,
 		Type:       input.Type,
 		Method:     input.Method,
-		Parameters: []Parameter{},
+		Parameters: []parameter.Parameter{},
 	}
 
 	if input.Description != nil {
