@@ -18,7 +18,7 @@ swagger: check-swagger
 	swagger generate spec --work-dir src -o ./docs/swagger.json --scan-models
 
 serve-swagger: check-swagger
-	swagger serve -F=swagger swagger.yaml
+	swagger serve -F=swagger docs/swagger.json
 
 mock:
 	rm -rf mocks

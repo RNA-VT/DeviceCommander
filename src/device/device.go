@@ -50,8 +50,10 @@ func FromNewDevice(newDeviceArgs NewDeviceParams) Device {
 	return newDevice
 }
 
-// Device is a wrapper for the Device model. It aims to provide a helpful
-// layer of abstraction away from the gqlgen/postgres models.
+// Device is one of the core concepts of this application. A Device represents
+// a microcontroller that complies with the DeviceCommander standard.
+//
+// swagger:model
 type Device struct {
 
 	// the UUID for the device.
@@ -94,16 +96,6 @@ type Device struct {
 
 	logger *log.Entry
 }
-
-// // NewDeviceWrapper creates a new instance of a device.Wrapper.
-// func NewDevice(d model.Device) Device {
-// 	dev := Device{
-// 		Device: &d,
-// 		logger: log.WithFields(log.Fields{"module": "device"}),
-// 	}
-
-// 	return dev
-// }
 
 // NewDevice creates a barebones new instance of a Device with a host and port.
 func NewDevice(host string, port int) (Device, error) {

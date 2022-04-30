@@ -4,6 +4,9 @@ import (
 	"github.com/google/uuid"
 )
 
+// A Parameter is used in conjunction with an Endpoint to define a control point for a device.
+//
+// swagger:model
 type Parameter struct {
 	ID          uuid.UUID `json:"ID" faker:"uuid_hyphenated"`
 	EndpointID  uuid.UUID `json:"EndpointID" faker:"uuid_hyphenated"`

@@ -7,12 +7,14 @@ import (
 	"github.com/rna-vt/devicecommander/src/device/endpoint/parameter"
 )
 
-// type DeviceEndpoint interface {
-// 	Execute(map[string]interface{}) error
-// }
-
-// DeviceEndpoint implements the Endpoint interface. It provides a functional
-// layer for interacting with a specific Device's endpoint.
+// An Endpoint is a single api endpoint served and described by the device.
+// Future possible example endpoints:
+// * "on/off"
+// * "set artnet universe"
+// * "set color"
+// * "read temperature"
+//
+// swagger:model
 type Endpoint struct {
 	// model.Endpoint
 	ID          uuid.UUID             `json:"ID" faker:"uuid_hyphenated"`
