@@ -32,7 +32,7 @@ func (r DeviceRouter) RegisterRoutes(e *echo.Echo) {
 	//
 	//     Responses:
 	//       default: genericError
-	//       200: someResponse
+	//       200: getAllDeviceResponse
 	//       422: validationError
 	api.GET("/", r.DeviceController.GetAll)
 
