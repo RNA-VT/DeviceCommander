@@ -17,17 +17,6 @@
   "host": "device-commander.rna-vt.com",
   "basePath": "/",
   "paths": {
-    "/device": {
-      "post": {
-        "summary": "Get information about a single device.",
-        "operationId": "idOfDevice",
-        "responses": {
-          "200": {
-            "$ref": "#/responses/deviceResponse"
-          }
-        }
-      }
-    },
     "/v1/device": {
       "get": {
         "description": "This will show all devices stored in the DB.",
@@ -173,14 +162,6 @@
         "format": "uint8"
       },
       "x-go-package": "github.com/google/uuid"
-    }
-  },
-  "responses": {
-    "deviceResponse": {
-      "description": "This text will appear as description of your response body.",
-      "schema": {
-        "$ref": "#/definitions/Device"
-      }
     }
   },
   "securityDefinitions": {
