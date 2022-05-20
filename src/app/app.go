@@ -1,9 +1,7 @@
 package app
 
 import (
-	"net/http"
-
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/rna-vt/devicecommander/src/cluster"
@@ -29,7 +27,6 @@ func (a *Application) Start() {
 }
 
 func (a *Application) startListening() {
-	a.Echo.GET("/", hello)
 
 	a.Router.RegisterRoutes(a.Echo)
 	log.Info("Configured routes listening on " + a.Hostname)
@@ -44,8 +41,4 @@ func (a *Application) startListening() {
 
 func (a *Application) startMaintainingCluster() {
 	a.Cluster.Start()
-}
-
-func hello(c echo.Context) error {
-	return c.String(http.StatusOK, "Hello, World!")
 }
