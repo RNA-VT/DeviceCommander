@@ -1,22 +1,21 @@
 package app
 
 import (
+	"net/http"
+
 	"github.com/labstack/echo"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/rna-vt/devicecommander/src/cluster"
-	"github.com/rna-vt/devicecommander/src/device"
-	"github.com/rna-vt/devicecommander/src/device/endpoint"
 	"github.com/rna-vt/devicecommander/src/rest/routes"
 )
 
 // The Application encapsulates the required state for the running software.
 type Application struct {
-	Cluster            cluster.Cluster
-	Echo               *echo.Echo
-	Hostname           string
-	DeviceRepository   device.Repository
-	EndpointRepository endpoint.Repository
+	Cluster  cluster.Cluster
+	Echo     *echo.Echo
+	Hostname string
+	Router   routes.Router
 }
 
 // SystemInfo returns a stringified version of this api.
@@ -30,7 +29,9 @@ func (a *Application) Start() {
 }
 
 func (a *Application) startListening() {
-	routes.BaseRouter{}.RegisterRoutes(a.Echo)
+	a.Echo.GET("/", hello)
+
+	a.Router.RegisterRoutes(a.Echo)
 	log.Info("Configured routes listening on " + a.Hostname)
 
 	log.Println("*****************************************************")
@@ -43,4 +44,8 @@ func (a *Application) startListening() {
 
 func (a *Application) startMaintainingCluster() {
 	a.Cluster.Start()
+}
+
+func hello(c echo.Context) error {
+	return c.String(http.StatusOK, "Hello, World!")
 }

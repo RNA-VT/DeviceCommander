@@ -13,7 +13,8 @@ import (
 	"github.com/rna-vt/devicecommander/src/device"
 	"github.com/rna-vt/devicecommander/src/postgres"
 	postgresDevice "github.com/rna-vt/devicecommander/src/postgres/device"
-	postgresEndpoint "github.com/rna-vt/devicecommander/src/postgres/endpoint"
+	"github.com/rna-vt/devicecommander/src/rest/controllers"
+	"github.com/rna-vt/devicecommander/src/rest/routes"
 )
 
 func init() {
@@ -33,10 +34,14 @@ func NewServerCommand() *cobra.Command {
 				return err
 			}
 
-			endpointRepository, err := postgresEndpoint.NewRepository(dbConfig)
-			if err != nil {
-				log.Error(err)
-				return err
+			echoInstance := echo.New()
+
+			router := routes.BaseRouter{
+				DeviceRouter: routes.DeviceRouter{
+					DeviceController: controllers.DeviceController{
+						Repository: deviceRepository,
+					},
+				},
 			}
 
 			app := app.Application{
@@ -44,10 +49,9 @@ func NewServerCommand() *cobra.Command {
 					viper.GetString("CLUSTER_NAME"),
 					deviceRepository, device.NewHTTPDeviceClient(),
 				),
-				Echo:               echo.New(),
-				Hostname:           fmt.Sprintf("%s:%s", viper.GetString("HOST"), viper.GetString("PORT")),
-				DeviceRepository:   deviceRepository,
-				EndpointRepository: endpointRepository,
+				Echo:     echoInstance,
+				Hostname: fmt.Sprintf("%s:%s", viper.GetString("HOST"), viper.GetString("PORT")),
+				Router:   router,
 			}
 
 			app.Start()

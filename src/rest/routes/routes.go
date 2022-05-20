@@ -1,14 +1,20 @@
 package routes
 
 import (
+	"net/http"
+
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/spf13/viper"
 )
 
-type Router interface{}
+type Router interface {
+	RegisterRoutes(*echo.Echo)
+}
 
-type BaseRouter struct{}
+type BaseRouter struct {
+	DeviceRouter
+}
 
 func (r BaseRouter) RegisterRoutes(e *echo.Echo) {
 	// Middleware
@@ -20,6 +26,8 @@ func (r BaseRouter) RegisterRoutes(e *echo.Echo) {
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"},
 	}))
+
+	e.GET("/base", hello)
 
 	r.registerFrontendRoutes(e)
 	r.registerBackendRoutes(e)
@@ -37,5 +45,12 @@ func (r BaseRouter) registerFrontendRoutes(e *echo.Echo) {
 }
 
 func (r BaseRouter) registerBackendRoutes(e *echo.Echo) {
-	DeviceRouter{}.RegisterRoutes(e)
+	e.GET("/backend", hello)
+	api := e.Group("group")
+	api.GET("/base2", hello)
+	r.DeviceRouter.RegisterRoutes(e)
+}
+
+func hello(c echo.Context) error {
+	return c.String(http.StatusOK, "Hello, World!")
 }
