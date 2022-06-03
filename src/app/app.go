@@ -27,7 +27,6 @@ func (a *Application) Start() {
 }
 
 func (a *Application) startListening() {
-
 	a.Router.RegisterRoutes(a.Echo)
 	log.Info("Configured routes listening on " + a.Hostname)
 

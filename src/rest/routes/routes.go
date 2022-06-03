@@ -7,8 +7,6 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/spf13/viper"
 	echoSwagger "github.com/swaggo/echo-swagger"
-
-	_ "github.com/swaggo/echo-swagger/example/docs"
 )
 
 type Router interface {
@@ -28,7 +26,7 @@ type Router interface {
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 
 // @host petstore.swagger.io
-// @BasePath /v2
+// @BasePath /v2.
 type BaseRouter struct {
 	DeviceRouter
 }
