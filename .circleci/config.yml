@@ -4,15 +4,15 @@ parameters:
     type: string
     default: "0.0.1"
 orbs:
-  docker: circleci/docker@1.7.0
+  docker: circleci/docker@2.1.2
 executors:
   docker-publisher:
     docker:
-      - image: circleci/buildpack-deps:latest-alpine
+      - image: cimg/base:2022.06
 jobs:
   test:
     docker:
-      - image: circleci/golang:1.16
+      - image: cimg/go:1.16
         auth:
           username: mydockerhub-user
           password: $DOCKERHUB_PASSWORD
@@ -62,7 +62,7 @@ jobs:
 
   build:
     docker:
-      - image: circleci/golang:1.16
+      - image: cimg/go:1.16
         auth:
           username: mydockerhub-user
           password: $DOCKERHUB_PASSWORD
@@ -105,4 +105,4 @@ workflows:
           filters:
               branches:
                 only:
-                  - master
+                  # - master
