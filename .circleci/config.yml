@@ -4,7 +4,7 @@ parameters:
     type: string
     default: "0.0.1"
 orbs:
-  docker: circleci/docker@1.7.0
+  docker: circleci/docker@2.1.2
 executors:
   docker-publisher:
     docker:
