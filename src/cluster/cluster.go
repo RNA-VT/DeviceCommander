@@ -123,8 +123,6 @@ func (c DeviceCluster) RunHealthCheckLoop(healthCheckPeriod int) {
 			}
 
 			for _, dev := range devices {
-				// dev := device.NewDeviceWrapper(*d)
-
 				resp, err := c.DeviceClient.Health(*dev)
 				if err != nil {
 					c.logger.Warn(fmt.Sprintf("error checking health for device [%s] %s", dev.ID.String(), err))
