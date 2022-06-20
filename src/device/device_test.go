@@ -15,8 +15,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/rna-vt/devicecommander/graph/model"
-	"github.com/rna-vt/devicecommander/src/test"
 	"github.com/rna-vt/devicecommander/src/utilities"
 )
 
@@ -54,7 +52,7 @@ func (s *DeviceServiceSuite) SetupSuite() {
 }
 
 func (s *DeviceServiceSuite) TestDeviceFromNewDeviceWith() {
-	testNewDevice := test.GenerateRandomNewDevices(1)[0]
+	testNewDevice := GenerateRandomNewDeviceParams(1)[0]
 
 	newDeviceResult := FromNewDevice(testNewDevice)
 
@@ -63,25 +61,15 @@ func (s *DeviceServiceSuite) TestDeviceFromNewDeviceWith() {
 	assert.NotNil(s.T(), newDeviceResult.Endpoints, "the Endpoints array is initialized")
 }
 
-func (s *DeviceServiceSuite) TestNewDeviceWrapper() {
-	testNewDevice := test.GenerateRandomNewDevices(1)[0]
-
-	newDeviceResult := FromNewDevice(testNewDevice)
-
-	wrapper := NewDeviceWrapper(newDeviceResult)
-
-	assert.Equal(s.T(), wrapper.Device.ID, newDeviceResult.ID, "the wrapper should have the same ID as the Device")
-}
-
 func (s *DeviceServiceSuite) TestNewDeviceFromRequestBody() {
-	testNewDevice := test.GenerateRandomNewDevices(1)[0]
+	testNewDevice := GenerateRandomNewDeviceParams(1)[0]
 
 	b, err := json.Marshal(testNewDevice)
 	assert.Nil(s.T(), err)
 
 	r := ioutil.NopCloser(strings.NewReader(string(b))) // r type is io.ReadCloser
 
-	newDevice, err := BasicDevice{}.NewDeviceFromRequestBody(r)
+	newDevice, err := NewDeviceFromRequestBody(r)
 	assert.Nil(s.T(), err)
 
 	assert.Equal(s.T(), testNewDevice, newDevice, "the device should remain unchanged")
@@ -109,11 +97,9 @@ func (s *DeviceServiceSuite) TestEvaluateSpecificationResponse() {
 
 	client := HTTPDeviceClient{}
 
-	testDevice := BasicDevice{
-		Device: &model.Device{
-			Host: host,
-			Port: mockServerPort,
-		},
+	testDevice := Device{
+		Host: host,
+		Port: mockServerPort,
 	}
 
 	resp, err := client.Specification(testDevice)
@@ -130,13 +116,11 @@ func (s *DeviceServiceSuite) TestEvaluateSpecificationResponse() {
 }
 
 func (s *DeviceServiceSuite) TestDeviceURL() {
-	testNewDevice := test.GenerateRandomNewDevices(1)[0]
+	testNewDeviceParams := GenerateRandomNewDeviceParams(1)[0]
 
-	newDeviceResult := FromNewDevice(testNewDevice)
+	testDevice := FromNewDevice(testNewDeviceParams)
 
-	wrapper := NewDeviceWrapper(newDeviceResult)
-
-	devURL := wrapper.URL()
+	devURL := testDevice.URL()
 	// validate the URL
 	_, err := url.ParseRequestURI(devURL)
 	assert.Nil(s.T(), err)
@@ -144,6 +128,17 @@ func (s *DeviceServiceSuite) TestDeviceURL() {
 	lastChar := devURL[len(devURL)-1:]
 
 	assert.NotEqual(s.T(), lastChar, "/", "the URL should not end in a \"/\"")
+}
+
+func (s *DeviceServiceSuite) TestGenerateRandomNewDevice() {
+	testLength := 3
+	testNewDevices := GenerateRandomNewDeviceParams(testLength)
+
+	for _, v := range testNewDevices {
+		s.Require().NotNil(v, "all of the devices should not be nil")
+	}
+
+	s.Equal(len(testNewDevices), testLength, "there should be the correct number of devices")
 }
 
 // In order for 'go test' to run this suite, we need to create

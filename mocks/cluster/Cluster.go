@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	model "github.com/rna-vt/devicecommander/graph/model"
+	device "github.com/rna-vt/devicecommander/src/device"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -18,17 +18,24 @@ func (_m *Cluster) DeviceDiscovery(_a0 int) {
 }
 
 // HandleDiscoveredDevice provides a mock function with given fields: _a0
-func (_m *Cluster) HandleDiscoveredDevice(_a0 model.NewDevice) error {
+func (_m *Cluster) HandleDiscoveredDevice(_a0 device.NewDeviceParams) (device.Device, error) {
 	ret := _m.Called(_a0)
 
-	var r0 error
-	if rf, ok := ret.Get(0).(func(model.NewDevice) error); ok {
+	var r0 device.Device
+	if rf, ok := ret.Get(0).(func(device.NewDeviceParams) device.Device); ok {
 		r0 = rf(_a0)
 	} else {
-		r0 = ret.Error(0)
+		r0 = ret.Get(0).(device.Device)
 	}
 
-	return r0
+	var r1 error
+	if rf, ok := ret.Get(1).(func(device.NewDeviceParams) error); ok {
+		r1 = rf(_a0)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }
 
 // Name provides a mock function with given fields:

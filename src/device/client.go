@@ -8,17 +8,15 @@ import (
 	"strconv"
 
 	log "github.com/sirupsen/logrus"
-
-	"github.com/rna-vt/devicecommander/graph/model"
 )
 
 // DeviceClient implements the common http actions when interacting with a device.
 type Client interface {
-	Info(Device) (model.NewDevice, error)
+	Info(Device) (NewDeviceParams, error)
 	Health(Device) (*http.Response, error)
 	EvaluateHealthCheckResponse(resp *http.Response, d Device) bool
 	Specification(Device) (*http.Response, error)
-	EvaluateSpecificationResponse(*http.Response) (model.Device, error)
+	EvaluateSpecificationResponse(*http.Response) (Device, error)
 }
 
 // HTTPDeviceClient is an implementation of the IDeviceClient. It communicates
@@ -42,7 +40,7 @@ func (c HTTPDeviceClient) dangerousHTTPGet(url string) (resp *http.Response, err
 	return http.Get(url)
 }
 
-func (c HTTPDeviceClient) Info(d Device) (model.NewDevice, error) {
+func (c HTTPDeviceClient) Info(d Device) (NewDeviceParams, error) {
 	panic("function not implemented")
 }
 
@@ -72,12 +70,12 @@ func (c HTTPDeviceClient) EvaluateHealthCheckResponse(resp *http.Response, d Dev
 
 	switch resp.StatusCode {
 	case http.StatusOK:
-		c.logger.WithFields(log.Fields{"event": "isHealthy"}).Info(d.ID())
+		c.logger.WithFields(log.Fields{"event": "isHealthy"}).Info(d.ID)
 		healthy = true
 	case http.StatusNotFound:
-		c.logger.Error("Registered Device Not Found: " + d.ID().String())
+		c.logger.Error("Registered Device Not Found: " + d.ID.String())
 	default:
-		c.logger.Error("Unexpected Result: " + d.ID().String())
+		c.logger.Error("Unexpected Result: " + d.ID.String())
 		c.logger.Error("Status Code: " + strconv.Itoa(resp.StatusCode))
 		c.logger.Error("Response: " + string(body))
 	}
@@ -95,8 +93,8 @@ func (c HTTPDeviceClient) Specification(d Device) (*http.Response, error) {
 	return r, nil
 }
 
-func (c HTTPDeviceClient) EvaluateSpecificationResponse(resp *http.Response) (model.Device, error) {
-	dev := model.Device{}
+func (c HTTPDeviceClient) EvaluateSpecificationResponse(resp *http.Response) (Device, error) {
+	dev := Device{}
 	defer resp.Body.Close()
 
 	err := json.NewDecoder(resp.Body).Decode(&dev)

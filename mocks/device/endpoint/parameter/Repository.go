@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	device "github.com/rna-vt/devicecommander/src/device"
+	parameter "github.com/rna-vt/devicecommander/src/device/endpoint/parameter"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -13,20 +13,20 @@ type Repository struct {
 }
 
 // Create provides a mock function with given fields: _a0
-func (_m *Repository) Create(_a0 device.NewDeviceParams) (*device.Device, error) {
+func (_m *Repository) Create(_a0 parameter.NewParameterParams) (*parameter.Parameter, error) {
 	ret := _m.Called(_a0)
 
-	var r0 *device.Device
-	if rf, ok := ret.Get(0).(func(device.NewDeviceParams) *device.Device); ok {
+	var r0 *parameter.Parameter
+	if rf, ok := ret.Get(0).(func(parameter.NewParameterParams) *parameter.Parameter); ok {
 		r0 = rf(_a0)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*device.Device)
+			r0 = ret.Get(0).(*parameter.Parameter)
 		}
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(device.NewDeviceParams) error); ok {
+	if rf, ok := ret.Get(1).(func(parameter.NewParameterParams) error); ok {
 		r1 = rf(_a0)
 	} else {
 		r1 = ret.Error(1)
@@ -36,15 +36,15 @@ func (_m *Repository) Create(_a0 device.NewDeviceParams) (*device.Device, error)
 }
 
 // Delete provides a mock function with given fields: _a0
-func (_m *Repository) Delete(_a0 string) (*device.Device, error) {
+func (_m *Repository) Delete(_a0 string) (*parameter.Parameter, error) {
 	ret := _m.Called(_a0)
 
-	var r0 *device.Device
-	if rf, ok := ret.Get(0).(func(string) *device.Device); ok {
+	var r0 *parameter.Parameter
+	if rf, ok := ret.Get(0).(func(string) *parameter.Parameter); ok {
 		r0 = rf(_a0)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*device.Device)
+			r0 = ret.Get(0).(*parameter.Parameter)
 		}
 	}
 
@@ -59,20 +59,20 @@ func (_m *Repository) Delete(_a0 string) (*device.Device, error) {
 }
 
 // Get provides a mock function with given fields: _a0
-func (_m *Repository) Get(_a0 device.Device) ([]*device.Device, error) {
+func (_m *Repository) Get(_a0 parameter.Parameter) ([]*parameter.Parameter, error) {
 	ret := _m.Called(_a0)
 
-	var r0 []*device.Device
-	if rf, ok := ret.Get(0).(func(device.Device) []*device.Device); ok {
+	var r0 []*parameter.Parameter
+	if rf, ok := ret.Get(0).(func(parameter.Parameter) []*parameter.Parameter); ok {
 		r0 = rf(_a0)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*device.Device)
+			r0 = ret.Get(0).([]*parameter.Parameter)
 		}
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(device.Device) error); ok {
+	if rf, ok := ret.Get(1).(func(parameter.Parameter) error); ok {
 		r1 = rf(_a0)
 	} else {
 		r1 = ret.Error(1)
@@ -82,15 +82,15 @@ func (_m *Repository) Get(_a0 device.Device) ([]*device.Device, error) {
 }
 
 // GetAll provides a mock function with given fields:
-func (_m *Repository) GetAll() ([]*device.Device, error) {
+func (_m *Repository) GetAll() ([]*parameter.Parameter, error) {
 	ret := _m.Called()
 
-	var r0 []*device.Device
-	if rf, ok := ret.Get(0).(func() []*device.Device); ok {
+	var r0 []*parameter.Parameter
+	if rf, ok := ret.Get(0).(func() []*parameter.Parameter); ok {
 		r0 = rf()
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*device.Device)
+			r0 = ret.Get(0).([]*parameter.Parameter)
 		}
 	}
 
@@ -105,11 +105,11 @@ func (_m *Repository) GetAll() ([]*device.Device, error) {
 }
 
 // Update provides a mock function with given fields: _a0
-func (_m *Repository) Update(_a0 device.UpdateDeviceParams) error {
+func (_m *Repository) Update(_a0 parameter.UpdateParameterParams) error {
 	ret := _m.Called(_a0)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(device.UpdateDeviceParams) error); ok {
+	if rf, ok := ret.Get(0).(func(parameter.UpdateParameterParams) error); ok {
 		r0 = rf(_a0)
 	} else {
 		r0 = ret.Error(0)

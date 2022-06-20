@@ -1,21 +1,19 @@
 package app
 
 import (
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/rna-vt/devicecommander/src/cluster"
-	"github.com/rna-vt/devicecommander/src/device"
-	"github.com/rna-vt/devicecommander/src/endpoint"
-	"github.com/rna-vt/devicecommander/src/routes"
+	"github.com/rna-vt/devicecommander/src/rest/routes"
 )
 
 // The Application encapsulates the required state for the running software.
 type Application struct {
-	Cluster            cluster.Cluster
-	Echo               *echo.Echo
-	Hostname           string
-	DeviceRepository   device.Repository
-	EndpointRepository endpoint.Repository
+	Cluster  cluster.Cluster
+	Echo     *echo.Echo
+	Hostname string
+	Router   routes.Router
 }
 
 // SystemInfo returns a stringified version of this api.
@@ -24,9 +22,22 @@ func (a *Application) SystemInfo() string {
 }
 
 func (a *Application) Start() {
-	api := routes.NewAPIService(&a.Cluster, a.DeviceRepository, a.EndpointRepository)
+	a.startListening()
+	a.startMaintainingCluster()
+}
 
+func (a *Application) startListening() {
+	a.Router.RegisterRoutes(a.Echo)
+	log.Info("Configured routes listening on " + a.Hostname)
+
+	log.Println("*****************************************************")
+	log.Println("~Rejoice~ The Device Commander Lives Again! ~Rejoice~")
+	log.Println("*****************************************************")
+
+	// Start server
+	a.Echo.Logger.Fatal(a.Echo.Start(a.Hostname))
+}
+
+func (a *Application) startMaintainingCluster() {
 	a.Cluster.Start()
-
-	api.ConfigureRoutes(a.Hostname, a.Echo)
 }

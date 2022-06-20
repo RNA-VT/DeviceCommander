@@ -17,23 +17,30 @@
   "host": "device-commander.rna-vt.com",
   "basePath": "/",
   "paths": {
-    "/device": {
-      "post": {
-        "summary": "Get information about a single device.",
-        "operationId": "idOfDevice",
-        "parameters": [
-          {
-            "description": "This text will appear as description of your request body.",
-            "name": "Body",
-            "in": "body",
-            "schema": {
-              "$ref": "#/definitions/GetDevicePayload"
-            }
-          }
+    "/v1/device": {
+      "get": {
+        "description": "This will show all devices stored in the DB.",
+        "consumes": [
+          "application/json"
         ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "summary": "Lists all Devices",
+        "operationId": "getAllDevices",
         "responses": {
           "200": {
-            "$ref": "#/responses/deviceResponse"
+            "$ref": "#/responses/getAllDeviceResponse"
+          },
+          "422": {
+            "$ref": "#/responses/validationError"
+          },
+          "default": {
+            "$ref": "#/responses/genericError"
           }
         }
       }
@@ -41,9 +48,8 @@
   },
   "definitions": {
     "Device": {
-      "description": "ID -- the serial number of the connecting device\nName - Optional Device Nickname\nDescription - Optional text describing this device\nHost - Device Api Host\nPort - Device Api Port. Set to 443 for https",
+      "description": "Device is one of the core concepts of this application. A Device represents\na microcontroller that complies with the DeviceCommander standard.",
       "type": "object",
-      "title": "Device -- a compliant physical component.",
       "required": [
         "ID",
         "MAC",
@@ -92,10 +98,12 @@
           "format": "int64"
         }
       },
-      "x-go-package": "github.com/rna-vt/devicecommander/graph/model"
+      "x-go-package": "github.com/rna-vt/devicecommander/src/device"
     },
     "Endpoint": {
+      "description": "Future possible example endpoints:\n\"on/off\"\n\"set artnet universe\"\n\"set color\"\n\"read temperature\"",
       "type": "object",
+      "title": "An Endpoint is a single api endpoint served and described by the device.",
       "properties": {
         "Description": {
           "type": "string"
@@ -122,37 +130,11 @@
           "type": "string"
         }
       },
-      "x-go-package": "github.com/rna-vt/devicecommander/graph/model"
-    },
-    "GetDevicePayload": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "integer",
-          "format": "int64",
-          "x-go-name": "ID",
-          "example": 1
-        },
-        "jsonrpc": {
-          "type": "string",
-          "x-go-name": "Version",
-          "example": "1.0"
-        },
-        "method": {
-          "type": "string",
-          "x-go-name": "Method",
-          "example": "getDevice"
-        },
-        "params": {
-          "type": "string",
-          "x-go-name": "Params",
-          "example": "705e4dcb-3ecd-24f3-3a35-3e926e4bded5"
-        }
-      },
-      "x-go-package": "github.com/rna-vt/devicecommander/src/rpc/method"
+      "x-go-package": "github.com/rna-vt/devicecommander/src/device/endpoint"
     },
     "Parameter": {
       "type": "object",
+      "title": "A Parameter is used in conjunction with an Endpoint to define a control point for a device.",
       "properties": {
         "Description": {
           "type": "string"
@@ -170,7 +152,7 @@
           "type": "string"
         }
       },
-      "x-go-package": "github.com/rna-vt/devicecommander/graph/model"
+      "x-go-package": "github.com/rna-vt/devicecommander/src/device/endpoint/parameter"
     },
     "UUID": {
       "description": "A UUID is a 128 bit (16 byte) Universal Unique IDentifier as defined in RFC\n4122.",
@@ -183,10 +165,40 @@
     }
   },
   "responses": {
-    "deviceResponse": {
-      "description": "This text will appear as description of your response body.",
+    "getAllDeviceResponse": {
+      "description": "GetAllDeviceResponse is a response for the GetAllDevices endpoint.",
       "schema": {
-        "$ref": "#/definitions/Device"
+        "type": "object",
+        "required": [
+          "Devices",
+          "Message"
+        ],
+        "properties": {
+          "Message": {
+            "type": "string",
+            "example": "Expected type string"
+          }
+        }
+      }
+    },
+    "validationError": {
+      "description": "A ValidationError is an error that is used when the required input fails validation.",
+      "schema": {
+        "type": "object",
+        "required": [
+          "Message"
+        ],
+        "properties": {
+          "FieldName": {
+            "description": "An optional field name to which this validation applies",
+            "type": "string"
+          },
+          "Message": {
+            "description": "The validation message",
+            "type": "string",
+            "example": "Expected type int"
+          }
+        }
       }
     }
   },

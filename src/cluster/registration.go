@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/rna-vt/devicecommander/graph/model"
 	"github.com/rna-vt/devicecommander/src/device"
 	"github.com/rna-vt/devicecommander/src/scanner"
 )
@@ -14,7 +13,7 @@ import (
 // DeviceDiscovery will start an ArpScanner and use its results to create new
 // Devices in the database if they do not already exist.
 func (c DeviceCluster) DeviceDiscovery(scanDurationSeconds int) {
-	newDevices := make(chan model.NewDevice)
+	newDevices := make(chan device.NewDeviceParams)
 	defer close(newDevices)
 	stop := make(chan struct{})
 	// defer close(stop)
@@ -39,7 +38,7 @@ func (c DeviceCluster) DeviceDiscovery(scanDurationSeconds int) {
 				c.logger.Error(err)
 			}
 
-			err = device.NewDeviceWrapper(d).RunHealthCheck(c.DeviceClient)
+			err = d.RunHealthCheck(c.DeviceClient)
 			if err != nil {
 				c.logger.Error(err)
 			}
@@ -51,30 +50,30 @@ func (c DeviceCluster) DeviceDiscovery(scanDurationSeconds int) {
 // HandleDiscoveredDevice does this with some additional steps. For example:
 // 1. does the Device already exist in the DB? (MAC address is the unique identifier in this case).
 // 2. immediately check its health.
-func (c DeviceCluster) HandleDiscoveredDevice(newDevice model.NewDevice) (model.Device, error) {
-	results, err := c.DeviceRepository.Get(model.Device{
+func (c DeviceCluster) HandleDiscoveredDevice(newDevice device.NewDeviceParams) (device.Device, error) {
+	results, err := c.DeviceRepository.Get(device.Device{
 		MAC: *newDevice.Mac,
 	})
 	if err != nil {
-		return model.Device{}, err
+		return device.Device{}, err
 	}
 
-	discoveredDevice := new(model.Device)
+	discoveredDevice := new(device.Device)
 	switch len(results) {
 	case 0:
 		discoveredDevice, err = c.DeviceRepository.Create(newDevice)
 		if err != nil {
-			return model.Device{}, err
+			return device.Device{}, err
 		}
 	case 1:
 		discoveredDevice := device.FromNewDevice(newDevice)
 		discoveredDevice.Active = true
 
 		if err := c.DeviceRepository.Update(updateDeviceFromDevice(&discoveredDevice)); err != nil {
-			return model.Device{}, err
+			return device.Device{}, err
 		}
 	default:
-		return model.Device{}, errors.New("multiple results returned for 1 mac address")
+		return device.Device{}, errors.New("multiple results returned for 1 mac address")
 	}
 
 	c.logger.Debugf("registered mac address [%s] with id [%s] at [%s]:[%s]",
@@ -86,9 +85,9 @@ func (c DeviceCluster) HandleDiscoveredDevice(newDevice model.NewDevice) (model.
 	return *discoveredDevice, nil
 }
 
-// updateDeviceFromDevice builds a model.UpdateDevice from a model.Device.
-func updateDeviceFromDevice(d *model.Device) model.UpdateDevice {
-	updateDevice := model.UpdateDevice{
+// updateDeviceFromDevice builds a device.UpdateDeviceParams from a device.Device.
+func updateDeviceFromDevice(d *device.Device) device.UpdateDeviceParams {
+	updateDevice := device.UpdateDeviceParams{
 		Mac:  &d.MAC,
 		Host: &d.Host,
 		Port: &d.Port,
