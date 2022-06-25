@@ -33,30 +33,37 @@ func (c DeviceCluster) DeviceDiscovery(scanDurationSeconds int) {
 			c.logger.Debug("Exit NewDevice stream watch")
 			return
 		case tmpNewDevice := <-newDevices:
-			d, err := c.HandleDiscoveredDevice(tmpNewDevice)
+			err := c.initNewDevice(tmpNewDevice)
 			if err != nil {
-				c.logger.Error("failed to register new device, failed to init discovered device")
-				c.logger.Error(err)
 				break
 			}
-
-			err = d.RunHealthCheck(c.DeviceClient)
-			if err != nil {
-				c.logger.Error("failed to register new device, health check failed")
-				c.logger.Error(err)
-				break
-			}
-
-			err = d.RequestSpecification(c.DeviceClient)
-			if err != nil {
-				c.logger.Error("failed to register new device, failed to request and load device specification")
-				c.logger.Error(err)
-				break
-			}
-
-			d.Active = true
 		}
 	}
+}
+
+func (c DeviceCluster) initNewDevice(tmpNewDevice device.NewDeviceParams) error {
+	d, err := c.HandleDiscoveredDevice(tmpNewDevice)
+	if err != nil {
+		c.logger.Error("failed to register new device, failed to init discovered device")
+		c.logger.Error(err)
+		return err
+	}
+
+	err = d.RunHealthCheck(c.DeviceClient)
+	if err != nil {
+		c.logger.Error("failed to register new device, health check failed")
+		c.logger.Error(err)
+		return err
+	}
+
+	err = d.RequestSpecification(c.DeviceClient)
+	if err != nil {
+		c.logger.Error("failed to register new device, failed to request and load device specification")
+		c.logger.Error(err)
+		return err
+	}
+	d.Activate()
+	return nil
 }
 
 // Once a Device is found on the network it needs to get processed into the platform.

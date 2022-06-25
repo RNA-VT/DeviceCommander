@@ -18,6 +18,7 @@ type BasicDevice interface {
 	ProcessHealthCheckResult(result bool) int
 	Unresponsive() bool
 	RunHealthCheck(client Client) error
+	Activate()
 }
 
 // NewDeviceFromRequestBody creates a new instance of a NewDevice.
@@ -137,4 +138,8 @@ func (d Device) ProcessHealthCheckResult(result bool) int {
 func (d Device) Unresponsive() bool {
 	failThreshold := 3
 	return d.Failures >= failThreshold
+}
+
+func (d *Device) Activate() {
+	d.Active = true
 }
