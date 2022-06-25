@@ -26,7 +26,7 @@ mock:
 
 .PHONY: test
 test:
-	./scripts/test.sh
+	./scripts/test.sh $(REFRESH)
 
 run:
 	sudo go run main.go server
