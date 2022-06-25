@@ -97,8 +97,22 @@ func (c HTTPDeviceClient) EvaluateSpecificationResponse(resp *http.Response) (De
 	dev := Device{}
 	defer resp.Body.Close()
 
-	err := json.NewDecoder(resp.Body).Decode(&dev)
-	if err != nil {
+	switch resp.StatusCode {
+	case http.StatusOK:
+		err := json.NewDecoder(resp.Body).Decode(&dev)
+		if err != nil {
+			return dev, err
+		}
+	default:
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			c.logger.Error("failed to read the specification response")
+			return dev, err
+		}
+
+		c.logger.Error("Unexpected Result:")
+		c.logger.Error("Status Code: " + strconv.Itoa(resp.StatusCode))
+		c.logger.Error("Response: " + string(body))
 		return dev, err
 	}
 
