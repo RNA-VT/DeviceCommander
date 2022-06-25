@@ -35,13 +35,26 @@ func (c DeviceCluster) DeviceDiscovery(scanDurationSeconds int) {
 		case tmpNewDevice := <-newDevices:
 			d, err := c.HandleDiscoveredDevice(tmpNewDevice)
 			if err != nil {
+				c.logger.Error("failed to register new device, failed to init discovered device")
 				c.logger.Error(err)
+				break
 			}
 
 			err = d.RunHealthCheck(c.DeviceClient)
 			if err != nil {
+				c.logger.Error("failed to register new device, health check failed")
 				c.logger.Error(err)
+				break
 			}
+
+			err = d.RequestSpecification(c.DeviceClient)
+			if err != nil {
+				c.logger.Error("failed to register new device, failed to request and load device specification")
+				c.logger.Error(err)
+				break
+			}
+
+			d.Active = true
 		}
 	}
 }
@@ -67,7 +80,6 @@ func (c DeviceCluster) HandleDiscoveredDevice(newDevice device.NewDeviceParams) 
 		}
 	case 1:
 		discoveredDevice := device.FromNewDevice(newDevice)
-		discoveredDevice.Active = true
 
 		if err := c.DeviceRepository.Update(updateDeviceFromDevice(&discoveredDevice)); err != nil {
 			return device.Device{}, err
