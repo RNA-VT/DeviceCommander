@@ -97,8 +97,9 @@ func (s *PostgresEndpointRepositorySuite) TestUpdate() {
 
 	tmpDesc := "update random test"
 	err := s.endpointRepository.Update(endpoint.UpdateEndpointParams{
-		ID:          testEndpoint.ID.String(),
-		Description: &tmpDesc,
+		ID:           testEndpoint.ID.String(),
+		Description:  &tmpDesc,
+		ResponseType: "bool",
 	})
 	assert.Nil(s.T(), err)
 
@@ -116,8 +117,9 @@ func (s *PostgresEndpointRepositorySuite) TestUpdateNonExistent() {
 	tmpDesc := "non existent random test"
 	tmpUUID := uuid.New()
 	err := s.endpointRepository.Update(endpoint.UpdateEndpointParams{
-		ID:          tmpUUID.String(),
-		Description: &tmpDesc,
+		ID:           tmpUUID.String(),
+		Description:  &tmpDesc,
+		ResponseType: "bool",
 	})
 
 	assert.NotNil(s.T(), err, "updating an endpoint that does not exist should throw an error")
