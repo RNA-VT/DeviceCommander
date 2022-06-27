@@ -29,22 +29,3 @@ export default function App() {
     </ThemeProvider>
   );
 }
-
-// export default class App extends React.Component {
-//   render() {
-//     return (
-//       <ThemeProvider theme={mdTheme}>
-//         <CssBaseline />
-//         <Router>
-//           <div>
-//             <Routes>
-//               <Route path="/" element={<Home />} />
-//               <Route path="/devices" element={<Devices />} />
-//               <Route path="/settings" element={<Settings />} />
-//             </Routes>
-//           </div>
-//         </Router>
-//       </ThemeProvider>
-//     );
-//   }
-// }
