@@ -10,8 +10,8 @@ import AppBar from './AppBar';
 import { PageState } from '../../pages/store';
 
 interface TopBarProps {
-    open: boolean
-    toggleDrawer: () => void
+  open: boolean
+  toggleDrawer: () => void
 }
 
 export default function TopBar({ open, toggleDrawer }: TopBarProps) {
