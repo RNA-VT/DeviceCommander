@@ -29,13 +29,22 @@ func (c DeviceCluster) DeviceDiscovery(scanDurationSeconds int) {
 		close(stop)
 	})
 
+	// Add discovered device to platform db
+	// Verify that discovered device produces a DeviceCommander compliant api
+	// and collect device details
+	// Activate verified device
+	// Update db
+	c.ListenForDevices(stop, newDevices)
+}
+
+func (c DeviceCluster) ListenForDevices(stop chan struct{}, newDevices chan device.NewDeviceParams) {
 	for {
 		select {
 		case <-stop:
 			c.logger.Debug("Exit NewDevice stream watch")
 			return
 		case tmpNewDevice := <-newDevices:
-			// Add discovered device to platform db
+
 			d, err := c.HandleDiscoveredDevice(tmpNewDevice)
 			if err != nil {
 				c.logger.WithFields(logrus.Fields{
@@ -46,13 +55,10 @@ func (c DeviceCluster) DeviceDiscovery(scanDurationSeconds int) {
 				c.logger.Error(err)
 			}
 
-			// Verify that discovered device produces a DeviceCommander compliant api
-			// and collect device details
 			d, verified := c.VerifyDeviceAPI(d)
 			if verified {
-				// Activate verified device
 				d.Activate()
-				// Update db
+
 				if err := c.DeviceRepository.Update(updateDeviceFromDevice(&d)); err != nil {
 					c.logger.Error(err)
 				}
