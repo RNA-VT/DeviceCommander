@@ -34,37 +34,35 @@ func (c DeviceCluster) DeviceDiscovery(scanDurationSeconds int) {
 			c.logger.Debug("Exit NewDevice stream watch")
 			return
 		case tmpNewDevice := <-newDevices:
-			d, err := c.initNewDevice(tmpNewDevice)
+			// Add discovered device to platform db
+			d, err := c.HandleDiscoveredDevice(tmpNewDevice)
 			if err != nil {
-				continue
+				c.logger.WithFields(logrus.Fields{
+					"host": d.Host,
+					"port": d.Port,
+					"mac":  d.MAC,
+				}).Error("discovered device init failed: failed to register new device with platform")
+				c.logger.Error(err)
 			}
-			// Activate Verified Device
-			d.Activate()
+
+			// Verify that discovered device produces a DeviceCommander compliant api
+			// and collect device details
+			d, verified := c.VerifyDeviceAPI(d)
+			if verified {
+				// Activate verified device
+				d.Activate()
+				// Update db
+				if err := c.DeviceRepository.Update(updateDeviceFromDevice(&d)); err != nil {
+					c.logger.Error(err)
+				}
+			}
+
 		}
 	}
 }
 
-// initNewDevice processes a newly discovered device on the network into the platform
-// & verifies that it adheres to the Device Commander api spec
-func (c DeviceCluster) initNewDevice(tmpNewDevice device.NewDeviceParams) (device.Device, error) {
-	// Add discovered IP to platform
-	d, err := c.HandleDiscoveredDevice(tmpNewDevice)
-	if err != nil {
-		c.logger.Error("discovered device init failed: failed to register new device with platform")
-		c.logger.Error(err)
-		return d, err
-	}
-
-	// Verify that discovered device produces a DeviceCommander compliant api and hydrate specification
-	verifiedDevice, err := c.verifyDeviceAPI(d)
-	if err != nil {
-		return device.Device{}, err
-	}
-	return verifiedDevice, nil
-}
-
-// verifyDeviceAPI confirms that the device is compliant & returns the device hydrated with return data from the device
-func (c DeviceCluster) verifyDeviceAPI(d device.Device) (device.Device, error) {
+// VerifyDeviceAPI confirms that the device is compliant & returns the device hydrated with return data from the device
+func (c DeviceCluster) VerifyDeviceAPI(d device.Device) (device.Device, bool) {
 	// Verify that Health Check endpoint responds and device is healthy
 	err := d.RunHealthCheck(c.DeviceClient)
 	if err != nil {
@@ -74,7 +72,7 @@ func (c DeviceCluster) verifyDeviceAPI(d device.Device) (device.Device, error) {
 			"mac":  d.MAC,
 		}).Error("device failed api verification: health check failed")
 		c.logger.Error(err)
-		return device.Device{}, err
+		return device.Device{}, false
 	}
 
 	// Get Device Spec
@@ -86,11 +84,11 @@ func (c DeviceCluster) verifyDeviceAPI(d device.Device) (device.Device, error) {
 			"mac":  d.MAC,
 		}).Error("device failed api verification: failed to request and load device specification")
 		c.logger.Error(err)
-		return device.Device{}, err
+		return device.Device{}, false
 	}
 
 	// Return spec'd device
-	return d.LoadFromSpecification(spec), nil
+	return d.LoadFromSpecification(spec), true
 }
 
 // Once a Device is found on the network it needs to get processed into the platform.
