@@ -30,3 +30,20 @@ func (s *ClusterSuite) TestHandleDiscoveredDevice() {
 	s.Equal(*newDevices[0].Mac, d.MAC)
 	s.Equal(newDevices[0].Port, d.Port)
 }
+
+func (s *ClusterSuite) TestVerifyDeviceAPI() {
+	devices := GenerateDevices(2)
+
+	// New, Healthy Device
+	s.mockDeviceRepository.On("Get", mock.AnythingOfType("device.Device")).Return([]*device.Device{
+		devices[0],
+	}, nil).Once()
+	s.mockDeviceRepository.On("Create", mock.AnythingOfType("device.NewDeviceParams")).Return(devices[0], nil).Once()
+	s.mockDeviceRepository.On("Update", mock.AnythingOfType("device.UpdateDeviceParams")).Return(devices[0], nil).Once()
+	s.mockDeviceClient.On("Health", mock.AnythingOfType("device.Device")).Return(nil, nil)
+	s.mockDeviceClient.On("Specification", mock.AnythingOfType("device.Device")).Return(nil, nil)
+	s.mockDeviceClient.On("EvaluateHealthCheckResponse", (*http.Response)(nil), mock.AnythingOfType("device.Device")).Return(true)
+	s.mockDeviceClient.On("EvaluateSpecificationResponse", (*http.Response)(nil)).Return(*devices[0], nil)
+	_, verified := s.cluster.VerifyDeviceAPI(*devices[0])
+	s.Equal(true, verified)
+}

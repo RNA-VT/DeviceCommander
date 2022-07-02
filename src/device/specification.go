@@ -11,6 +11,7 @@ func (d Device) RequestSpecification(client Client) (Device, error) {
 
 	spec, err := client.EvaluateSpecificationResponse(resp)
 	if err != nil {
+		d.logger.Warn(fmt.Sprintf("Error evaluating specification for [%s]", d.ID.String()))
 		return d, err
 	}
 
