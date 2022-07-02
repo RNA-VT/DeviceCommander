@@ -2,10 +2,11 @@ package device
 
 import (
 	"github.com/google/uuid"
+	"github.com/stretchr/testify/suite"
+
 	"github.com/rna-vt/devicecommander/src/device/endpoint"
 	"github.com/rna-vt/devicecommander/src/device/endpoint/parameter"
 	"github.com/rna-vt/devicecommander/src/utilities"
-	"github.com/stretchr/testify/suite"
 )
 
 type SpecificationSuite struct {

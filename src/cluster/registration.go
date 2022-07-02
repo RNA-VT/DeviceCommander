@@ -6,9 +6,10 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/sirupsen/logrus"
+
 	"github.com/rna-vt/devicecommander/src/device"
 	"github.com/rna-vt/devicecommander/src/scanner"
-	"github.com/sirupsen/logrus"
 )
 
 // DeviceDiscovery will start an ArpScanner and use its results to create new
@@ -56,12 +57,11 @@ func (c DeviceCluster) DeviceDiscovery(scanDurationSeconds int) {
 					c.logger.Error(err)
 				}
 			}
-
 		}
 	}
 }
 
-// VerifyDeviceAPI confirms that the device is compliant & returns the device hydrated with return data from the device
+// VerifyDeviceAPI confirms that the device is compliant & returns the device hydrated with return data from the device.
 func (c DeviceCluster) VerifyDeviceAPI(d device.Device) (device.Device, bool) {
 	// Verify that Health Check endpoint responds and device is healthy
 	err := d.RunHealthCheck(c.DeviceClient)
