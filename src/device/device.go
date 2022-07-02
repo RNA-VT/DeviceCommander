@@ -6,6 +6,7 @@ import (
 	"io"
 
 	"github.com/google/uuid"
+	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 
@@ -42,6 +43,7 @@ func FromNewDevice(newDeviceArgs NewDeviceParams) Device {
 		Host:      newDeviceArgs.Host,
 		Port:      newDeviceArgs.Port,
 		Endpoints: []endpoint.Endpoint{},
+		logger:    log.NewEntry(&logrus.Logger{}),
 	}
 
 	if newDeviceArgs.Mac != nil {
