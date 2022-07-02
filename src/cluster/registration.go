@@ -8,6 +8,7 @@ import (
 
 	"github.com/rna-vt/devicecommander/src/device"
 	"github.com/rna-vt/devicecommander/src/scanner"
+	"github.com/sirupsen/logrus"
 )
 
 // DeviceDiscovery will start an ArpScanner and use its results to create new
@@ -33,37 +34,63 @@ func (c DeviceCluster) DeviceDiscovery(scanDurationSeconds int) {
 			c.logger.Debug("Exit NewDevice stream watch")
 			return
 		case tmpNewDevice := <-newDevices:
-			err := c.initNewDevice(tmpNewDevice)
+			d, err := c.initNewDevice(tmpNewDevice)
 			if err != nil {
-				break
+				continue
 			}
+			// Activate Verified Device
+			d.Activate()
 		}
 	}
 }
 
-func (c DeviceCluster) initNewDevice(tmpNewDevice device.NewDeviceParams) error {
+// initNewDevice processes a newly discovered device on the network into the platform
+// & verifies that it adheres to the Device Commander api spec
+func (c DeviceCluster) initNewDevice(tmpNewDevice device.NewDeviceParams) (device.Device, error) {
+	// Add discovered IP to platform
 	d, err := c.HandleDiscoveredDevice(tmpNewDevice)
 	if err != nil {
-		c.logger.Error("failed to register new device, failed to init discovered device")
+		c.logger.Error("discovered device init failed: failed to register new device with platform")
 		c.logger.Error(err)
-		return err
+		return d, err
 	}
 
-	err = d.RunHealthCheck(c.DeviceClient)
+	// Verify that discovered device produces a DeviceCommander compliant api and hydrate specification
+	verifiedDevice, err := c.verifyDeviceAPI(d)
 	if err != nil {
-		c.logger.Error("failed to register new device, health check failed")
+		return device.Device{}, err
+	}
+	return verifiedDevice, nil
+}
+
+// verifyDeviceAPI confirms that the device is compliant & returns the device hydrated with return data from the device
+func (c DeviceCluster) verifyDeviceAPI(d device.Device) (device.Device, error) {
+	// Verify that Health Check endpoint responds and device is healthy
+	err := d.RunHealthCheck(c.DeviceClient)
+	if err != nil {
+		c.logger.WithFields(logrus.Fields{
+			"host": d.Host,
+			"port": d.Port,
+			"mac":  d.MAC,
+		}).Error("device failed api verification: health check failed")
 		c.logger.Error(err)
-		return err
+		return device.Device{}, err
 	}
 
-	err = d.RequestSpecification(c.DeviceClient)
+	// Get Device Spec
+	spec, err := d.RequestSpecification(c.DeviceClient)
 	if err != nil {
-		c.logger.Error("failed to register new device, failed to request and load device specification")
+		c.logger.WithFields(logrus.Fields{
+			"host": d.Host,
+			"port": d.Port,
+			"mac":  d.MAC,
+		}).Error("device failed api verification: failed to request and load device specification")
 		c.logger.Error(err)
-		return err
+		return device.Device{}, err
 	}
-	d.Activate()
-	return nil
+
+	// Return spec'd device
+	return d.LoadFromSpecification(spec), nil
 }
 
 // Once a Device is found on the network it needs to get processed into the platform.

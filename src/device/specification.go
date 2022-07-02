@@ -2,20 +2,19 @@ package device
 
 import "fmt"
 
-func (d Device) RequestSpecification(client Client) error {
+func (d Device) RequestSpecification(client Client) (Device, error) {
 	resp, err := client.Specification(d)
 	if err != nil {
 		d.logger.Warn(fmt.Sprintf("Error loading specification for [%s]", d.ID.String()))
-		return err
+		return d, err
 	}
 
 	spec, err := client.EvaluateSpecificationResponse(resp)
 	if err != nil {
-		return err
+		return d, err
 	}
 
-	d = d.LoadFromSpecification(spec)
-	return nil
+	return spec, nil
 }
 
 func (d Device) LoadFromSpecification(spec Device) Device {
