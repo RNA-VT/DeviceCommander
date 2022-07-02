@@ -12,6 +12,11 @@ type BasicDevice struct {
 	mock.Mock
 }
 
+// Activate provides a mock function with given fields:
+func (_m *BasicDevice) Activate() {
+	_m.Called()
+}
+
 // ProcessHealthCheckResult provides a mock function with given fields: result
 func (_m *BasicDevice) ProcessHealthCheckResult(result bool) int {
 	ret := _m.Called(result)

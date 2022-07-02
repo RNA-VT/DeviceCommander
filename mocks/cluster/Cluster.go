@@ -76,3 +76,24 @@ func (_m *Cluster) StopDiscovery() {
 func (_m *Cluster) StopHealth() {
 	_m.Called()
 }
+
+// VerifyDeviceAPI provides a mock function with given fields: _a0
+func (_m *Cluster) VerifyDeviceAPI(_a0 device.Device) (device.Device, bool) {
+	ret := _m.Called(_a0)
+
+	var r0 device.Device
+	if rf, ok := ret.Get(0).(func(device.Device) device.Device); ok {
+		r0 = rf(_a0)
+	} else {
+		r0 = ret.Get(0).(device.Device)
+	}
+
+	var r1 bool
+	if rf, ok := ret.Get(1).(func(device.Device) bool); ok {
+		r1 = rf(_a0)
+	} else {
+		r1 = ret.Get(1).(bool)
+	}
+
+	return r0, r1
+}
