@@ -14,12 +14,13 @@ func (d Device) RequestSpecification(client Client) error {
 		return err
 	}
 
-	d.LoadFromSpecification(spec)
+	d = d.LoadFromSpecification(spec)
 	return nil
 }
 
-func (d *Device) LoadFromSpecification(spec Device) {
+func (d Device) LoadFromSpecification(spec Device) Device {
 	d.Description = spec.Description
 	d.Endpoints = spec.Endpoints
 	d.Name = spec.Name
+	return d
 }
