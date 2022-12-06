@@ -3,14 +3,14 @@ set -eo pipefail
 
 refreshdb() {
     # Stop postgres if already running
-    docker-compose down
+    docker compose down
 
     # Clear old volumes
     docker volume rm devicecommander_postgres || true
     docker volume rm devicecommander_pgadmin || true
 
     # Start Up Postgres DB
-    docker-compose up -d
+    docker compose up -d
 
     # Run Migrations
     go run main.go migrate-db
