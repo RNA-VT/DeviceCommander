@@ -1,6 +1,9 @@
 package utilities
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"fmt"
+)
 
 // LabelString -.
 func LabelString(key string, value string) string {
@@ -34,4 +37,8 @@ func MergeMaps(maps ...map[string]interface{}) map[string]interface{} {
 		}
 	}
 	return result
+}
+
+func WrapError(outer, inner error) error {
+	return fmt.Errorf("%w; "+outer.Error(), inner)
 }
