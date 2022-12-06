@@ -60,7 +60,7 @@ func (s *PostgresDeviceRepositorySuite) TestGet() {
 
 	assert.Equal(s.T(), len(results[0].Endpoints), len(testDevice.Endpoints), "the return from get should have the same number of endpoints as the original object")
 
-	assert.Equal(s.T(), results[0].ID, testDevice.ID, "the return from create should be equal to the return from get")
+	s.Equal(results[0], testDevice, "the return from create should be equal to the return from get")
 	assert.Equal(s.T(), results[0].MAC, testDevice.MAC, "the return from create should be equal to the return from get")
 	assert.Equal(s.T(), results[0].Name, testDevice.Name, "the return from create should be equal to the return from get")
 	assert.Equal(s.T(), results[0].Description, testDevice.Description, "the return from create should be equal to the return from get")
