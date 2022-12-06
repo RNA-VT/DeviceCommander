@@ -102,11 +102,8 @@ func (s *DeviceServiceSuite) TestEvaluateSpecificationResponse() {
 		Port: mockServerPort,
 	}
 
-	resp, err := client.Specification(testDevice)
+	dev, err := client.GetSpecificationFromDevice(testDevice)
 	assert.Nil(s.T(), err, "requesting a mock spec should not throw an error")
-
-	dev, err := client.EvaluateSpecificationResponse(resp)
-	assert.Nil(s.T(), err, "evaluating a json string response should not throw an error")
 
 	assert.Equal(s.T(), "something or other", dev.Name, "the Name in the json string should be applied to the Device")
 

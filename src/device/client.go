@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/rna-vt/devicecommander/src/utilities"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -15,8 +16,7 @@ type Client interface {
 	Info(Device) (NewDeviceParams, error)
 	Health(Device) (*http.Response, error)
 	EvaluateHealthCheckResponse(resp *http.Response, d Device) bool
-	Specification(Device) (*http.Response, error)
-	EvaluateSpecificationResponse(*http.Response) (Device, error)
+	GetSpecificationFromDevice(Device) (*Device, error)
 }
 
 // HTTPDeviceClient is an implementation of the IDeviceClient. It communicates
@@ -82,39 +82,26 @@ func (c HTTPDeviceClient) EvaluateHealthCheckResponse(resp *http.Response, d Dev
 	return healthy
 }
 
-func (c HTTPDeviceClient) Specification(d Device) (*http.Response, error) {
+func (c HTTPDeviceClient) GetSpecificationFromDevice(d Device) (*Device, error) {
+	dev := Device{}
 	url := d.URL() + "/specification"
 
-	r, err := c.dangerousHTTPGet(url)
+	resp, err := c.dangerousHTTPGet(url)
 	if err != nil {
-		return &http.Response{}, err
+		return nil, utilities.WrapError(ErrSpecificationRequestFailed, err)
 	}
-
-	return r, nil
-}
-
-func (c HTTPDeviceClient) EvaluateSpecificationResponse(resp *http.Response) (Device, error) {
-	dev := Device{}
 	defer resp.Body.Close()
 
 	switch resp.StatusCode {
 	case http.StatusOK:
 		err := json.NewDecoder(resp.Body).Decode(&dev)
 		if err != nil {
-			return dev, err
+			return &dev, utilities.WrapError(ErrSpecificationFailedToDecode, err)
 		}
 	default:
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			c.logger.Error("failed to read the specification response")
-			return dev, err
-		}
-
-		c.logger.Error("Unexpected Result:")
-		c.logger.Error("Status Code: " + strconv.Itoa(resp.StatusCode))
-		c.logger.Error("Response: " + string(body))
-		return dev, err
+		c.logger.Error("Specification Request Failed with Status Code: " + strconv.Itoa(resp.StatusCode))
+		return &dev, utilities.WrapError(ErrSpecificationRequestNon200, err)
 	}
 
-	return dev, nil
+	return &dev, nil
 }

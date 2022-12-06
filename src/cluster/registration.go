@@ -53,8 +53,10 @@ func (c DeviceCluster) ListenForDevices(stop chan struct{}, newDevices chan devi
 
 			// Verify that discovered device produces a DeviceCommander compliant api
 			// and collect device details
-			d, verified := c.VerifyDeviceAPI(d)
-			if verified {
+			d, err = c.VerifyDeviceAPI(d)
+			if err != nil {
+				c.logger.Error(err)
+			} else {
 				// Activate verified device
 				d.Activate()
 
@@ -68,7 +70,7 @@ func (c DeviceCluster) ListenForDevices(stop chan struct{}, newDevices chan devi
 }
 
 // VerifyDeviceAPI confirms that the device is compliant & returns the device hydrated with return data from the device.
-func (c DeviceCluster) VerifyDeviceAPI(d device.Device) (device.Device, bool) {
+func (c DeviceCluster) VerifyDeviceAPI(d device.Device) (device.Device, error) {
 	// Verify that Health Check endpoint responds and device is healthy
 	err := d.RunHealthCheck(c.DeviceClient)
 	if err != nil {
@@ -78,11 +80,11 @@ func (c DeviceCluster) VerifyDeviceAPI(d device.Device) (device.Device, bool) {
 			"mac":  d.MAC,
 		}).Error("device failed api verification: health check failed")
 		c.logger.Error(err)
-		return device.Device{}, false
+		return device.Device{}, err
 	}
 
 	// Get Device Spec
-	spec, err := d.RequestSpecification(c.DeviceClient)
+	spec, err := c.DeviceClient.GetSpecificationFromDevice(d)
 	if err != nil {
 		c.logger.WithFields(logrus.Fields{
 			"host": d.Host,
@@ -90,11 +92,11 @@ func (c DeviceCluster) VerifyDeviceAPI(d device.Device) (device.Device, bool) {
 			"mac":  d.MAC,
 		}).Error("device failed api verification: failed to request and load device specification")
 		c.logger.Error(err)
-		return device.Device{}, false
+		return device.Device{}, err
 	}
 
 	// Return spec'd device
-	return d.LoadFromSpecification(spec), true
+	return d.LoadFromSpecification(spec), err
 }
 
 // Once a Device is found on the network it needs to get processed into the platform.

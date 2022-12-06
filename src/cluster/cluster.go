@@ -19,7 +19,7 @@ type Cluster interface {
 	StopHealth()
 	StopDiscovery()
 	HandleDiscoveredDevice(device.NewDeviceParams) (device.Device, error)
-	VerifyDeviceAPI(device.Device) (device.Device, bool)
+	VerifyDeviceAPI(device.Device) (device.Device, error)
 }
 
 // Cluster is responsible for maintaining the cluster like state of DeviceCommander.

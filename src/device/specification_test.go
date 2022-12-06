@@ -47,7 +47,7 @@ func (s *SpecificationSuite) TestRequestSpecification() {
 	}
 
 	// New, Healthy Device
-	result, err := device.RequestSpecification(NewHTTPDeviceClient())
+	result, err := NewHTTPDeviceClient().GetSpecificationFromDevice(device)
 	s.Assertions.NoError(err)
 	s.Assertions.Equal(spec, result)
 }
@@ -56,7 +56,7 @@ func (s *SpecificationSuite) TestLoadFromSpecifcation() {
 	device := Device{
 		ID: uuid.New(),
 	}
-	spec := Device{
+	spec := &Device{
 		Name:        "My Device",
 		Description: "Devicey Devicey Deviceness Device",
 		Endpoints: []endpoint.Endpoint{
