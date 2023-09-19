@@ -25,7 +25,7 @@ func ConfigureEnvironment() {
 	viper.SetDefault("ENV", "local") // local or production only
 	viper.SetDefault("HOST", "0.0.0.0")
 	viper.SetDefault("PORT", 8001)
-	viper.SetDefault("CLUSTER_NAME", "Flaming Hot Fleet Directory")
+	viper.SetDefault("CLUSTER_NAME", "DefaultCluster")
 	viper.SetDefault("DEFAULT_TLS_PORT", 443)
 	viper.SetDefault("ARP_SCAN_DURATION", 30)
 	viper.SetDefault("DISCOVERY_PERIOD", 30)

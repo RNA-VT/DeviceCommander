@@ -30,3 +30,10 @@ test:
 
 run:
 	sudo go run main.go server
+
+run-local-db:
+	echo "Starting database..."
+	echo "Go to http://0.0.0.0:5050/ to access the pgAdmin"
+	echo "pgAdmin password: admin"
+	echo "internal connection password: changeme"
+	docker-compose up

@@ -1,13 +1,32 @@
-import { atom, selector } from 'recoil';
+import { atom, selector, selectorFamily } from 'recoil';
 import GetDevicesMethod from '../api/method/GetDevices';
 import Device from '../api/device/Device';
 
-export const DevicesState = selector<Device[]>({
+interface DeviceListState {
+  devices: Device[]
+}
+
+export const DeviceListAtom = atom<DeviceListState>({
+  key: 'deviceListAtom',
+  default: {
+    devices: [],
+  },
+});
+
+export const DevicesState = selectorFamily<Device[], string>({
   key: 'devices',
-  get: async () => {
+  get: (_) => async () => {
     const apiMethod = new GetDevicesMethod('http://localhost:8001');
     const devices = await apiMethod.do();
 
+    return devices;
+  },
+});
+
+export const currentDeviceListQuery = selector({
+  key: 'currentDeviceListQuery',
+  get: ({ get }) => {
+    const devices = get(DevicesState(''));
     return devices;
   },
 });

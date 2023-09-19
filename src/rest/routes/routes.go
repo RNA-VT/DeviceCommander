@@ -50,7 +50,7 @@ func (r BaseRouter) RegisterRoutes(e *echo.Echo) {
 }
 
 func (r BaseRouter) registerFrontendRoutes(e *echo.Echo) {
-	frontendRoot := "../frontend/build/"
+	frontendRoot := "./frontend/build/"
 	if viper.GetString("ENV") == "production" {
 		frontendRoot = "/src/build/"
 	}
@@ -61,9 +61,6 @@ func (r BaseRouter) registerFrontendRoutes(e *echo.Echo) {
 }
 
 func (r BaseRouter) registerBackendRoutes(e *echo.Echo) {
-	e.GET("/backend", hello)
-	api := e.Group("group")
-	api.GET("/base2", hello)
 	r.DeviceRouter.RegisterRoutes(e)
 }
 

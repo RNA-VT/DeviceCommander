@@ -9,14 +9,31 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import CheckIcon from '@mui/icons-material/Check';
 import ClearIcon from '@mui/icons-material/Clear';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { Button } from '@mui/material';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import Device from '../api/device/Device';
 import Dashboard from '../layouts/dashboard/Dashboard';
-import { PageState, DevicesState } from './store';
+import { PageState, DevicesState, DeviceListAtom } from './store';
+import DeleteDevicesMethod from '../api/method/DeleteDevice';
 
 export default function Devices() {
-  const devices = useRecoilValue(DevicesState);
+  const devices = useRecoilValue(DevicesState(''));
   const setPageState = useSetRecoilState(PageState);
+  const setDeviceListState = useSetRecoilState(DeviceListAtom);
+
+  const deleteDevice = async (id: string) => {
+    console.log(`Deleting device ${id}`);
+
+    const deleteMethod = new DeleteDevicesMethod('http://localhost:8001', id);
+    const resp = await deleteMethod.do();
+    console.log(resp);
+
+    const newDevices = devices.filter((device: Device) => device.ID !== id);
+    setDeviceListState({
+      devices: newDevices,
+    });
+  };
 
   useEffect(() => {
     setPageState({
@@ -35,8 +52,9 @@ export default function Devices() {
                 <TableCell>Name</TableCell>
                 <TableCell align="right">MAC Address</TableCell>
                 <TableCell align="right">IP</TableCell>
-                <TableCell align="right">Failures</TableCell>
-                <TableCell align="right">Active</TableCell>
+                <TableCell align="center">Failures</TableCell>
+                <TableCell align="center">Active</TableCell>
+                <TableCell align="center">Delete</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -54,8 +72,16 @@ export default function Devices() {
                     :
                     {device.Port}
                   </TableCell>
-                  <TableCell align="right">{device.Failures}</TableCell>
-                  <TableCell align="right">{device.Active ? <CheckIcon /> : <ClearIcon />}</TableCell>
+                  <TableCell align="center">{device.Failures}</TableCell>
+                  <TableCell align="center">{device.Active ? <CheckIcon /> : <ClearIcon />}</TableCell>
+                  <TableCell align="center">
+                    <Button onClick={(_: React.MouseEvent<HTMLElement>) => {
+                      deleteDevice(device.ID);
+                    }}
+                    >
+                      <DeleteIcon />
+                    </Button>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>

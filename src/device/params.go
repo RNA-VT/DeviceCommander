@@ -2,7 +2,7 @@ package device
 
 // Device models.
 type NewDeviceParams struct {
-	Mac         *string `json:"MAC" faker:"mac_address"`
+	MAC         *string `json:"MAC" faker:"mac_address"`
 	Name        *string `json:"Name"`
 	Description *string `json:"Description"`
 	Host        string  `json:"Host" faker:"ipv4"`
@@ -12,7 +12,7 @@ type NewDeviceParams struct {
 
 type UpdateDeviceParams struct {
 	ID          string  `json:"ID" faker:"uuid_hyphenated"`
-	Mac         *string `json:"MAC" faker:"mac_address"`
+	MAC         *string `json:"MAC" faker:"mac_address"`
 	Name        *string `json:"Name"`
 	Description *string `json:"Description"`
 	Host        *string `json:"Host" faker:"ipv4"`

@@ -13,7 +13,7 @@ a large collection of compliant devices.
 ```
 2. Start Postgres
 ```
-  docker-compose up
+  make run-local-db
 ``` 
 3. Run Migrations
 ```

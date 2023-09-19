@@ -22,8 +22,8 @@ func (a *Application) SystemInfo() string {
 }
 
 func (a *Application) Start() {
-	a.startListening()
 	a.startMaintainingCluster()
+	a.startListening()
 }
 
 func (a *Application) startListening() {
@@ -39,5 +39,6 @@ func (a *Application) startListening() {
 }
 
 func (a *Application) startMaintainingCluster() {
+	log.Printf("Starting cluster %s\n", a.Cluster.Name())
 	a.Cluster.Start()
 }

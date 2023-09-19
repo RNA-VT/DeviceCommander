@@ -15,16 +15,21 @@ import (
 func (c DeviceCluster) DeviceDiscovery(scanDurationSeconds int) {
 	newDevices := make(chan device.NewDeviceParams)
 	defer close(newDevices)
+	scannerStop := make(chan struct{})
 	stop := make(chan struct{})
-	// defer close(stop)
-	arpScanner := scanner.NewArpScanner(newDevices, stop)
+	defer close(scannerStop)
+	defer close(stop)
+	arpScanner := scanner.NewArpScanner(newDevices, scannerStop)
 
 	go arpScanner.Start()
 
 	// listen for scanDurationSeconds... then shut it down.
 	c.logger.Info(fmt.Sprintf("ARP scanning for %d seconds...", scanDurationSeconds))
 	time.AfterFunc(time.Duration(scanDurationSeconds)*time.Second, func() {
-		close(stop)
+		c.logger.Info("ARP scan complete... shutting down ARP scanner.")
+		scannerStop <- struct{}{}
+		stop <- struct{}{}
+		// close(stop)
 	})
 
 	for {
@@ -35,12 +40,12 @@ func (c DeviceCluster) DeviceDiscovery(scanDurationSeconds int) {
 		case tmpNewDevice := <-newDevices:
 			d, err := c.HandleDiscoveredDevice(tmpNewDevice)
 			if err != nil {
-				c.logger.Error(err)
+				c.logger.Warn(err)
 			}
 
 			err = d.RunHealthCheck(c.DeviceClient)
 			if err != nil {
-				c.logger.Error(err)
+				c.logger.Warn(err)
 			}
 		}
 	}
@@ -52,7 +57,7 @@ func (c DeviceCluster) DeviceDiscovery(scanDurationSeconds int) {
 // 2. immediately check its health.
 func (c DeviceCluster) HandleDiscoveredDevice(newDevice device.NewDeviceParams) (device.Device, error) {
 	results, err := c.DeviceRepository.Get(device.Device{
-		MAC: *newDevice.Mac,
+		MAC: *newDevice.MAC,
 	})
 	if err != nil {
 		return device.Device{}, err
@@ -65,30 +70,47 @@ func (c DeviceCluster) HandleDiscoveredDevice(newDevice device.NewDeviceParams) 
 		if err != nil {
 			return device.Device{}, err
 		}
-	case 1:
-		discoveredDevice := device.FromNewDevice(newDevice)
-		discoveredDevice.Active = true
 
-		if err := c.DeviceRepository.Update(updateDeviceFromDevice(&discoveredDevice)); err != nil {
+		c.logger.Debugf("registered new device -- mac address [%s] with id [%s] at [%s]:[%s]",
+			discoveredDevice.MAC,
+			discoveredDevice.ID,
+			newDevice.Host,
+			strconv.Itoa(newDevice.Port),
+		)
+	case 1:
+		partiallyUpdatedDevice := updateDeviceFromDevice(&newDevice)
+		partiallyUpdatedDevice.ID = results[0].ID.String()
+
+		if err := c.DeviceRepository.Update(partiallyUpdatedDevice); err != nil {
 			return device.Device{}, err
 		}
+
+		results, err = c.DeviceRepository.Get(device.Device{
+			ID: discoveredDevice.ID,
+		})
+		if err != nil {
+			return device.Device{}, err
+		}
+		discoveredDevice = results[0]
+
+		c.logger.Debugf(
+			"updated known device -- mac address [%s] with id [%s] at [%s]:[%s]",
+			discoveredDevice.MAC,
+			discoveredDevice.ID,
+			newDevice.Host,
+			strconv.Itoa(newDevice.Port),
+		)
 	default:
 		return device.Device{}, errors.New("multiple results returned for 1 mac address")
 	}
-
-	c.logger.Debugf("registered mac address [%s] with id [%s] at [%s]:[%s]",
-		discoveredDevice.MAC,
-		discoveredDevice.ID,
-		newDevice.Host,
-		strconv.Itoa(newDevice.Port))
 
 	return *discoveredDevice, nil
 }
 
 // updateDeviceFromDevice builds a device.UpdateDeviceParams from a device.Device.
-func updateDeviceFromDevice(d *device.Device) device.UpdateDeviceParams {
+func updateDeviceFromDevice(d *device.NewDeviceParams) device.UpdateDeviceParams {
 	updateDevice := device.UpdateDeviceParams{
-		Mac:  &d.MAC,
+		MAC:  d.MAC,
 		Host: &d.Host,
 		Port: &d.Port,
 	}

@@ -43,8 +43,8 @@ func FromNewDevice(newDeviceArgs NewDeviceParams) Device {
 		Endpoints: []endpoint.Endpoint{},
 	}
 
-	if newDeviceArgs.Mac != nil {
-		newDevice.MAC = *newDeviceArgs.Mac
+	if newDeviceArgs.MAC != nil {
+		newDevice.MAC = *newDeviceArgs.MAC
 	}
 
 	return newDevice

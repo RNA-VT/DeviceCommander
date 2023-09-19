@@ -13,7 +13,7 @@ func (s *ClusterSuite) TestHandleDiscoveredDevice() {
 	newDevices := make([]device.NewDeviceParams, len(devices))
 	for i, d := range devices {
 		newDevices[i] = device.NewDeviceParams{
-			Mac:  &d.MAC,
+			MAC:  &d.MAC,
 			Host: d.Host,
 			Port: d.Port,
 		}
@@ -27,6 +27,31 @@ func (s *ClusterSuite) TestHandleDiscoveredDevice() {
 	d, err := s.cluster.HandleDiscoveredDevice(newDevices[0])
 	s.Equal(err, nil)
 	s.Equal(newDevices[0].Host, d.Host)
-	s.Equal(*newDevices[0].Mac, d.MAC)
+	s.Equal(*newDevices[0].MAC, d.MAC)
+	s.Equal(newDevices[0].Port, d.Port)
+}
+
+func (s *ClusterSuite) TestHandleDiscoveredDeviceAlreadyExists() {
+	devices := GenerateDevices(2)
+	newDevices := make([]device.NewDeviceParams, len(devices))
+	for i, d := range devices {
+		newDevices[i] = device.NewDeviceParams{
+			MAC:  &d.MAC,
+			Host: d.Host,
+			Port: d.Port,
+		}
+	}
+
+	// New, Healthy Device
+	s.mockDeviceRepository.On("Get", mock.AnythingOfType("device.Device")).Return([]*device.Device{
+		devices[0],
+	}, nil).Twice()
+	s.mockDeviceRepository.On("Update", mock.AnythingOfType("device.UpdateDeviceParams")).Return(nil).Once()
+	s.mockDeviceClient.On("Health", mock.AnythingOfType("device.Device")).Return(nil, nil)
+	s.mockDeviceClient.On("EvaluateHealthCheckResponse", (*http.Response)(nil), mock.AnythingOfType("device.Device")).Return(true)
+	d, err := s.cluster.HandleDiscoveredDevice(newDevices[0])
+	s.Equal(err, nil)
+	s.Equal(newDevices[0].Host, d.Host)
+	s.Equal(*newDevices[0].MAC, d.MAC)
 	s.Equal(newDevices[0].Port, d.Port)
 }

@@ -44,9 +44,11 @@ func GetLocalAddresses() (IPScanResults, error) {
 			switch v := a.(type) {
 			case *net.IPAddr:
 				logger.Trace(fmt.Sprintf("%v : %s (%s)\n", i.Name, v, v.IP.DefaultMask()))
+				logger.Printf(fmt.Sprintf("%v : %s (%s)\n", i.Name, v, v.IP.DefaultMask()))
 
 			case *net.IPNet:
 				logger.Trace(fmt.Sprintf("%s : %v [%v/%v]\n", i.Name, v, v.IP, v.Mask))
+				logger.Printf(fmt.Sprintf("%s : %v [%v/%v]\n", i.Name, v, v.IP, v.Mask))
 				if v.IP.To4() != nil {
 					results.IPv4Addresses = append(results.IPv4Addresses, v.IP)
 				} else {
