@@ -1,8 +1,6 @@
 package routes
 
 import (
-	"net/http"
-
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/spf13/viper"
@@ -43,8 +41,6 @@ func (r BaseRouter) RegisterRoutes(e *echo.Echo) {
 	}))
 
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
-	e.GET("/base", hello)
-
 	r.registerFrontendRoutes(e)
 	r.registerBackendRoutes(e)
 }
@@ -62,8 +58,4 @@ func (r BaseRouter) registerFrontendRoutes(e *echo.Echo) {
 
 func (r BaseRouter) registerBackendRoutes(e *echo.Echo) {
 	r.DeviceRouter.RegisterRoutes(e)
-}
-
-func hello(c echo.Context) error {
-	return c.String(http.StatusOK, "Hello, World!")
 }

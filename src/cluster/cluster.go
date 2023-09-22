@@ -124,19 +124,17 @@ func (c DeviceCluster) RunHealthCheckLoop(healthCheckPeriod int) {
 			}
 
 			for _, dev := range devices {
-				fmt.Println("begin health check loop X")
 				if dev == nil {
 					c.logger.Warn("nil device found in focus set")
 					continue
 				}
 
 				resp, err := c.DeviceClient.Health(*dev)
-
 				if err != nil {
 					c.logger.Warn(fmt.Sprintf("error checking health for device [%s] %s", dev.ID.String(), err))
 					continue
 				}
-				fmt.Println("evaluating health check response")
+
 				result := c.DeviceClient.EvaluateHealthCheckResponse(resp, *dev)
 				if result {
 					c.logger.Trace(fmt.Sprintf("device [%s] is healthy", dev.ID.String()))
