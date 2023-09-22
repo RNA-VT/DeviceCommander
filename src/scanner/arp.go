@@ -25,8 +25,6 @@ import (
 	"github.com/google/gopacket/pcap"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-
-	"github.com/rna-vt/devicecommander/src/device"
 )
 
 const (
@@ -35,9 +33,15 @@ const (
 	protAddressSize        = 4
 )
 
+type FoundDevice struct {
+	MAC  string
+	IP   string
+	Port int
+}
+
 type ArpScanner struct {
 	LoopDelay                    int
-	NewDeviceChan                chan device.NewDeviceParams
+	FoundDeviceChan              chan FoundDevice
 	Stop                         chan struct{}
 	PCAPPort                     int32
 	BroadcastResponseWaitSeconds int
@@ -45,10 +49,10 @@ type ArpScanner struct {
 	logger                       *logrus.Entry
 }
 
-func NewArpScanner(newDeviceChan chan device.NewDeviceParams, stopChan chan struct{}) ArpScanner {
+func NewArpScanner(foundDeviceChan chan FoundDevice, stopChan chan struct{}) ArpScanner {
 	return ArpScanner{
 		LoopDelay:                    viper.GetInt("ARP_SCANNER_LOOP_DELAY"),
-		NewDeviceChan:                newDeviceChan,
+		FoundDeviceChan:              foundDeviceChan,
 		Stop:                         stopChan,
 		PCAPPort:                     viper.GetInt32("ARP_SCANNER_PCAP_PORT"),
 		BroadcastResponseWaitSeconds: viper.GetInt("ARP_SCANNER_BROADCAST_RESPONSE_WAIT_SECONDS"),
@@ -178,14 +182,14 @@ func (a *ArpScanner) readARP(handle *pcap.Handle, iface *net.Interface) {
 			tmpMacAddress := net.HardwareAddr(arp.SourceHwAddress).String()
 			ip := net.IP(arp.SourceProtAddress).String()
 
-			newDevice := device.NewDeviceParams{
-				MAC:  &tmpMacAddress,
-				Host: ip,
+			foundDevice := FoundDevice{
+				MAC:  tmpMacAddress,
+				IP:   ip,
 				Port: a.DefaultPort,
 			}
 
 			// pass new device across channel
-			a.NewDeviceChan <- newDevice
+			a.FoundDeviceChan <- foundDevice
 		}
 	}
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/rna-vt/devicecommander/src/device"
+	"github.com/rna-vt/devicecommander/src/scanner"
 )
 
 type Cluster interface {
@@ -18,7 +19,7 @@ type Cluster interface {
 	RunHealthCheckLoop(int)
 	StopHealth()
 	StopDiscovery()
-	HandleDiscoveredDevice(device.NewDeviceParams) (device.Device, error)
+	HandleDiscoveredDevice(scanner.FoundDevice) (device.Device, error)
 }
 
 // Cluster is responsible for maintaining the cluster like state of DeviceCommander.

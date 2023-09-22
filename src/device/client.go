@@ -50,7 +50,7 @@ func (c HTTPDeviceClient) Health(d Device) (*http.Response, error) {
 
 	resp, err := c.dangerousHTTPGet(url)
 	if err != nil {
-		return &http.Response{}, fmt.Errorf("error checking health [%s] %w", url, err.Error())
+		return &http.Response{}, fmt.Errorf("error checking health [%s] %w", url, err)
 	}
 
 	return resp, nil
