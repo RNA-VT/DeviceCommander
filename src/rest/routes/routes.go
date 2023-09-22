@@ -1,8 +1,6 @@
 package routes
 
 import (
-	"net/http"
-
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/spf13/viper"
@@ -43,14 +41,12 @@ func (r BaseRouter) RegisterRoutes(e *echo.Echo) {
 	}))
 
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
-	e.GET("/base", hello)
-
 	r.registerFrontendRoutes(e)
 	r.registerBackendRoutes(e)
 }
 
 func (r BaseRouter) registerFrontendRoutes(e *echo.Echo) {
-	frontendRoot := "../frontend/build/"
+	frontendRoot := "./frontend/build/"
 	if viper.GetString("ENV") == "production" {
 		frontendRoot = "/src/build/"
 	}
@@ -61,12 +57,5 @@ func (r BaseRouter) registerFrontendRoutes(e *echo.Echo) {
 }
 
 func (r BaseRouter) registerBackendRoutes(e *echo.Echo) {
-	e.GET("/backend", hello)
-	api := e.Group("group")
-	api.GET("/base2", hello)
 	r.DeviceRouter.RegisterRoutes(e)
-}
-
-func hello(c echo.Context) error {
-	return c.String(http.StatusOK, "Hello, World!")
 }

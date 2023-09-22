@@ -6,13 +6,13 @@ import { useSetRecoilState } from 'recoil';
 import Dashboard from '../layouts/dashboard/Dashboard';
 import { PageState } from './store';
 
-function Home() {
+export default function Settings() {
   const setPageState = useSetRecoilState(PageState);
 
   useEffect(() => {
     setPageState({
-      title: 'Home',
-      index: 'home',
+      title: 'Settings',
+      index: 'settings',
     });
   });
 
@@ -20,7 +20,6 @@ function Home() {
     <Dashboard>
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
         <Grid container spacing={3}>
-          {/* Chart */}
           <Grid item xs={12} md={8} lg={9}>
             <Paper
               sx={{
@@ -30,11 +29,9 @@ function Home() {
                 height: 240,
               }}
             >
-              {/* <Chart /> */}
-              <h1>Chart</h1>
+              <h1>Settings</h1>
             </Paper>
           </Grid>
-          {/* Recent Deposits */}
           <Grid item xs={12} md={4} lg={3}>
             <Paper
               sx={{
@@ -44,15 +41,12 @@ function Home() {
                 height: 240,
               }}
             >
-              <h1>Deposits</h1>
-              {/* <Deposits /> */}
+              <h1>Settings</h1>
             </Paper>
           </Grid>
-          {/* Recent Orders */}
           <Grid item xs={12}>
             <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-              <h1>Orders</h1>
-              {/* <Orders /> */}
+              <h1>Settings</h1>
             </Paper>
           </Grid>
         </Grid>
@@ -61,5 +55,3 @@ function Home() {
 
   );
 }
-
-export default Home;

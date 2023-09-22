@@ -1,8 +1,6 @@
 package routes
 
 import (
-	"log"
-
 	"github.com/labstack/echo/v4"
 
 	"github.com/rna-vt/devicecommander/src/rest/controllers"
@@ -13,7 +11,6 @@ type DeviceRouter struct {
 }
 
 func (r DeviceRouter) RegisterRoutes(e *echo.Echo) {
-	log.Println("register device routes")
 	api := e.Group("/v1")
 
 	api.POST("/", r.DeviceController.Create)

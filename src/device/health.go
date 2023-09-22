@@ -9,7 +9,7 @@ import (
 func (d Device) RunHealthCheck(client Client) error {
 	resp, err := client.Health(d)
 	if err != nil {
-		d.logger.Warn(fmt.Sprintf("Error checking [%s] %s", d.ID.String(), err))
+		return err
 	}
 
 	result := client.EvaluateHealthCheckResponse(resp, d)

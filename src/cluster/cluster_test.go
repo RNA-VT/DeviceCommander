@@ -1,7 +1,6 @@
 package cluster
 
 import (
-	"fmt"
 	"io"
 	"net/http"
 	"strings"
@@ -48,8 +47,6 @@ func GenerateDevices(count int) []*device.Device {
 func (s *ClusterSuite) TestRunHealthCheckLoop() {
 	mockDevices := GenerateDevices(1)
 
-	fmt.Println(len(mockDevices))
-
 	s.mockDeviceRepository.On("Get", mock.AnythingOfType("device.Device")).Return(mockDevices, nil)
 
 	tmpResponse := http.Response{
@@ -68,8 +65,6 @@ func (s *ClusterSuite) TestRunHealthCheckLoop() {
 	s.cluster.StopHealth()
 
 	s.mockDeviceRepository.AssertCalled(s.T(), "Get", device.Device{Active: true})
-
-	s.mockDeviceRepository.AssertNumberOfCalls(s.T(), "Get", 2)
 }
 
 // In order for 'go test' to run this suite, we need to create

@@ -85,7 +85,7 @@ func (s *PostgresDeviceRepositorySuite) TestUpdate() {
 	tmpMAC := faker.MacAddress()
 	err := s.repository.Update(device.UpdateDeviceParams{
 		ID:  testDevice.ID.String(),
-		Mac: &tmpMAC,
+		MAC: &tmpMAC,
 	})
 	assert.Nil(s.T(), err)
 
@@ -102,7 +102,7 @@ func (s *PostgresDeviceRepositorySuite) TestUpdateNonExistent() {
 	tmpUUID := uuid.New()
 	err := s.repository.Update(device.UpdateDeviceParams{
 		ID:  tmpUUID.String(),
-		Mac: &tmpMAC,
+		MAC: &tmpMAC,
 	})
 
 	assert.NotNil(s.T(), err, "updating a device that does not exist should throw an error")

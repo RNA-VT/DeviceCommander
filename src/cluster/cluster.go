@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/rna-vt/devicecommander/src/device"
+	"github.com/rna-vt/devicecommander/src/scanner"
 )
 
 type Cluster interface {
@@ -18,7 +19,7 @@ type Cluster interface {
 	RunHealthCheckLoop(int)
 	StopHealth()
 	StopDiscovery()
-	HandleDiscoveredDevice(device.NewDeviceParams) (device.Device, error)
+	HandleDiscoveredDevice(scanner.FoundDevice) (device.Device, error)
 }
 
 // Cluster is responsible for maintaining the cluster like state of DeviceCommander.
@@ -89,6 +90,7 @@ func (c DeviceCluster) StopDiscovery() {
 // RunDeviceDiscoveryLoop continuously searches for other responsive devices on the network.
 func (c DeviceCluster) RunDeviceDiscoveryLoop(discoveryPeriod int) {
 	ticker := time.NewTicker(time.Duration(discoveryPeriod) * time.Second)
+	c.logger.Infof("Starting Device Discovery Loop with period %d seconds", discoveryPeriod)
 	for range ticker.C {
 		select {
 		case <-c.discoveryStop:
@@ -123,16 +125,22 @@ func (c DeviceCluster) RunHealthCheckLoop(healthCheckPeriod int) {
 			}
 
 			for _, dev := range devices {
+				if dev == nil {
+					c.logger.Warn("nil device found in focus set")
+					continue
+				}
+
 				resp, err := c.DeviceClient.Health(*dev)
 				if err != nil {
 					c.logger.Warn(fmt.Sprintf("error checking health for device [%s] %s", dev.ID.String(), err))
+					continue
+				}
+
+				result := c.DeviceClient.EvaluateHealthCheckResponse(resp, *dev)
+				if result {
+					c.logger.Trace(fmt.Sprintf("device [%s] is healthy", dev.ID.String()))
 				} else {
-					result := c.DeviceClient.EvaluateHealthCheckResponse(resp, *dev)
-					if result {
-						c.logger.Trace(fmt.Sprintf("device [%s] is healthy", dev.ID.String()))
-					} else {
-						c.logger.Trace(fmt.Sprintf("device [%s] is not healthy", dev.ID.String()))
-					}
+					c.logger.Trace(fmt.Sprintf("device [%s] is not healthy", dev.ID.String()))
 				}
 			}
 		}
