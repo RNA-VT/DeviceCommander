@@ -11,16 +11,17 @@ import CheckIcon from '@mui/icons-material/Check';
 import ClearIcon from '@mui/icons-material/Clear';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Button } from '@mui/material';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilValue, useSetRecoilState, useRecoilRefresher_UNSTABLE } from 'recoil';
 import Device from '../api/device/Device';
 import Dashboard from '../layouts/dashboard/Dashboard';
 import { PageState, DevicesState, DeviceListAtom } from './store';
 import DeleteDevicesMethod from '../api/method/DeleteDevice';
 
 export default function Devices() {
-  const devices = useRecoilValue(DevicesState(''));
   const setPageState = useSetRecoilState(PageState);
-  const setDeviceListState = useSetRecoilState(DeviceListAtom);
+  const deviceListState = useRecoilValue(DeviceListAtom);
+  const devices = useRecoilValue(DevicesState(deviceListState.loadCount));
+  const refreshDeviceList = useRecoilRefresher_UNSTABLE(DevicesState(deviceListState.loadCount));
 
   const deleteDevice = async (id: string) => {
     console.log(`Deleting device ${id}`);
@@ -29,10 +30,7 @@ export default function Devices() {
     const resp = await deleteMethod.do();
     console.log(resp);
 
-    const newDevices = devices.filter((device: Device) => device.ID !== id);
-    setDeviceListState({
-      devices: newDevices,
-    });
+    refreshDeviceList();
   };
 
   useEffect(() => {
