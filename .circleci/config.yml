@@ -38,7 +38,7 @@ jobs:
           command: dockerize -wait tcp://localhost:5432 -timeout 1m
       - run:
           name: Install dependencies
-          command: sudo apt-get install libpcap-dev
+          command: sudo apt-get update -y && sudo apt-get install libpcap-dev
       - run:
           name: Run DB migrations.
           command: go run main.go migrate-db
