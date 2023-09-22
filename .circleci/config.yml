@@ -70,7 +70,7 @@ jobs:
       - checkout
       - run:
           name: Install dependencies
-          command: sudo apt-get install libpcap-dev
+          command: sudo apt-get update -y && sudo apt-get install libpcap-dev
       - run:
           name: Build go project
           command: ./scripts/build.sh
