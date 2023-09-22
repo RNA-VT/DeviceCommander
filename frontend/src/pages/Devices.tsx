@@ -14,14 +14,13 @@ import { Button } from '@mui/material';
 import { useRecoilValue, useSetRecoilState, useRecoilRefresher_UNSTABLE } from 'recoil';
 import Device from '../api/device/Device';
 import Dashboard from '../layouts/dashboard/Dashboard';
-import { PageState, DevicesState, DeviceListAtom } from './store';
+import { PageState, DevicesState } from './store';
 import DeleteDevicesMethod from '../api/method/DeleteDevice';
 
 export default function Devices() {
   const setPageState = useSetRecoilState(PageState);
-  const deviceListState = useRecoilValue(DeviceListAtom);
-  const devices = useRecoilValue(DevicesState(deviceListState.loadCount));
-  const refreshDeviceList = useRecoilRefresher_UNSTABLE(DevicesState(deviceListState.loadCount));
+  const devices = useRecoilValue(DevicesState);
+  const refreshDeviceList = useRecoilRefresher_UNSTABLE(DevicesState);
 
   const deleteDevice = async (id: string) => {
     console.log(`Deleting device ${id}`);
