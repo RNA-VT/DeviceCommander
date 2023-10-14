@@ -5,29 +5,25 @@ parameters:
     default: "0.0.1"
 orbs:
   docker: circleci/docker@2.1.2
-  go: circleci/go@1.7.3
 executors:
   docker-publisher:
     docker:
       - image: cimg/base:2022.06
 jobs:
   test:
-    # docker:
-    #   - image: circleci/golang:1.21
-    #     auth:
-    #       username: mydockerhub-user
-    #       password: $DOCKERHUB_PASSWORD
-    #   - image: circleci/postgres:9.6-alpine
-    #     auth:
-    #       username: mydockerhub-user
-    #       password: $DOCKERHUB_PASSWORD
-    #     environment:
-    #       POSTGRES_USER: postgres
-    #       POSTGRES_DB: postgres
-    #       POSTGRES_PASSWORD: changeme
-    executor:
-      name: go/default # Use the default executor from the orb
-      tag: '1.21.1' # Specify a version tag
+    docker:
+      - image: cimg/go:1.21.3
+        auth:
+          username: mydockerhub-user
+          password: $DOCKERHUB_PASSWORD
+      - image: circleci/postgres:9.6-alpine
+        auth:
+          username: mydockerhub-user
+          password: $DOCKERHUB_PASSWORD
+        environment:
+          POSTGRES_USER: postgres
+          POSTGRES_DB: postgres
+          POSTGRES_PASSWORD: changeme
     parallelism: 1
     environment:
       TEST_RESULTS: /tmp/test-results
@@ -65,14 +61,11 @@ jobs:
           path: /tmp/test-results
 
   build:
-    # docker:
-      # - image: circleci/golang:1.21
-      #   auth:
-      #     username: mydockerhub-user
-      #     password: $DOCKERHUB_PASSWORD
-    executor:
-      name: go/default # Use the default executor from the orb
-      tag: '1.21.1' # Specify a version tag
+    docker:
+      - image: cimg/go:1.21.3
+        auth:
+          username: mydockerhub-user
+          password: $DOCKERHUB_PASSWORD
     steps:
       - checkout
       - run:
