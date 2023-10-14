@@ -5,7 +5,6 @@ import (
 
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/rna-vt/devicecommander/src/device"
@@ -48,7 +47,7 @@ func (s *PostgresEndpointRepositorySuite) CreateTestEndpoint() endpoint.Endpoint
 	testEndpoint := testEndpoints[0]
 
 	end, err := s.endpointRepository.Create(testEndpoint)
-	assert.Nil(s.T(), err)
+	s.Nil(err)
 	s.testDevices[0].Endpoints = nil
 
 	s.testEndpoints = append(s.testEndpoints, *end)
@@ -62,34 +61,34 @@ func (s *PostgresEndpointRepositorySuite) TestGet() {
 	results, err := s.endpointRepository.Get(endpoint.Endpoint{
 		ID: testEndpoint.ID,
 	})
-	assert.Nil(s.T(), err)
+	s.Nil(err)
 
 	s.Equal(1, len(results), "there should only be a single return when searching by id")
 	s.Equal(testEndpoint, *results[0], "the return from create should be equal to the return from get")
 
 	for _, p := range results[0].Parameters {
-		assert.Equal(s.T(), testEndpoint.ID, p.EndpointID, "the new param should have the correct endpoint id")
+		s.Equal(testEndpoint.ID, p.EndpointID, "the new param should have the correct endpoint id")
 	}
 
-	assert.Equal(s.T(), len(testEndpoint.Parameters), len(results[0].Parameters), "the endpoint should have the same number of parameters as the new obj")
+	s.Equal(len(testEndpoint.Parameters), len(results[0].Parameters), "the endpoint should have the same number of parameters as the new obj")
 }
 
 func (s *PostgresEndpointRepositorySuite) TestDelete() {
 	testEndpoint := s.CreateTestEndpoint()
 
 	deleteResult, err := s.endpointRepository.Delete(testEndpoint.ID.String())
-	assert.Nil(s.T(), err)
+	s.Nil(err)
 
-	assert.Equal(s.T(), deleteResult.ID, testEndpoint.ID, "the return from a delete should contain the deleted object")
+	s.Equal(deleteResult.ID, testEndpoint.ID, "the return from a delete should contain the deleted object")
 
 	getResults, err := s.endpointRepository.Get(endpoint.Endpoint{
 		ID: testEndpoint.ID,
 	})
-	assert.Nil(s.T(), err)
+	s.Nil(err)
 
-	assert.Nil(s.T(), err)
+	s.Nil(err)
 
-	assert.Equal(s.T(), 0, len(getResults), "there should be 0 endpoints with the ID of the deleted endpoint")
+	s.Equal(0, len(getResults), "there should be 0 endpoints with the ID of the deleted endpoint")
 }
 
 func (s *PostgresEndpointRepositorySuite) TestUpdate() {
@@ -100,16 +99,16 @@ func (s *PostgresEndpointRepositorySuite) TestUpdate() {
 		ID:          testEndpoint.ID.String(),
 		Description: &tmpDesc,
 	})
-	assert.Nil(s.T(), err)
+	s.Nil(err)
 
 	getResults, err := s.endpointRepository.Get(endpoint.Endpoint{
 		ID: testEndpoint.ID,
 	})
-	assert.Nil(s.T(), err)
+	s.Nil(err)
 
-	assert.Equal(s.T(), tmpDesc, *getResults[0].Description, "the updated endpoint should have the new description")
+	s.Equal(tmpDesc, *getResults[0].Description, "the updated endpoint should have the new description")
 
-	assert.Equal(s.T(), testEndpoint.Method, getResults[0].Method, "the updated endpoint's method should remain unchanged")
+	s.Equal(testEndpoint.Method, getResults[0].Method, "the updated endpoint's method should remain unchanged")
 }
 
 func (s *PostgresEndpointRepositorySuite) TestUpdateNonExistent() {
@@ -120,7 +119,7 @@ func (s *PostgresEndpointRepositorySuite) TestUpdateNonExistent() {
 		Description: &tmpDesc,
 	})
 
-	assert.NotNil(s.T(), err, "updating an endpoint that does not exist should throw an error")
+	s.NotNil(err, "updating an endpoint that does not exist should throw an error")
 }
 
 func (s *PostgresEndpointRepositorySuite) TearDownSuite() {
@@ -131,7 +130,7 @@ func (s *PostgresEndpointRepositorySuite) TearDownSuite() {
 
 	for _, d := range s.testDevices {
 		_, err := s.deviceRepository.Delete(d.ID.String())
-		assert.Nil(s.T(), err)
+		s.Nil(err)
 	}
 
 	s.testDevices = []device.Device{}

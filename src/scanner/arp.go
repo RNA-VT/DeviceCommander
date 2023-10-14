@@ -6,9 +6,9 @@
 
 // arpscan implements ARP scanning of all interfaces' local networks using
 // gopacket and its subpackages.  This example shows, among other things:
-//   * Generating and sending packet data
-//   * Reading in packet data and interpreting it
-//   * Use of the 'pcap' subpackage for reading/writing
+//   - Generating and sending packet data
+//   - Reading in packet data and interpreting it
+//   - Use of the 'pcap' subpackage for reading/writing
 package scanner
 
 import (
@@ -32,12 +32,6 @@ const (
 	arpHardwareAddressSize = 6
 	protAddressSize        = 4
 )
-
-type FoundDevice struct {
-	MAC  string
-	IP   string
-	Port int
-}
 
 type ArpScanner struct {
 	LoopDelay                    int

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { APIMethod } from './Method';
+import { APIMethod } from '../Method';
 import Device from '../device/Device';
 
 export default class GetDevicesMethod implements APIMethod {

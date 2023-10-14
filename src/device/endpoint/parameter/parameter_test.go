@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/rna-vt/devicecommander/src/utilities"
@@ -23,11 +22,11 @@ func (s *ParameterSuite) TestNewParameter() {
 	testNewParameter := GenerateRandomNewParameterForEndpoint(tmpUUID.String(), 1)[0]
 	newParameter, err := FromNewParameter(testNewParameter)
 
-	assert.Nil(s.T(), err, "creating a new parameter from a NewParameter should not throw an error")
+	s.Nil(err, "creating a new parameter from a NewParameter should not throw an error")
 
-	assert.NotNil(s.T(), newParameter.ID, "the parameter ID should be initialized")
+	s.NotNil(newParameter.ID, "the parameter ID should be initialized")
 
-	assert.Equal(s.T(), tmpUUID, newParameter.EndpointID, "the new parameter should have the correct EndpointID relation")
+	s.Equal(tmpUUID, newParameter.EndpointID, "the new parameter should have the correct EndpointID relation")
 }
 
 func (s *ParameterSuite) TestNewParameterInvalid() {
@@ -36,7 +35,7 @@ func (s *ParameterSuite) TestNewParameterInvalid() {
 	testNewParameter.EndpointID = ""
 
 	_, err := FromNewParameter(testNewParameter)
-	assert.NotNil(s.T(), err, "creating a new Parameter with a NewParameter with an invalid EndpointID should throw an error")
+	s.NotNil(err, "creating a new Parameter with a NewParameter with an invalid EndpointID should throw an error")
 }
 
 func (s *ParameterSuite) GenerateRandomNewParameter() {

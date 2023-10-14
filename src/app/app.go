@@ -1,33 +1,32 @@
 package app
 
 import (
-	"github.com/labstack/echo/v4"
+	echo "github.com/labstack/echo/v4"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/rna-vt/devicecommander/src/cluster"
 	"github.com/rna-vt/devicecommander/src/rest/routes"
 )
 
 // The Application encapsulates the required state for the running software.
 type Application struct {
-	Cluster  cluster.Cluster
 	Echo     *echo.Echo
 	Hostname string
-	Router   routes.Router
+	Routers  []routes.Router
 }
 
 // SystemInfo returns a stringified version of this api.
 func (a *Application) SystemInfo() string {
-	return "Cluster: " + a.Cluster.Name() + "\nEcho Server: " + a.Echo.Server.TLSConfig.ServerName
+	return "Echo Server: " + a.Echo.Server.TLSConfig.ServerName
 }
 
 func (a *Application) Start() {
-	a.startMaintainingCluster()
 	a.startListening()
 }
 
 func (a *Application) startListening() {
-	a.Router.RegisterRoutes(a.Echo)
+	for _, router := range a.Routers {
+		router.RegisterRoutes(a.Echo)
+	}
 	log.Info("Configured routes listening on " + a.Hostname)
 
 	log.Println("*****************************************************")
@@ -36,9 +35,4 @@ func (a *Application) startListening() {
 
 	// Start server
 	a.Echo.Logger.Fatal(a.Echo.Start(a.Hostname))
-}
-
-func (a *Application) startMaintainingCluster() {
-	log.Printf("Starting cluster %s\n", a.Cluster.Name())
-	a.Cluster.Start()
 }

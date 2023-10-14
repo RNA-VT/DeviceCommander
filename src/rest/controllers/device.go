@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/google/uuid"
@@ -10,6 +11,7 @@ import (
 	"github.com/rna-vt/devicecommander/src/device"
 	"github.com/rna-vt/devicecommander/src/postgres"
 	postgresDevice "github.com/rna-vt/devicecommander/src/postgres/device"
+	"github.com/rna-vt/devicecommander/src/utils"
 )
 
 type DeviceController struct {
@@ -39,6 +41,9 @@ func (controller DeviceController) Create(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+
+	fmt.Println(utils.PrettyPrintJSON(dev))
+	fmt.Println(utils.PrettyPrintJSON(newDevice))
 
 	return c.JSON(http.StatusOK, newDevice)
 }

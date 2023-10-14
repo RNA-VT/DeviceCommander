@@ -12,10 +12,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/rna-vt/devicecommander/src/utilities"
+	"github.com/rna-vt/devicecommander/src/utils"
 )
 
 const testDeviceResponse = `{
@@ -56,23 +56,23 @@ func (s *DeviceServiceSuite) TestDeviceFromNewDeviceWith() {
 
 	newDeviceResult := FromNewDevice(testNewDevice)
 
-	assert.Equal(s.T(), newDeviceResult.MAC, *testNewDevice.MAC, "the MAC address is properly assigned")
+	s.Equal(newDeviceResult.MAC, *testNewDevice.MAC, "the MAC address is properly assigned")
 
-	assert.NotNil(s.T(), newDeviceResult.Endpoints, "the Endpoints array is initialized")
+	s.NotNil(newDeviceResult.Endpoints, "the Endpoints array is initialized")
 }
 
 func (s *DeviceServiceSuite) TestNewDeviceFromRequestBody() {
 	testNewDevice := GenerateRandomNewDeviceParams(1)[0]
 
 	b, err := json.Marshal(testNewDevice)
-	assert.Nil(s.T(), err)
+	s.Nil(err)
 
 	r := ioutil.NopCloser(strings.NewReader(string(b))) // r type is io.ReadCloser
 
 	newDevice, err := NewDeviceFromRequestBody(r)
-	assert.Nil(s.T(), err)
+	s.Nil(err)
 
-	assert.Equal(s.T(), testNewDevice, newDevice, "the device should remain unchanged")
+	s.Equal(testNewDevice, newDevice, "the device should remain unchanged")
 }
 
 func isJSON(s string) bool {
@@ -80,20 +80,44 @@ func isJSON(s string) bool {
 	return json.Unmarshal([]byte(s), &js) == nil
 }
 
+func (s *DeviceServiceSuite) TestURLGeneration() {
+	testDevice := Device{
+		Host: "192.168.1.43",
+		Port: 80,
+	}
+	url := testDevice.URL()
+
+	s.Equal("http://192.168.1.43:80", url, "the URL should be properly generated")
+}
+
+func (s *DeviceServiceSuite) TestDeviceSpecification() {
+	deviceClient := NewHTTPDeviceClient()
+
+	testDevice := Device{
+		Host: "192.168.1.43",
+		Port: 80,
+	}
+
+	spec, err := deviceClient.Specification(testDevice)
+	s.Require().Nil(err, "requesting a specification from a running device should not throw an error")
+
+	fmt.Println(utils.PrettyPrintJSON(spec))
+}
+
 func (s *DeviceServiceSuite) TestEvaluateSpecificationResponse() {
-	assert.Equal(s.T(), true, isJSON(testDeviceResponse), "the test json should be valid json")
+	s.Equal(true, isJSON(testDeviceResponse), "the test json should be valid json")
 
 	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, testDeviceResponse)
 	}))
 	mockServerURL, err := url.Parse(mockServer.URL)
-	assert.Nil(s.T(), err, "the mock server should have a valid URL")
+	s.Nil(err, "the mock server should have a valid URL")
 
 	host, port, err := net.SplitHostPort(mockServerURL.Host)
-	assert.Nil(s.T(), err, "splitting the mock server Host should not throw errors")
+	s.Nil(err, "splitting the mock server Host should not throw errors")
 
 	mockServerPort, err := strconv.Atoi(port)
-	assert.Nil(s.T(), err, "the mock server should have an int port")
+	s.Nil(err, "the mock server should have an int port")
 
 	client := HTTPDeviceClient{}
 
@@ -102,17 +126,17 @@ func (s *DeviceServiceSuite) TestEvaluateSpecificationResponse() {
 		Port: mockServerPort,
 	}
 
-	resp, err := client.Specification(testDevice)
-	assert.Nil(s.T(), err, "requesting a mock spec should not throw an error")
+	spec, err := client.Specification(testDevice)
+	s.Nil(err, "requesting a mock spec should not throw an error")
 
-	dev, err := client.EvaluateSpecificationResponse(resp)
-	assert.Nil(s.T(), err, "evaluating a json string response should not throw an error")
+	dev, err := client.EvaluateSpecificationResponse(spec)
+	s.Nil(err, "evaluating a json string response should not throw an error")
 
-	assert.Equal(s.T(), "something or other", dev.Name, "the Name in the json string should be applied to the Device")
+	s.Equal("something or other", dev.Name, "the Name in the json string should be applied to the Device")
 
-	assert.Equal(s.T(), 2, len(dev.Endpoints), "there should be 2 Endpoints in the return")
+	s.Equal(2, len(dev.Endpoints), "there should be 2 Endpoints in the return")
 
-	assert.Equal(s.T(), 2, len(dev.Endpoints[0].Parameters), "there should be 2 Parameters in the first Endpoint")
+	s.Equal(2, len(dev.Endpoints[0].Parameters), "there should be 2 Parameters in the first Endpoint")
 }
 
 func (s *DeviceServiceSuite) TestDeviceURL() {
@@ -123,11 +147,11 @@ func (s *DeviceServiceSuite) TestDeviceURL() {
 	devURL := testDevice.URL()
 	// validate the URL
 	_, err := url.ParseRequestURI(devURL)
-	assert.Nil(s.T(), err)
+	s.Nil(err)
 
 	lastChar := devURL[len(devURL)-1:]
 
-	assert.NotEqual(s.T(), lastChar, "/", "the URL should not end in a \"/\"")
+	s.NotEqual(lastChar, "/", "the URL should not end in a \"/\"")
 }
 
 func (s *DeviceServiceSuite) TestGenerateRandomNewDevice() {

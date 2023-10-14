@@ -6,7 +6,6 @@ import (
 	"github.com/bxcodec/faker/v3"
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/rna-vt/devicecommander/src/device"
@@ -30,7 +29,7 @@ func (s *PostgresDeviceRepositorySuite) SetupSuite() {
 	s.repository = deviceRepository
 
 	dev, err := s.repository.Create(device.GenerateRandomNewDeviceParams(1)[0])
-	assert.Nil(s.T(), err)
+	s.Nil(err)
 
 	// add device to test list for deletion after
 	s.testDevices = append(s.testDevices, *dev)
@@ -41,7 +40,7 @@ func (s *PostgresDeviceRepositorySuite) CreateTestDevice() device.Device {
 	testDevice := testDevices[0]
 
 	newDevice, err := s.repository.Create(testDevice)
-	assert.Nil(s.T(), err)
+	s.Nil(err)
 
 	s.testDevices = append(s.testDevices, *newDevice)
 
@@ -54,29 +53,29 @@ func (s *PostgresDeviceRepositorySuite) TestGet() {
 	results, err := s.repository.Get(device.Device{
 		ID: testDevice.ID,
 	})
-	assert.Nil(s.T(), err)
+	s.Nil(err)
 
-	assert.Equal(s.T(), len(results), 1, "there should only be a single return when searching by id")
+	s.Equal(len(results), 1, "there should only be a single return when searching by id")
 
-	assert.Equal(s.T(), len(results[0].Endpoints), len(testDevice.Endpoints), "the return from get should have the same number of endpoints as the original object")
+	s.Equal(len(results[0].Endpoints), len(testDevice.Endpoints), "the return from get should have the same number of endpoints as the original object")
 
-	assert.Equal(s.T(), *results[0], testDevice, "the return from create should be equal to the return from get")
+	s.Equal(*results[0], testDevice, "the return from create should be equal to the return from get")
 }
 
 func (s *PostgresDeviceRepositorySuite) TestDelete() {
 	testDevice := s.CreateTestDevice()
 
 	deleteResult, err := s.repository.Delete(testDevice.ID.String())
-	assert.Nil(s.T(), err, "there should be no error when deleting a newly created device")
+	s.Nil(err, "there should be no error when deleting a newly created device")
 
-	assert.Equal(s.T(), deleteResult.ID, testDevice.ID, "the return from a delete should contain the deleted object")
+	s.Equal(deleteResult.ID, testDevice.ID, "the return from a delete should contain the deleted object")
 
 	getResults, err := s.repository.Get(device.Device{
 		ID: testDevice.ID,
 	})
-	assert.Nil(s.T(), err)
+	s.Nil(err)
 
-	assert.Equal(s.T(), len(getResults), 0, "there should be 0 devices with the ID of the deleted device")
+	s.Equal(len(getResults), 0, "there should be 0 devices with the ID of the deleted device")
 }
 
 func (s *PostgresDeviceRepositorySuite) TestUpdate() {
@@ -87,14 +86,14 @@ func (s *PostgresDeviceRepositorySuite) TestUpdate() {
 		ID:  testDevice.ID.String(),
 		MAC: &tmpMAC,
 	})
-	assert.Nil(s.T(), err)
+	s.Nil(err)
 
 	getResults, err := s.repository.Get(device.Device{
 		ID: testDevice.ID,
 	})
-	assert.Nil(s.T(), err)
+	s.Nil(err)
 
-	assert.Equal(s.T(), getResults[0].MAC, tmpMAC, "the updated device should have the new MAC address")
+	s.Equal(getResults[0].MAC, tmpMAC, "the updated device should have the new MAC address")
 }
 
 func (s *PostgresDeviceRepositorySuite) TestUpdateNonExistent() {
@@ -105,7 +104,7 @@ func (s *PostgresDeviceRepositorySuite) TestUpdateNonExistent() {
 		MAC: &tmpMAC,
 	})
 
-	assert.NotNil(s.T(), err, "updating a device that does not exist should throw an error")
+	s.NotNil(err, "updating a device that does not exist should throw an error")
 }
 
 func (s *PostgresDeviceRepositorySuite) AfterTest(_, _ string) {

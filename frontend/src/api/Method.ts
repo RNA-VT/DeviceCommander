@@ -1,3 +1,3 @@
 export interface APIMethod {
-  do(): object
+  do(): Promise<object>
 }

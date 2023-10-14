@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/rna-vt/devicecommander/src/utilities"
@@ -25,13 +24,13 @@ func (s *EndpointSuite) CreateTestNewEndpoint() NewEndpointParams {
 func (s *EndpointSuite) TestNewEndpoint() {
 	testNewEndpoint := s.CreateTestNewEndpoint()
 	testEndpoint, err := FromNewEndpoint(testNewEndpoint)
-	assert.Nil(s.T(), err, "creating a new Endpoint from a NewEndpoint should not throw an error")
+	s.Nil(err, "creating a new Endpoint from a NewEndpoint should not throw an error")
 
-	assert.NotNil(s.T(), testEndpoint.Parameters, "the Parameters field should be initialized")
+	s.NotNil(testEndpoint.Parameters, "the Parameters field should be initialized")
 
-	assert.NotNil(s.T(), testEndpoint.ID, "the endpoint ID should be initialized")
+	s.NotNil(testEndpoint.ID, "the endpoint ID should be initialized")
 
-	assert.Equal(s.T(), testNewEndpoint.Description, testEndpoint.Description, "the description should carry through to the NewEndpoint")
+	s.Equal(testNewEndpoint.Description, testEndpoint.Description, "the description should carry through to the NewEndpoint")
 }
 
 func (s *EndpointSuite) TestGenerateRandomNewEndpoints() {

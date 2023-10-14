@@ -11,9 +11,9 @@ type DeviceRouter struct {
 }
 
 func (r DeviceRouter) RegisterRoutes(e *echo.Echo) {
-	api := e.Group("/v1")
+	api := e.Group("/v1/device")
 
-	api.POST("/", r.DeviceController.Create)
+	api.POST("", r.DeviceController.Create)
 
 	// swagger:route GET /v1/device getAllDevices
 	//
@@ -35,8 +35,8 @@ func (r DeviceRouter) RegisterRoutes(e *echo.Echo) {
 	//       default: genericError
 	//       200: getAllDeviceResponse
 	//       422: validationError
-	api.GET("/device", r.DeviceController.GetAll)
+	api.GET("", r.DeviceController.GetAll)
 
-	api.GET("/device/:id", r.DeviceController.GetDevice)
-	api.DELETE("/device/:id", r.DeviceController.Delete)
+	api.GET("/:id", r.DeviceController.GetDevice)
+	api.DELETE("/:id", r.DeviceController.Delete)
 }

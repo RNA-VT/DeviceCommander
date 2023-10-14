@@ -47,6 +47,14 @@ func FromNewDevice(newDeviceArgs NewDeviceParams) Device {
 		newDevice.MAC = *newDeviceArgs.MAC
 	}
 
+	if newDeviceArgs.Name != nil {
+		newDevice.Name = *newDeviceArgs.Name
+	}
+
+	if newDeviceArgs.Description != nil {
+		newDevice.Description = *newDeviceArgs.Description
+	}
+
 	return newDevice
 }
 
@@ -60,11 +68,11 @@ type Device struct {
 	//
 	// required: true
 	// example: 705e4dcb-3ecd-24f3-3a35-3e926e4bded5
-	ID uuid.UUID `json:"ID" faker:"uuid_hyphenated"`
+	ID uuid.UUID `json:"ID"  gorm:"unique" faker:"uuid_hyphenated"`
 
 	// the MAC address for this device.
 	// required: true
-	MAC string `json:"MAC" gorm:"unique" faker:"mac_address"`
+	MAC string `json:"MAC" faker:"mac_address"`
 
 	// the human readable name of the device.
 	// required: false

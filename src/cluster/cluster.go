@@ -1,148 +1,122 @@
 package cluster
 
-import (
-	"fmt"
-	"time"
+// type Cluster interface {
+// 	Name() string
+// 	Start()
+// 	DeviceDiscovery(int)
+// 	RunHealthCheckLoop(int)
+// 	StopHealth()
+// 	StopDiscovery()
+// 	HandleDiscoveredDevice(scanner.FoundDevice) (device.Device, error)
+// }
 
-	log "github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
+// // Cluster is responsible for maintaining the cluster like state of DeviceCommander.
+// // It does things like probe the current active set for health and collection
+// // of new devices. The important differentiation between the Cluster and a repository
+// // of Devices is the active nature of the devices tracked in a Cluster. An active
+// // device is one that is currently responding to the device-commander protocol.
+// type DeviceCluster struct {
+// 	name             string
+// 	DeviceRepository device.Repository
+// 	DeviceClient     device.Client
+// 	logger           *log.Entry
+// 	discoveryStop    chan bool
+// 	healthStop       chan bool
+// }
 
-	"github.com/rna-vt/devicecommander/src/device"
-	"github.com/rna-vt/devicecommander/src/scanner"
-)
+// func NewDeviceCluster(
+// 	name string,
+// 	deviceRepository device.Repository,
+// 	deviceClient device.Client,
+// ) DeviceCluster {
+// 	return DeviceCluster{
+// 		name:             name,
+// 		DeviceRepository: deviceRepository,
+// 		DeviceClient:     deviceClient,
+// 		logger:           log.WithFields(log.Fields{"module": "cluster"}),
+// 		discoveryStop:    make(chan bool),
+// 		healthStop:       make(chan bool),
+// 	}
+// }
 
-type Cluster interface {
-	Name() string
-	PrintClusterInfo()
-	Start()
-	DeviceDiscovery(int)
-	RunHealthCheckLoop(int)
-	StopHealth()
-	StopDiscovery()
-	HandleDiscoveredDevice(scanner.FoundDevice) (device.Device, error)
-}
+// func (c DeviceCluster) Name() string {
+// 	return c.name
+// }
 
-// Cluster is responsible for maintaining the cluster like state of DeviceCommander.
-// It does things like probe the current active set for health and collection
-// of new devices. The important differentiation between the Cluster and a repository
-// of Devices is the active nature of the devices tracked in a Cluster. An active
-// device is one that is currently responding to the device-commander protocol.
-type DeviceCluster struct {
-	name             string
-	DeviceRepository device.Repository
-	DeviceClient     device.Client
-	logger           *log.Entry
-	discoveryStop    chan bool
-	healthStop       chan bool
-}
+// // Start begins the collection of new devices (registration) and device health
+// // check goroutines.
+// func (c DeviceCluster) Start() {
+// 	// // Discovery and collection of new devices.
+// 	// go c.RunDeviceDiscoveryLoop(viper.GetInt("DISCOVERY_PERIOD"))
 
-func NewDeviceCluster(
-	name string,
-	deviceRepository device.Repository,
-	deviceClient device.Client,
-) DeviceCluster {
-	return DeviceCluster{
-		name:             name,
-		DeviceRepository: deviceRepository,
-		DeviceClient:     deviceClient,
-		logger:           log.WithFields(log.Fields{"module": "cluster"}),
-		discoveryStop:    make(chan bool),
-		healthStop:       make(chan bool),
-	}
-}
+// 	// Health Check
+// 	go c.RunHealthCheckLoop(viper.GetInt("HEALTH_CHECK_PERIOD"))
+// }
 
-// PrintClusterInfo will cleanly print out info about the cluster.
-func (c DeviceCluster) PrintClusterInfo() {
-	devices, err := c.DeviceRepository.GetAll()
-	if err != nil {
-		c.logger.Error(err)
-		return
-	}
-	for i := 0; i < len(devices); i++ {
-		c.logger.Println("----Device---")
-		c.logger.Println(fmt.Sprintf("%+v", devices[i]))
-	}
-	c.logger.Println()
-}
+// func (c DeviceCluster) StopHealth() {
+// 	c.healthStop <- true
+// }
 
-func (c DeviceCluster) Name() string {
-	return c.name
-}
+// func (c DeviceCluster) StopDiscovery() {
+// 	c.discoveryStop <- true
+// }
 
-// Start begins the collection of new devices (registration) and device health
-// check goroutines.
-func (c DeviceCluster) Start() {
-	// Discovery and collection of new devices.
-	go c.RunDeviceDiscoveryLoop(viper.GetInt("DISCOVERY_PERIOD"))
+// // RunDeviceDiscoveryLoop continuously searches for other responsive devices on the network.
+// func (c DeviceCluster) RunDeviceDiscoveryLoop(discoveryPeriod int) {
+// 	ticker := time.NewTicker(time.Duration(discoveryPeriod) * time.Second)
+// 	c.logger.Infof("Starting Device Discovery Loop with period %d seconds", discoveryPeriod)
+// 	for range ticker.C {
+// 		select {
+// 		case <-c.discoveryStop:
+// 			c.logger.Info("Ticker stopped by healthStop chan")
+// 			return
+// 		default:
+// 			c.logger.Info("Begin Device Discovery... ")
+// 			c.DeviceDiscovery(viper.GetInt("ARP_SCAN_DURATION"))
+// 		}
+// 	}
+// }
 
-	// Health Check
-	go c.RunHealthCheckLoop(viper.GetInt("HEALTH_CHECK_PERIOD"))
-}
+// // RunHealthCheckLoop continuously probes the Health state of Active nodes stored in the DB.
+// // The important results of this health check will be tracked in the DB.
+// func (c DeviceCluster) RunHealthCheckLoop(healthCheckPeriod int) {
+// 	ticker := time.NewTicker(time.Duration(healthCheckPeriod) * time.Second)
+// 	for range ticker.C {
+// 		select {
+// 		case <-c.healthStop:
+// 			c.logger.Info("Ticker stopped by healthStop chan")
+// 			return
+// 		default:
+// 			devices, err := c.DeviceRepository.Get(device.Device{
+// 				Active: true,
+// 			})
 
-func (c DeviceCluster) StopHealth() {
-	c.healthStop <- true
-}
+// 			c.logger.Info(fmt.Sprintf("Begin Health Checks for %d devices... ", len(devices)))
 
-func (c DeviceCluster) StopDiscovery() {
-	c.discoveryStop <- true
-}
+// 			if err != nil {
+// 				c.logger.Error(err)
+// 				return
+// 			}
 
-// RunDeviceDiscoveryLoop continuously searches for other responsive devices on the network.
-func (c DeviceCluster) RunDeviceDiscoveryLoop(discoveryPeriod int) {
-	ticker := time.NewTicker(time.Duration(discoveryPeriod) * time.Second)
-	c.logger.Infof("Starting Device Discovery Loop with period %d seconds", discoveryPeriod)
-	for range ticker.C {
-		select {
-		case <-c.discoveryStop:
-			c.logger.Info("Ticker stopped by healthStop chan")
-			return
-		default:
-			c.logger.Info("Begin Device Discovery... ")
-			c.DeviceDiscovery(viper.GetInt("ARP_SCAN_DURATION"))
-		}
-	}
-}
+// 			for _, dev := range devices {
+// 				if dev == nil {
+// 					c.logger.Warn("nil device found in focus set")
+// 					continue
+// 				}
 
-// RunHealthCheckLoop continuously probes the Health state of Active nodes stored in the DB.
-// The important results of this health check will be tracked in the DB.
-func (c DeviceCluster) RunHealthCheckLoop(healthCheckPeriod int) {
-	ticker := time.NewTicker(time.Duration(healthCheckPeriod) * time.Second)
-	for range ticker.C {
-		select {
-		case <-c.healthStop:
-			c.logger.Info("Ticker stopped by healthStop chan")
-			return
-		default:
-			devices, err := c.DeviceRepository.Get(device.Device{
-				Active: true,
-			})
+// 				resp, err := c.DeviceClient.Health(*dev)
+// 				if err != nil {
+// 					c.logger.Warn(fmt.Sprintf("error checking health for device [%s] %s", dev.ID.String(), err))
+// 					continue
+// 				}
 
-			c.logger.Info(fmt.Sprintf("Begin Health Checks for %d devices... ", len(devices)))
-
-			if err != nil {
-				c.logger.Error(err)
-				return
-			}
-
-			for _, dev := range devices {
-				if dev == nil {
-					c.logger.Warn("nil device found in focus set")
-					continue
-				}
-
-				resp, err := c.DeviceClient.Health(*dev)
-				if err != nil {
-					c.logger.Warn(fmt.Sprintf("error checking health for device [%s] %s", dev.ID.String(), err))
-					continue
-				}
-
-				result := c.DeviceClient.EvaluateHealthCheckResponse(resp, *dev)
-				if result {
-					c.logger.Trace(fmt.Sprintf("device [%s] is healthy", dev.ID.String()))
-				} else {
-					c.logger.Trace(fmt.Sprintf("device [%s] is not healthy", dev.ID.String()))
-				}
-			}
-		}
-	}
-}
+// 				result := c.DeviceClient.EvaluateHealthCheckResponse(resp, *dev)
+// 				if result {
+// 					c.logger.Trace(fmt.Sprintf("device [%s] is healthy", dev.ID.String()))
+// 				} else {
+// 					c.logger.Trace(fmt.Sprintf("device [%s] is not healthy", dev.ID.String()))
+// 				}
+// 			}
+// 		}
+// 	}
+// }
