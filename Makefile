@@ -2,6 +2,9 @@
 build:
 	./scripts/build.sh
 
+docker-build:
+	docker build -t rnavt/devicecommander .
+
 lint:
 	golangci-lint run
 
