@@ -18,7 +18,7 @@ import Device from '../api/device/Device';
 import Dashboard from '../layouts/dashboard/Dashboard';
 import { PageState, DevicesState } from './store';
 import DeleteDevicesMethod from '../api/method/DeleteDevice';
-import RunARPScanMethod from '../api/cluster/RunARPScan';
+import RunARPScanMethod from '../api/ops/RunARPScan';
 import AddDeviceModal from '../modals/AddDevice';
 
 export default function Devices() {
