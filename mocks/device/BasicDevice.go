@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	device "github.com/rna-vt/devicecommander/src/device"
+	device "github.com/rna-vt/devicecommander/pkg/device"
 	mock "github.com/stretchr/testify/mock"
 )
 

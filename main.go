@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/sirupsen/logrus"
 
-	"github.com/rna-vt/devicecommander/src/cmd"
+	"github.com/rna-vt/devicecommander/pkg/cmd"
 )
 
 func main() {

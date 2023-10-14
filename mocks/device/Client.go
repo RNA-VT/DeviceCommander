@@ -5,7 +5,7 @@ package mocks
 import (
 	http "net/http"
 
-	device "github.com/rna-vt/devicecommander/src/device"
+	device "github.com/rna-vt/devicecommander/pkg/device"
 
 	mock "github.com/stretchr/testify/mock"
 )
