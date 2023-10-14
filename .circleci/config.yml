@@ -65,7 +65,7 @@ jobs:
           path: /tmp/test-results
 
   build:
-    docker:
+    # docker:
       # - image: circleci/golang:1.21
       #   auth:
       #     username: mydockerhub-user
