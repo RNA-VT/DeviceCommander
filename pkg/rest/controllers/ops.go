@@ -4,9 +4,10 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	log "github.com/sirupsen/logrus"
+
 	"github.com/rna-vt/devicecommander/pkg/device/registration"
 	"github.com/rna-vt/devicecommander/pkg/scanner"
-	log "github.com/sirupsen/logrus"
 )
 
 type ARPScanResponse struct {
@@ -19,7 +20,6 @@ type OpsController struct {
 }
 
 func NewOpsController() (OpsController, error) {
-
 	return OpsController{}, nil
 }
 

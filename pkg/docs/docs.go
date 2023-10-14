@@ -2,23 +2,23 @@
 //
 // DeviceCommander API documentation.
 //
-//     Schemes: http
-//     BasePath: /
-//     Version: 1.0.0
-//     Host: device-commander.rna-vt.com
+//	 Schemes: http
+//	 BasePath: /
+//	 Version: 1.0.0
+//	 Host: device-commander.rna-vt.com
 //
-//     Consumes:
-//     - application/json
+//	 Consumes:
+//	 - application/json
 //
-//     Produces:
-//     - application/json
+//	 Produces:
+//	 - application/json
 //
-//     Security:
-//     - basic
+//	 Security:
+//	 - basic
 //
-//    SecurityDefinitions:
-//    basic:
-//      type: basic
+//	SecurityDefinitions:
+//	basic:
+//	  type: basic
 //
 // swagger:meta
 package docs

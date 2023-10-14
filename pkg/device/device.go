@@ -63,7 +63,6 @@ func FromNewDevice(newDeviceArgs NewDeviceParams) Device {
 //
 // swagger:model
 type Device struct {
-
 	// the UUID for the device.
 	//
 	// required: true

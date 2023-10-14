@@ -89,7 +89,6 @@ func (c HTTPDeviceClient) Specification(d Device) (Specification, error) {
 		Path("/specification").
 		ToJSON(&spec).
 		Fetch(context.Background())
-
 	if err != nil {
 		return spec, err
 	}

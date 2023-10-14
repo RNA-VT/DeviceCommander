@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/rna-vt/devicecommander/pkg/device"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+
+	"github.com/rna-vt/devicecommander/pkg/device"
 )
 
 type Scanner interface {

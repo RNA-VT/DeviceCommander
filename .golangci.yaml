@@ -37,7 +37,10 @@ linters:
   - gosec
 issues:
   exclude-rules:
-    - path: src/docs/*
+    - path: mocks/*
+      linters:
+        - typecheck
+    - path: pkg/docs/*
       linters:
         - deadcode
         - unused

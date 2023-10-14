@@ -4,10 +4,11 @@ import (
 	"strconv"
 
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
+
 	"github.com/rna-vt/devicecommander/pkg/device"
 	"github.com/rna-vt/devicecommander/pkg/scanner"
 	"github.com/rna-vt/devicecommander/pkg/utils"
-	log "github.com/sirupsen/logrus"
 )
 
 type Registrar interface {
