@@ -101,7 +101,7 @@ workflows:
           image: rnavt/devicecommander
           context: docker_hub
           docker-context: .
-          tag: ${CIRCLE_SHA1:0:7},$CIRCLE_BRANCH
+          tag: ${CIRCLE_SHA1:0:7}
           filters:
               branches:
                 only:
