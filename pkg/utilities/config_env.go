@@ -28,7 +28,7 @@ func ConfigureEnvironment() {
 	viper.SetDefault("CLUSTER_NAME", "DefaultCluster")
 	viper.SetDefault("DEFAULT_TLS_PORT", 443)
 	viper.SetDefault("ARP_SCAN_DURATION", 30)
-	viper.SetDefault("DISCOVERY_PERIOD", 30)
+	viper.SetDefault("DISCOVERY_PERIOD", 10)
 	viper.SetDefault("HEALTH_CHECK_PERIOD", 60)
 
 	viper.SetDefault("POSTGRES_NAME", "postgres")

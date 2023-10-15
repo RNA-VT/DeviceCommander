@@ -58,9 +58,7 @@ export default function AddDeviceModal(props: { open: boolean, handleClose: () =
         <Form
           schema={schema}
           validator={validator}
-          // onChange={log('changed')}
           onSubmit={handleSubmit}
-        // onError={log('errors')}
         />
       </Box>
     </Modal>

@@ -31,14 +31,32 @@ func NewDeviceRegistrar(deviceClient device.Client, deviceRepository device.Repo
 
 func (s DeviceRegistrar) HandleProspects(prospects []scanner.FoundDevice) ([]device.Device, error) {
 	newDevices := []device.Device{}
+	newDeviceChan := make(chan device.Device)
+	errChan := make(chan error)
+
+	s.logger.Debugf("handling %d prospects...", len(prospects))
 
 	for _, prospect := range prospects {
-		newDevice, err := s.handleDiscoveredDevice(prospect)
-		if err != nil {
-			return []device.Device{}, err
-		}
-		newDevices = append(newDevices, newDevice)
+		go func(prospect scanner.FoundDevice) {
+			newDevice, err := s.handleDiscoveredDevice(prospect)
+			if err != nil {
+				errChan <- err
+				return
+			}
+			newDeviceChan <- newDevice
+		}(prospect)
 	}
+
+	for i := 0; i < len(prospects); i++ {
+		select {
+		case newDevice := <-newDeviceChan:
+			newDevices = append(newDevices, newDevice)
+		case err := <-errChan:
+			s.logger.Errorf("error handling discovered device: %s", err)
+		}
+	}
+
+	s.logger.Debugf("finished handling %d prospects... %d devices successful", len(prospects), len(newDevices))
 
 	return newDevices, nil
 }
@@ -61,7 +79,7 @@ func (s DeviceRegistrar) handleDiscoveredDevice(foundDevice scanner.FoundDevice)
 	})
 	if err != nil {
 		log.Debugf("error getting device specification: %s, device_details: %s", err, utils.PrettyPrintJSON(foundDevice))
-		return device.Device{}, errors.Wrap(err, "error getting device specification")
+		// return device.Device{}, errors.Wrap(err, "error getting device specification")
 	}
 
 	switch len(results) {
