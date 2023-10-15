@@ -26,8 +26,9 @@ func (s *RegistrarSuite) SetupSuite() {
 	s.mockDeviceClient = mockdevice.Client{}
 
 	s.registrar = NewDeviceRegistrar(
-		&s.mockDeviceClient,
-		&s.mockDeviceRepository,
+		WithDeviceClient(&s.mockDeviceClient),
+		WithDeviceRepository(&s.mockDeviceRepository),
+		WithCompliantDeviceStorage(true),
 	)
 }
 

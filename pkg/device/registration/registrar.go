@@ -19,13 +19,37 @@ type DeviceRegistrar struct {
 	DeviceClient     device.Client
 	DeviceRepository device.Repository
 	logger           *log.Entry
+
+	storeNonCompliantDevices bool
 }
 
-func NewDeviceRegistrar(deviceClient device.Client, deviceRepository device.Repository) DeviceRegistrar {
-	return DeviceRegistrar{
-		DeviceClient:     deviceClient,
-		DeviceRepository: deviceRepository,
-		logger:           log.WithFields(log.Fields{"module": "device_registrar"}),
+func NewDeviceRegistrar(opts ...func(*DeviceRegistrar)) DeviceRegistrar {
+	dr := DeviceRegistrar{
+		logger: log.WithFields(log.Fields{"module": "device_registrar"}),
+	}
+
+	for _, opt := range opts {
+		opt(&dr)
+	}
+
+	return dr
+}
+
+func WithDeviceClient(deviceClient device.Client) func(*DeviceRegistrar) {
+	return func(dr *DeviceRegistrar) {
+		dr.DeviceClient = deviceClient
+	}
+}
+
+func WithDeviceRepository(deviceRepository device.Repository) func(*DeviceRegistrar) {
+	return func(dr *DeviceRegistrar) {
+		dr.DeviceRepository = deviceRepository
+	}
+}
+
+func WithCompliantDeviceStorage(store bool) func(*DeviceRegistrar) {
+	return func(dr *DeviceRegistrar) {
+		dr.storeNonCompliantDevices = store
 	}
 }
 

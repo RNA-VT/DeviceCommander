@@ -69,8 +69,9 @@ func getRouters(deviceClient device.HTTPDeviceClient, deviceRepository device.Re
 					deviceClient,
 				),
 				DeviceRegistrar: registration.NewDeviceRegistrar(
-					deviceClient,
-					deviceRepository,
+					registration.WithDeviceClient(deviceClient),
+					registration.WithDeviceRepository(deviceRepository),
+					registration.WithCompliantDeviceStorage(true),
 				),
 			},
 		},
