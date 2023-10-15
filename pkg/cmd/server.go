@@ -39,33 +39,10 @@ func NewServerCommand() *cobra.Command {
 
 			echoInstance := echo.New()
 
-			baseRouter := routes.BaseRouter{
-				DeviceRouter: routes.DeviceRouter{
-					DeviceController: controllers.DeviceController{
-						Repository: deviceRepository,
-					},
-				},
-			}
-
-			opsRouter := routes.OpsRouter{
-				OpsController: controllers.OpsController{
-					DeviceScanner: scanner.NewDeviceScanner(
-						deviceClient,
-					),
-					DeviceRegistrar: registration.NewDeviceRegistrar(
-						deviceClient,
-						deviceRepository,
-					),
-				},
-			}
-
 			app := app.Application{
 				Echo:     echoInstance,
 				Hostname: fmt.Sprintf("%s:%s", viper.GetString("HOST"), viper.GetString("PORT")),
-				Routers: []routes.Router{
-					baseRouter,
-					opsRouter,
-				},
+				Routers:  getRouters(deviceClient, deviceRepository),
 			}
 
 			app.Start()
@@ -75,4 +52,27 @@ func NewServerCommand() *cobra.Command {
 	}
 
 	return &command
+}
+
+func getRouters(deviceClient device.HTTPDeviceClient, deviceRepository device.Repository) []routes.Router {
+	return []routes.Router{
+		routes.BaseRouter{
+			DeviceRouter: routes.DeviceRouter{
+				DeviceController: controllers.DeviceController{
+					Repository: deviceRepository,
+				},
+			},
+		},
+		routes.OpsRouter{
+			OpsController: controllers.OpsController{
+				DeviceScanner: scanner.NewDeviceScanner(
+					deviceClient,
+				),
+				DeviceRegistrar: registration.NewDeviceRegistrar(
+					deviceClient,
+					deviceRepository,
+				),
+			},
+		},
+	}
 }

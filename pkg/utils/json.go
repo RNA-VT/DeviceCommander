@@ -9,3 +9,11 @@ func PrettyPrintJSON(data interface{}) string {
 	}
 	return string(byteArray)
 }
+
+func PrintJSON(data interface{}) string {
+	byteArray, err := json.Marshal(data)
+	if err != nil {
+		panic("failed to marshal basic json")
+	}
+	return string(byteArray)
+}

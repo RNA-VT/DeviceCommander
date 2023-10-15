@@ -2,22 +2,22 @@ package device
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"strconv"
 
 	"github.com/carlmjohnson/requests"
 	log "github.com/sirupsen/logrus"
+
+	"github.com/rna-vt/devicecommander/pkg/utils"
 )
 
 // DeviceClient implements the common http actions when interacting with a device.
 type Client interface {
-	Info(Device) (NewDeviceParams, error)
 	Health(Device) (*http.Response, error)
 	EvaluateHealthCheckResponse(resp *http.Response, d Device) bool
 	Specification(Device) (Specification, error)
-	EvaluateSpecificationResponse(Specification) (Device, error)
 }
 
 // HTTPDeviceClient is an implementation of the IDeviceClient. It communicates
@@ -41,10 +41,6 @@ func (c HTTPDeviceClient) dangerousHTTPGet(url string) (resp *http.Response, err
 	return http.Get(url)
 }
 
-func (c HTTPDeviceClient) Info(d Device) (NewDeviceParams, error) {
-	panic("function not implemented")
-}
-
 // Health on the HTTPDeviceClient queries the device.URL `/health` endpoint to determine health.
 func (c HTTPDeviceClient) Health(d Device) (*http.Response, error) {
 	url := d.URL() + "/health"
@@ -57,11 +53,15 @@ func (c HTTPDeviceClient) Health(d Device) (*http.Response, error) {
 	return resp, nil
 }
 
+type HealthResponse struct{}
+
 // EvaluateHealthCheckResponse determines the final outcome of the HealthCheck by examining a http.Response.
 // The only requirements for a positive health response is a status code of 200 and a parseable body.
 func (c HTTPDeviceClient) EvaluateHealthCheckResponse(resp *http.Response, d Device) bool {
 	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
+
+	healthResponse := HealthResponse{}
+	err := json.NewDecoder(resp.Body).Decode(&healthResponse)
 	if err != nil {
 		c.logger.Error("failed to read the healthcheck response")
 		return false
@@ -77,7 +77,7 @@ func (c HTTPDeviceClient) EvaluateHealthCheckResponse(resp *http.Response, d Dev
 	default:
 		c.logger.Error("Unexpected Result: " + d.ID.String())
 		c.logger.Error("Status Code: " + strconv.Itoa(resp.StatusCode))
-		c.logger.Error("Response: " + string(body))
+		c.logger.Error("Response: " + utils.PrettyPrintJSON(healthResponse))
 	}
 	return healthy
 }
@@ -94,16 +94,4 @@ func (c HTTPDeviceClient) Specification(d Device) (Specification, error) {
 	}
 
 	return spec, nil
-}
-
-func (c HTTPDeviceClient) EvaluateSpecificationResponse(spec Specification) (Device, error) {
-	dev := Device{}
-	// defer resp.Body.Close()
-
-	// err := json.NewDecoder(resp.Body).Decode(&dev)
-	// if err != nil {
-	// 	return dev, err
-	// }
-
-	return dev, nil
 }

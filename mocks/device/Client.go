@@ -29,30 +29,6 @@ func (_m *Client) EvaluateHealthCheckResponse(resp *http.Response, d device.Devi
 	return r0
 }
 
-// EvaluateSpecificationResponse provides a mock function with given fields: _a0
-func (_m *Client) EvaluateSpecificationResponse(_a0 device.Specification) (device.Device, error) {
-	ret := _m.Called(_a0)
-
-	var r0 device.Device
-	var r1 error
-	if rf, ok := ret.Get(0).(func(device.Specification) (device.Device, error)); ok {
-		return rf(_a0)
-	}
-	if rf, ok := ret.Get(0).(func(device.Specification) device.Device); ok {
-		r0 = rf(_a0)
-	} else {
-		r0 = ret.Get(0).(device.Device)
-	}
-
-	if rf, ok := ret.Get(1).(func(device.Specification) error); ok {
-		r1 = rf(_a0)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
 // Health provides a mock function with given fields: _a0
 func (_m *Client) Health(_a0 device.Device) (*http.Response, error) {
 	ret := _m.Called(_a0)
@@ -68,30 +44,6 @@ func (_m *Client) Health(_a0 device.Device) (*http.Response, error) {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*http.Response)
 		}
-	}
-
-	if rf, ok := ret.Get(1).(func(device.Device) error); ok {
-		r1 = rf(_a0)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// Info provides a mock function with given fields: _a0
-func (_m *Client) Info(_a0 device.Device) (device.NewDeviceParams, error) {
-	ret := _m.Called(_a0)
-
-	var r0 device.NewDeviceParams
-	var r1 error
-	if rf, ok := ret.Get(0).(func(device.Device) (device.NewDeviceParams, error)); ok {
-		return rf(_a0)
-	}
-	if rf, ok := ret.Get(0).(func(device.Device) device.NewDeviceParams); ok {
-		r0 = rf(_a0)
-	} else {
-		r0 = ret.Get(0).(device.NewDeviceParams)
 	}
 
 	if rf, ok := ret.Get(1).(func(device.Device) error); ok {

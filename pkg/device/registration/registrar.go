@@ -55,42 +55,47 @@ func (s DeviceRegistrar) handleDiscoveredDevice(foundDevice scanner.FoundDevice)
 		return device.Device{}, err
 	}
 
-	tmpSpec, err := s.DeviceClient.Specification(device.Device{
+	_, err = s.DeviceClient.Specification(device.Device{
 		Host: foundDevice.IP,
 		Port: foundDevice.Port,
 	})
 	if err != nil {
+		log.Debugf("error getting device specification: %s, device_details: %s", err, utils.PrettyPrintJSON(foundDevice))
 		return device.Device{}, errors.Wrap(err, "error getting device specification")
 	}
 
-	s.logger.Debug(utils.PrettyPrintJSON(tmpSpec))
-
-	discoveredDevice := &device.Device{}
 	switch len(results) {
 	case 0:
-		discoveredDevice, err = s.DeviceRepository.Create(newDeviceFromFoundDevice(foundDevice))
+		discoveredDevice, err := s.handleUnknownDevice(foundDevice)
 		if err != nil {
 			return device.Device{}, err
 		}
-
-		s.logger.Debugf("registered new device -- mac address [%s] with id [%s] at [%s]:[%s]",
-			discoveredDevice.MAC,
-			discoveredDevice.ID,
-			foundDevice.IP,
-			strconv.Itoa(foundDevice.Port),
-		)
-
+		return *discoveredDevice, nil
 	case 1:
-		discoveredDevice, err = s.handleKnownDevice(foundDevice, *results[0])
+		discoveredDevice, err := s.handleKnownDevice(foundDevice, *results[0])
 		if err != nil {
 			return device.Device{}, err
 		}
-
+		return *discoveredDevice, nil
 	default:
 		return device.Device{}, errors.New("multiple results returned for 1 mac address")
 	}
+}
 
-	return *discoveredDevice, nil
+func (s DeviceRegistrar) handleUnknownDevice(foundDevice scanner.FoundDevice) (*device.Device, error) {
+	discoveredDevice, err := s.DeviceRepository.Create(newDeviceFromFoundDevice(foundDevice))
+	if err != nil {
+		return &device.Device{}, err
+	}
+
+	s.logger.Debugf("registered new device -- mac address [%s] with id [%s] at [%s]:[%s]",
+		discoveredDevice.MAC,
+		discoveredDevice.ID,
+		foundDevice.IP,
+		strconv.Itoa(foundDevice.Port),
+	)
+
+	return discoveredDevice, nil
 }
 
 func (s DeviceRegistrar) handleKnownDevice(foundDevice scanner.FoundDevice, existingDevice device.Device) (*device.Device, error) {
