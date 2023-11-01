@@ -4,7 +4,7 @@ parameters:
     type: string
     default: "0.0.1"
 orbs:
-  docker: circleci/docker@2.1.2
+  docker: circleci/docker@2.4.0
 executors:
   docker-publisher:
     docker:
@@ -12,7 +12,7 @@ executors:
 jobs:
   test:
     docker:
-      - image: circleci/golang:1.16
+      - image: cimg/go:1.21.3
         auth:
           username: mydockerhub-user
           password: $DOCKERHUB_PASSWORD
@@ -62,7 +62,7 @@ jobs:
 
   build:
     docker:
-      - image: circleci/golang:1.16
+      - image: cimg/go:1.21.3
         auth:
           username: mydockerhub-user
           password: $DOCKERHUB_PASSWORD
@@ -77,7 +77,7 @@ jobs:
             
   lint:
     docker:
-      - image: golangci/golangci-lint:v1.43-alpine
+      - image: golangci/golangci-lint:v1.54-alpine
     steps:
       - checkout
       - run:
@@ -101,7 +101,7 @@ workflows:
           image: rnavt/devicecommander
           context: docker_hub
           docker-context: .
-          tag: ${CIRCLE_SHA1:0:7},$CIRCLE_BRANCH
+          tag: ${CIRCLE_SHA1:0:7}
           filters:
               branches:
                 only:

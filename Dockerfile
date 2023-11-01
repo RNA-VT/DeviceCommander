@@ -1,6 +1,8 @@
-FROM golang:1.17-alpine as go-builder
+FROM golang:1.21-alpine as go-builder
 
-RUN apk add libpcap-dev build-base
+ENV CGO_ENABLED=1
+
+RUN apk update && apk add --update gcc libpcap-dev alpine-sdk
 
 WORKDIR /app
 
@@ -21,11 +23,10 @@ RUN npm install
 RUN npm run build
 
 # Build final image
-FROM debian:10.4-slim as final
+FROM debian:12-slim as final
 
 COPY --from=go-builder /app/device-commander /usr/local/bin/device-commander
 COPY --from=node-builder /src/build /src/build
-
 
 ENV ENV "production"
 

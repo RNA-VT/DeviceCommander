@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Container from '@mui/material/Container';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
@@ -7,20 +7,25 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import CheckIcon from '@mui/icons-material/Check';
-import ClearIcon from '@mui/icons-material/Clear';
+import ThumbDownIcon from '@mui/icons-material/ThumbDown';
+import ThumbUpIcon from '@mui/icons-material/ThumbUp';
+import CachedIcon from '@mui/icons-material/Cached';
 import DeleteIcon from '@mui/icons-material/Delete';
+import Stack from '@mui/material/Stack';
 import { Button } from '@mui/material';
 import { useRecoilValue, useSetRecoilState, useRecoilRefresher_UNSTABLE } from 'recoil';
 import Device from '../api/device/Device';
 import Dashboard from '../layouts/dashboard/Dashboard';
 import { PageState, DevicesState } from './store';
 import DeleteDevicesMethod from '../api/method/DeleteDevice';
+import RunARPScanMethod from '../api/ops/RunARPScan';
+import AddDeviceModal from '../modals/AddDevice';
 
 export default function Devices() {
   const setPageState = useSetRecoilState(PageState);
   const devices = useRecoilValue(DevicesState);
   const refreshDeviceList = useRecoilRefresher_UNSTABLE(DevicesState);
+  const [addDeviceModalOpen, setAddDeviceModalOpen] = useState(false);
 
   const deleteDevice = async (id: string) => {
     console.log(`Deleting device ${id}`);
@@ -32,7 +37,25 @@ export default function Devices() {
     refreshDeviceList();
   };
 
+  const handleDeviceScanClick = () => {
+    console.log('Device Scan');
+    const scanMethod = new RunARPScanMethod('http://localhost:8001');
+    const resp = scanMethod.do();
+    console.log(resp);
+  };
+
+  const handleAddDeviceClick = () => {
+    console.log('Add Device');
+    setAddDeviceModalOpen(true);
+  };
+
+  const handleAddDeviceModalClose = () => {
+    setAddDeviceModalOpen(false);
+    refreshDeviceList();
+  };
+
   useEffect(() => {
+    console.log('Setting page state');
     setPageState({
       title: 'Devices',
       index: 'devices',
@@ -41,6 +64,14 @@ export default function Devices() {
 
   return (
     <Dashboard>
+      <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
+        <Stack direction="row" justifyContent="flex-end" spacing={1}>
+          <Button variant="contained" onClick={handleDeviceScanClick}>Run Device Scan</Button>
+          <Button variant="contained" onClick={handleAddDeviceClick}>Add Device</Button>
+          <Button variant="contained" onClick={refreshDeviceList}><CachedIcon /></Button>
+          <AddDeviceModal open={addDeviceModalOpen} handleClose={handleAddDeviceModalClose} />
+        </Stack>
+      </Container>
       <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
         <TableContainer component={Paper}>
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -70,7 +101,7 @@ export default function Devices() {
                     {device.Port}
                   </TableCell>
                   <TableCell align="center">{device.Failures}</TableCell>
-                  <TableCell align="center">{device.Active ? <CheckIcon /> : <ClearIcon />}</TableCell>
+                  <TableCell align="center">{device.Active ? <ThumbUpIcon /> : <ThumbDownIcon />}</TableCell>
                   <TableCell align="center">
                     <Button onClick={(_: React.MouseEvent<HTMLElement>) => {
                       deleteDevice(device.ID);

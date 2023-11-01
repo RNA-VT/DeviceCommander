@@ -2,6 +2,10 @@ run:
   tests: true
   modules-download-mode: vendor
   skip-dirs-use-default: true
+  skip-dirs:
+    - mocks
+    - frontend
+  timeout: 5m
 # Linter Docs: https://golangci-lint.run/usage/linters/
 linters:
   enable:
@@ -37,7 +41,10 @@ linters:
   - gosec
 issues:
   exclude-rules:
-    - path: src/docs/*
+    - path: mocks/*
+      linters:
+        - typecheck
+    - path: pkg/docs/*
       linters:
         - deadcode
         - unused

@@ -98,7 +98,7 @@
           "format": "int64"
         }
       },
-      "x-go-package": "github.com/rna-vt/devicecommander/src/device"
+      "x-go-package": "github.com/rna-vt/devicecommander/pkg/device"
     },
     "Endpoint": {
       "description": "Future possible example endpoints:\n\"on/off\"\n\"set artnet universe\"\n\"set color\"\n\"read temperature\"",
@@ -130,7 +130,7 @@
           "type": "string"
         }
       },
-      "x-go-package": "github.com/rna-vt/devicecommander/src/device/endpoint"
+      "x-go-package": "github.com/rna-vt/devicecommander/pkg/device/endpoint"
     },
     "Parameter": {
       "type": "object",
@@ -152,7 +152,7 @@
           "type": "string"
         }
       },
-      "x-go-package": "github.com/rna-vt/devicecommander/src/device/endpoint/parameter"
+      "x-go-package": "github.com/rna-vt/devicecommander/pkg/device/endpoint/parameter"
     },
     "UUID": {
       "description": "A UUID is a 128 bit (16 byte) Universal Unique IDentifier as defined in RFC\n4122.",

@@ -1,0 +1,3 @@
+all: True
+dir: "./pkg"
+keeptree: True
